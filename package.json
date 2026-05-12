@@ -1,0 +1,31 @@
+{
+  "name": "desenvolvimentosoftware_turma1grupo1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anabelaPereira440/desenvolvimentoSoftware_turma1Grupo1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anabelaPereira440/desenvolvimentoSoftware_turma1Grupo1/issues"
+  },
+  "homepage": "https://github.com/anabelaPereira440/desenvolvimentoSoftware_turma1Grupo1#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.7.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
