@@ -1,25 +1,20 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class Utente {
+export class Exame {
+
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Column()
     nome!: string;
-    
-    @Column({unique: true})
-    numeroUtente!: number;
 
     @Column()
-    dataNascimento!: Date;
+    codigo!: string;
 
     @Column()
-    sexo!: string;
+    medico_nome!: string;
 
     @Column()
-    contacto!: string;
-
-    @Column()
-    medicoId!: number;
+    dataCriacao!: Date;
 }

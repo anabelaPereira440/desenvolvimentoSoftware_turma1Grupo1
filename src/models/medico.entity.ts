@@ -1,15 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class Utente {
+export class Medico {
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Column()
     nome!: string;
+
+    @Column()
+    especialidade!: string;
     
     @Column({unique: true})
-    numeroUtente!: number;
+    cedulaProfissional!: number;
 
     @Column()
     dataNascimento!: Date;
@@ -19,7 +22,4 @@ export class Utente {
 
     @Column()
     contacto!: string;
-
-    @Column()
-    medicoId!: number;
 }
