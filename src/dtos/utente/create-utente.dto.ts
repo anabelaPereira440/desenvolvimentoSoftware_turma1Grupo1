@@ -2,7 +2,7 @@
 export interface CreateUtenteDTO {
     nome: string;
     numeroUtente: number;
-    dataNascimento: Date;
+    dataNascimento: string;
     sexo: string;
     contacto: string;
     medicoId: number;

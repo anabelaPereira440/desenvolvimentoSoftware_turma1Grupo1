@@ -14,7 +14,9 @@ export class UtenteService {
         if (!dados.nome?.trim()) throw new Error("Nome é obrigatório.");
         if (!dados.numeroUtente) throw new Error("Número de utente é obrigatório.");
         if (!dados.dataNascimento) throw new Error("Data de nascimento é obrigatória.");
+        if (!dados.sexo?.trim()) throw new Error("O sexo é obrigatório.");
         if (!dados.contacto?.trim()) throw new Error("Contacto é obrigatório.");
+        if (!dados.medicoId) throw new Error("O ID do médico responsável é obrigatório.");
 
         const jaExiste = await this.repo.findOneBy({ numeroUtente: dados.numeroUtente });
         if (jaExiste) throw new Error("Já existe um utente igual registado no sistema.");
