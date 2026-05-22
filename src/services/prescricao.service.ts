@@ -21,7 +21,7 @@ export class PrescricaoService {
 
         const dataCriacao = new Date();
         const dataValidade = new Date();
-        dataValidade.setDate(dataCriacao.getDate() + 180);
+        dataValidade.setDate(dataCriacao.getDate() + 180); // Validade padrão de 6 meses
         
         const novaPrescricao = new Prescricao();
         novaPrescricao.medicamento = dados.medicamento;
