@@ -1,31 +1,48 @@
-import * as jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { baseDeDadosUsers } from '../database/local-storage';
-import { appConfig } from '../config/app.config';
+import { AppDataSource } from '../database/database';
+import { Prescricao } from '../models/prescricao.entity';
+import { CreatePrescricaoDto } from '../dtos/prescricao/create-prescricao.dto';
+import { PrescricaoResponseDto } from '../dtos/prescricao/prescricao-response.dto';
 
-export class AuthService {
-    login(username: string, password: string): string {
-        const user = baseDeDadosUsers.find(u => u.username === username);
+export class PrescricaoService {
+    private repo = AppDataSource.getRepository(Prescricao);
 
-        if (!user) {
-            throw new Error('Credenciais inválidas.');
-        }
+    //Listar todas as prescrições filtradas pelo DTO de resposta
+    async listarPrescricoes(): Promise<PrescricaoResponseDto[]> {
+        const prescricoes = await this.repo.find();
+        return prescricoes.map((p) => this.toResponseDto(p));
+    }
 
-        const passwordValida = bcrypt.compareSync(password, user.password);
+    //Criar prescrição e devolver apenas os dados do DTO de resposta
+    async criarPrescricao(dados: CreatePrescricaoDto): Promise<PrescricaoResponseDto> {
+        if (!dados.medicamento?.trim()) throw new Error("O nome do medicamento é obrigatório.");
+        if (!dados.dose?.trim()) throw new Error("A dose é obrigatória.");
+        if (!dados.medico_nome?.trim()) throw new Error("O nome do médico responsável é obrigatório.");
+        if (!dados.utenteId) throw new Error("O ID do utente é obrigatório.");
 
-        if (!passwordValida) {
-            throw new Error('Credenciais inválidas.');
-        }
+        const dataCriacao = new Date();
+        const dataValidade = new Date();
+        dataValidade.setDate(dataCriacao.getDate() + 180);
+        
+        const novaPrescricao = new Prescricao();
+        novaPrescricao.medicamento = dados.medicamento;
+        novaPrescricao.dose = dados.dose;
+        novaPrescricao.medico_nome = dados.medico_nome;
+        novaPrescricao.utenteId = dados.utenteId;
+        novaPrescricao.dataCriacao = dataCriacao; 
+        novaPrescricao.dataValidade = dataValidade;
 
-        const token = jwt.sign(
-            {
-                id: user.id,
-                username: user.username,
-                role: user.role
-            },
-            appConfig.auth.jwtSecret
-        );
+        const guardada = await this.repo.save(novaPrescricao);
+        return this.toResponseDto(guardada);
+    }
 
-        return token;
+    // Função auxiliar (Mapper) para transformar a Entity em DTO de Resposta
+    private toResponseDto(prescricao: Prescricao): PrescricaoResponseDto {
+        return {
+            id: prescricao.id,
+            medicamento: prescricao.medicamento,
+            dose: prescricao.dose,
+            medico_nome: prescricao.medico_nome,
+            dataValidade: prescricao.dataValidade
+        };
     }
 }

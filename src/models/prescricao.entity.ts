@@ -16,5 +16,11 @@ export class Prescricao {
     medico_nome!: string;
 
     @Column()
+    utenteId!: number; 
+
+    @Column()
     dataCriacao!: Date;
+
+    @Column()
+    dataValidade!: Date;
 }
