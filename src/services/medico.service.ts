@@ -19,12 +19,15 @@ export class MedicoService {
         if (!dados.contacto?.trim()) throw new Error("Contacto é obrigatório.");
 
         const jaExiste = await this.repo.findOneBy({ cedulaProfissional: dados.cedulaProfissional });
-        if (jaExiste) throw new Error("Já existe um médico registado com esta cédula profissiona.");
+        if (jaExiste) throw new Error("Já existe um médico registado com esta cédula profissional.");
 
-        const novoMedico = this.repo.create({
-            ...dados,
-            dataNascimento: new Date(dados.dataNascimento)
-        });
+        const novoMedico = new Medico();
+        novoMedico.nome = dados.nome;
+        novoMedico.especialidade = dados.especialidade;
+        novoMedico.cedulaProfissional = dados.cedulaProfissional;
+        novoMedico.dataNascimento = new Date(dados.dataNascimento);
+        novoMedico.sexo = dados.sexo;
+        novoMedico.contacto = dados.contacto;
 
         return this.repo.save(novoMedico);
     }

@@ -38,6 +38,20 @@ if (require.main === module) {
                 role: 'medico'
             });
         }
+
+        //Médicos Simulados
+        const medicoRepo = AppDataSource.getRepository(Medico);
+        if (await medicoRepo.count() === 0) {
+            await medicoRepo.save({
+                id: 1,
+                nome: 'Jorge Almeida',
+                especialidade: 'Pneumologia',
+                cedulaProfissional: 12345,
+                dataNascimento: new Date("1970-05-15"),
+                sexo: "Masculino",
+                contacto: "960000000"
+            }); 
+        }
         
         //Utentes Simulados
         const utenteRepo = AppDataSource.getRepository(Utente);
@@ -60,20 +74,6 @@ if (require.main === module) {
                 medicoId: 1 
             }
             ]);
-        }
-
-        //Médicos Simulados
-        const medicoRepo = AppDataSource.getRepository(Medico);
-        if (await medicoRepo.count() === 0) {
-            await medicoRepo.save({
-                id: 1,
-                nome: 'Jorge Almeida',
-                especialidade: 'Pneumologia',
-                cedulaProfissional: 12345,
-                dataNascimento: new Date("1970-05-15"),
-                sexo: "Masculino",
-                contacto: "960000000"
-            }); 
         }
 
         //Prescrições Simuladas

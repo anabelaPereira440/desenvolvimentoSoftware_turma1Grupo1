@@ -21,10 +21,13 @@ export class UtenteService {
         const jaExiste = await this.repo.findOneBy({ numeroUtente: dados.numeroUtente });
         if (jaExiste) throw new Error("Já existe um utente igual registado no sistema.");
 
-        const novoUtente = this.repo.create({
-            ...dados,
-            dataNascimento: new Date(dados.dataNascimento)
-        });
+        const novoUtente = new Utente();
+        novoUtente.nome = dados.nome;
+        novoUtente.numeroUtente = dados.numeroUtente;
+        novoUtente.dataNascimento = new Date(dados.dataNascimento);
+        novoUtente.sexo = dados.sexo;
+        novoUtente.contacto = dados.contacto;
+        novoUtente.medicoId = dados.medicoId;
 
         return this.repo.save(novoUtente);
     }
