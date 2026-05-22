@@ -25,7 +25,6 @@ app.use('/exames', exameRoutes);
 app.use('/prescricoes', prescricaoRoutes);
 
 //Inicialização da base de dados e servidor
-//REVER TUDO
 if (require.main === module) {
     AppDataSource.initialize().then(async () => { 
         console.log ("Base de Dados SQLite conectada com sucesso!");
@@ -102,7 +101,10 @@ if (require.main === module) {
         app.listen(3000, () =>
             console.log("Servidor (TypeORM + SQLite) a correr na porta 3000")
         );
-        //CATCH ERRO????? REVER ESTA PARTE
+    })
+    .catch((error) => {
+            console.error("Erro fatal ao iniciar a Base de Dados:", error);
+            process.exit(1);     
     });
 }
 export default app;

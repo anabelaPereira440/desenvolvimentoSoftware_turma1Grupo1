@@ -7,3 +7,9 @@ export interface CreateMedicoDTO {
     sexo: string;
     contacto: string;
 }
+
+export interface UpdateMedicoDTO {
+    nome?: string;
+    especialidade?: string;
+    contacto?: string;
+}

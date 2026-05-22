@@ -7,3 +7,9 @@ export interface CreateUtenteDTO {
     contacto: string;
     medicoId: number;
 }
+
+export interface UpdateUtenteDTO {
+    nome?: string;
+    contacto?: string;
+    medicoId?: number;
+}
