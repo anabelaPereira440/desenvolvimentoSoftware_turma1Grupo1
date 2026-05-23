@@ -7,6 +7,7 @@ import { Utente } from './models/utente.entity';
 import { Medico } from './models/medico.entity';
 import { Prescricao } from './models/prescricao.entity';
 import { Exame } from './models/exame.entity';
+import { AvaliacaoCarat } from './models/avaliacao-carat.entity';
 
 //Importação das Rotas
 import authRoutes from './routes/auth.routes'; 
@@ -14,6 +15,7 @@ import utenteRoutes from './routes/utente.routes';
 import medicoRoutes from './routes/medico.routes';
 import exameRoutes from './routes/exame.routes';
 import prescricaoRoutes from './routes/prescricao.routes';
+import caratRoutes from './routes/carat.routes';
 
 const app = express();
 
@@ -23,6 +25,7 @@ app.use('/utente', utenteRoutes);
 app.use ('/medico', medicoRoutes);
 app.use('/exames', exameRoutes);
 app.use('/prescricoes', prescricaoRoutes);
+app.use('/utente', caratRoutes); // Vincula o CARAT ao prefixo /utente, resultando em /utente/:id/carat!
 
 //Inicialização da base de dados e servidor
 if (require.main === module) {
@@ -97,7 +100,59 @@ if (require.main === module) {
                 dataCriacao: new Date()
             });
         }
+        
+        //Dados CARAT Simulados
+        const caratRepo = AppDataSource.getRepository(AvaliacaoCarat);
+        if (await caratRepo.count() === 0) {
+            console.log("A semear dados fictícios para o Módulo CARAT...");
+            
+            const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
+            const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
 
+            if (maria && antonio) {
+                await caratRepo.save([
+                    // 1. Avaliação antiga da Maria (Doença Não Controlada - Score Total = 11)
+                    {
+                        data: new Date("2026-04-10"),
+                        p1: 1, p2: 1, p3: 1, p4: 1, // Vias Superiores = 4
+                        p5: 1, p6: 2, p7: 1, p8: 1, p9: 1, p10: 1, // Vias Inferiores = 7
+                        scoreTotal: 11,
+                        subScoreViasSuperiores: 4,
+                        subScoreViasInferiores: 7,
+                        interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
+                        recomendacoes: "Revisão terapêutica urgente com o seu médico. Reforçar medidas de autocuidado e vigilância de sintomas severos.",
+                        utenteId: maria.id
+                    },
+                    // 2. Avaliação recente da Maria (Doença Controlada - Score Total = 25)
+                    {
+                        data: new Date("2026-05-20"),
+                        p1: 3, p2: 3, p3: 2, p4: 3, // Vias Superiores = 11
+                        p5: 3, p6: 2, p7: 2, p8: 3, p9: 2, p10: 2, // Vias Inferiores = 14
+                        scoreTotal: 25,
+                        subScoreViasSuperiores: 11,
+                        subScoreViasInferiores: 14,
+                        interpretacao: "Doença Respiratória Controlada.",
+                        recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 3 meses.",
+                        utenteId: maria.id
+                    },
+                    // 3. Avaliação do António (Doença Parcialmente Controlada - Score Total = 21)
+                    {
+                        data: new Date("2026-05-22"),
+                        p1: 2, p2: 2, p3: 2, p4: 2, // Vias Superiores = 8
+                        p5: 2, p6: 2, p7: 3, p8: 2, p9: 2, p10: 2, // Vias Inferiores = 13
+                        scoreTotal: 21,
+                        subScoreViasSuperiores: 8,
+                        subScoreViasInferiores: 13,
+                        interpretacao: "Doença Respiratória Parcialmente Controlada.",
+                        recomendacoes: "Manter o plano terapêutico habitual e agendar uma consulta de rotina para avaliação contínua.",
+                        utenteId: antonio.id
+                    }
+                ]);
+                console.log("Dados históricos do CARAT semeados com sucesso!");
+            }
+        }
+
+    
         app.listen(3000, () =>
             console.log("Servidor (TypeORM + SQLite) a correr na porta 3000")
         );
