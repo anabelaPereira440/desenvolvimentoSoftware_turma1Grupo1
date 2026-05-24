@@ -74,18 +74,63 @@
     form {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-width: 400px;
+      gap: 12px;
+      max-width: 600px;
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
     }
 
-    input, button.form-btn {
+    .campo-pergunta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .campo-pergunta label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+    }
+
+    input, select, button.form-btn {
       padding: 8px;
       font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+    }
+
+    button.form-btn {
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+
+    button.form-btn:hover {
+      background: #1d4ed8;
     }
 
     .erro {
       color: red;
+      font-weight: bold;
     }
+
+    .sucesso {
+      color: green;
+      font-weight: bold;
+    }
+
+    .bloco-resultado {
+      background: #eff6ff;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #bfdbfe;
+      margin-top: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -109,7 +154,7 @@
       <p>Controlo da Asma e da Rinite Alérgica</p>
 
       <h2>Nova Avaliação Clínica</h2>
-
+      
       <div style="margin-bottom: 15px;">
         <label for="caratUtenteId"><strong>Selecione o ID do Utente para o teste:</strong></label>
         <select id="caratUtenteId" onchange="buscarHistoricoCarat()">
@@ -233,6 +278,7 @@
       </div>
     </section>
 
+
     <section id="pagina-prescricoes" class="pagina">
       <h1>Prescrições</h1>
 
@@ -345,7 +391,7 @@
       }
     }
 
-    // Obter histórico do utente selecionado (get)
+    // Obter histórico do utente selecionado (GET)
     async function buscarHistoricoCarat() {
       const utenteId = document.getElementById('caratUtenteId').value;
       const container = document.getElementById('listaCarat');
@@ -534,11 +580,11 @@
       }
     }
 
-    document.getElementById('formCARAT').addEventListener('submit', criarAvaliacaoCarat)
+    document.getElementById('formCARAT').addEventListener('submit', criarAvaliacaoCarat);
     document.getElementById('formPrescricao').addEventListener('submit', criarPrescricao);
     document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
 
     buscarPrescricoes();
   </script>
 </body>
-</html>
+</html> 
