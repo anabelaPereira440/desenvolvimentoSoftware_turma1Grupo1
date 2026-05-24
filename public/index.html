@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <title>BreathCare Health System</title>
+  <title>Sistema Clínico</title>
   <style>
     body {
       margin: 0;
@@ -59,6 +59,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 16px;
+      margin-bottom: 20px;
     }
 
     th, td {
@@ -76,15 +77,55 @@
       flex-direction: column;
       gap: 8px;
       max-width: 400px;
+      margin-bottom: 20px;
     }
 
-    input, button.form-btn {
+    input, select, button.form-btn {
       padding: 8px;
       font-size: 14px;
+      box-sizing: border-box;
     }
+
+    button.form-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+
+    button.form-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-acao {
+      padding: 4px 8px;
+      margin-right: 5px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+    }
+    .btn-editar { background: #3b82f6; }
+    .btn-eliminar { background: #ef4444; }
 
     .erro {
       color: red;
+      font-size: 14px;
+    }
+    
+    .sucesso {
+      color: green;
+      font-size: 14px;
+    }
+
+    .pesquisa-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      align-items: center;
     }
   </style>
 </head>
@@ -92,60 +133,119 @@
   <nav>
     <h2>Menu</h2>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
-    <button onclick="mostrarPagina('pagina-submissaoCARAT')">Início</button>
-    <button onclick="mostrarPagina('pagina-prescricoes')">Prescrições</button>
-    <button onclick="mostrarPagina('pagina-exames')">Exames</button>
+    <button onclick="mostrarPagina('pagina-medicos'); buscarMedicos()">Médicos</button>
+    <button onclick="mostrarPagina('pagina-utentes'); buscarUtentes()">Utentes</button>
+    <button onclick="mostrarPagina('pagina-prescricoes'); buscarPrescricoes()">Prescrições</button>
+    <button onclick="mostrarPagina('pagina-exames'); buscarExames()">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
   </nav>
 
   <main>
     <section id="pagina-inicio" class="pagina ativa">
-      <h1>BreathCare Health System</h1>
-      <p>Escolha uma funcionalidade no menu.</p>
+      <h1>Sistema Clínico</h1>
+      <p>Escolha uma funcionalidade no menu lateral.</p>
     </section>
 
-    <section id="pagina-submissaoCARAT" class="pagina">
-      <h1>Questionário CARAT</h1>
-
-      <h2>Nova submissão</h2>
-      <form id="formCARAT">
-        <input id="medicamento" placeholder="Medicamento" required />
-        <input id="dose" placeholder="Dose" required />
-        <input id="medicoNome" placeholder="Nome do médico" required />
-        <button class="form-btn" type="submit">Criar prescrição</button>
-        <p id="erroPrescricao" class="erro"></p>
+    <section id="pagina-medicos" class="pagina">
+      <h1>Gestão de Médicos</h1>
+      
+      <h2 id="tituloFormMedico">Registar Médico</h2>
+      <form id="formMedico">
+        <input type="hidden" id="medicoId" />
+        <input id="medicoNome" placeholder="Nome do Médico" required />
+        <input id="medicoEspecialidade" placeholder="Especialidade (ex: Pneumologia)" required />
+        <input id="medicoCedula" placeholder="Cédula Profissional" type="number" required />
+        <input id="medicoNascimento" placeholder="Data de Nascimento" type="date" required />
+        <select id="medicoSexo" required>
+          <option value="" disabled selected>Selecionar Sexo</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Feminino">Feminino</option>
+        </select>
+        <input id="medicoContacto" placeholder="Contacto Telefónico" required />
+        <button class="form-btn" type="submit" id="btnFormMedico">Registar Médico</button>
+        <button type="button" id="btnCancelarMedico" style="display:none; padding:8px; background:#9ca3af; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="resetFormMedico()">Cancelar</button>
+        <p id="erroMedico" class="erro"></p>
       </form>
 
-      <h2>Lista de Prescrições</h2>
-      <div id="listaPrescricoes">
-        <p>A carregar prescrições...</p>
+      <h2>Pesquisar Médico por ID</h2>
+      <div class="pesquisa-box">
+        <input id="pesquisaMedicoId" placeholder="ID do Médico" type="number" style="padding: 8px; width: 150px;" />
+        <button class="form-btn" onclick="buscarMedicoPorId()">Pesquisar</button>
       </div>
+      <div id="resultadoPesquisaMedico"></div>
+
+      <h2>Lista de Médicos</h2>
+      <button onclick="buscarMedicos()" class="form-btn" style="margin-bottom:10px;">Listar Médicos</button>
+      <div id="listaMedicos"><p>A carregar médicos...</p></div>
+    </section>
+
+    <section id="pagina-utentes" class="pagina">
+      <h1>Gestão de Utentes</h1>
+      
+      <h2 id="tituloFormUtente">Registar Utente</h2>
+      <form id="formUtente">
+        <input type="hidden" id="utenteId" />
+        <input id="utenteNome" placeholder="Nome do Utente" required />
+        <input id="utenteSNS" placeholder="Número SNS" required type="number" />
+        <input id="utenteNascimento" placeholder="Data de Nascimento" type="date" required />
+        <select id="utenteSexo" required>
+          <option value="" disabled selected>Selecionar Sexo</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Feminino">Feminino</option>
+        </select>
+        <input id="utenteContacto" placeholder="Contacto Telefónico" required />
+        <input id="utenteMedicoId" placeholder="ID do Médico Responsável" required type="number" />
+        <button class="form-btn" type="submit" id="btnFormUtente">Registar Utente</button>
+        <button type="button" id="btnCancelarUtente" style="display:none; padding:8px; background:#9ca3af; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="resetFormUtente()">Cancelar</button>
+        <p id="erroUtente" class="erro"></p>
+      </form>
+
+      <h2>Pesquisar Utente por ID</h2>
+      <div class="pesquisa-box">
+        <input id="pesquisaUtenteId" placeholder="ID do Utente" type="number" style="padding: 8px; width: 150px;" />
+        <button class="form-btn" onclick="buscarUtentePorId()">Pesquisar</button>
+      </div>
+      <div id="resultadoPesquisaUtente"></div>
+
+      <h2>Lista de Utentes</h2>
+      <button onclick="buscarUtentes()" class="form-btn" style="margin-bottom:10px;">Listar Utentes</button>
+      <div id="listaUtentes"><p>A carregar utentes...</p></div>
     </section>
 
     <section id="pagina-prescricoes" class="pagina">
       <h1>Prescrições</h1>
-
+      
       <h2>Nova Prescrição</h2>
       <form id="formPrescricao">
-        <input id="medicamento" placeholder="Medicamento" required />
-        <input id="dose" placeholder="Dose" required />
-        <input id="medicoNome" placeholder="Nome do médico" required />
+        <input id="prescUtenteId" placeholder="ID do Utente" required type="number" />
+        <input id="prescMedicoNome" placeholder="Nome do médico" required />
+        <input id="prescMedicamento" placeholder="Medicamento" required />
+        <input id="prescDose" placeholder="Dose" required />
         <button class="form-btn" type="submit">Criar prescrição</button>
         <p id="erroPrescricao" class="erro"></p>
       </form>
 
       <h2>Lista de Prescrições</h2>
-      <div id="listaPrescricoes">
-        <p>A carregar prescrições...</p>
-      </div>
+      <button onclick="buscarPrescricoes()" class="form-btn" style="margin-bottom:10px;">Listar Prescrições</button>
+      <div id="listaPrescricoes"><p>A carregar prescrições...</p></div>
     </section>
 
     <section id="pagina-exames" class="pagina">
       <h1>Exames</h1>
-      <button onclick="buscarExames()">Atualizar exames</button>
-      <div id="listaExames">
-        <p>Nenhum exame carregado.</p>
-      </div>
+      
+      <h2>Novo Exame</h2>
+      <form id="formExame">
+        <input id="exameUtenteId" placeholder="ID do Utente" required type="number" />
+        <input id="exameMedicoNome" placeholder="Nome do médico" required />
+        <input id="exameNome" placeholder="Nome do Exame" required />
+        <input id="exameCodigo" placeholder="Código do Exame" required />
+        <button class="form-btn" type="submit">Requisitar Exame</button>
+        <p id="erroExame" class="erro"></p>
+      </form>
+
+      <h2>Histórico de Exames</h2>
+      <button onclick="buscarExames()" class="form-btn" style="margin-bottom:10px;">Listar Exames</button>
+      <div id="listaExames"><p>Nenhum exame carregado.</p></div>
     </section>
 
     <section id="pagina-fhir" class="pagina">
@@ -154,63 +254,322 @@
         <input id="codigoLoinc" placeholder="Código LOINC" required />
         <button class="form-btn" type="submit">Pesquisar Observation</button>
       </form>
-
       <h2>Resultado</h2>
       <pre id="resultadoFhir">Sem resultados.</pre>
     </section>
   </main>
 
   <script>
+    // --- NAVEGAÇÃO ---
     function mostrarPagina(idPagina) {
       const paginas = document.querySelectorAll('.pagina');
       paginas.forEach(pagina => pagina.classList.remove('ativa'));
-
       const paginaAtiva = document.getElementById(idPagina);
       if (paginaAtiva) {
         paginaAtiva.classList.add('ativa');
       }
     }
 
+    // ================= FUNÇÕES DE MÉDICOS =================
+    async function buscarMedicos() {
+      const container = document.getElementById('listaMedicos');
+      container.innerHTML = '<p>A carregar médicos...</p>';
+      try {
+        const resposta = await fetch('/medico'); // O teu endpoint no app.ts é /medico
+        const dados = await resposta.json();
+        if (!Array.isArray(dados) || dados.length === 0) {
+          container.innerHTML = '<p>Nenhum médico registado.</p>';
+          return;
+        }
+        let html = `
+          <table>
+            <thead>
+              <tr><th>#</th><th>Nome</th><th>Especialidade</th><th>Cédula</th><th>Contacto</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+        `;
+        for (const m of dados) {
+          html += `
+            <tr>
+              <td>${m.id ?? ''}</td>
+              <td>${m.nome ?? ''}</td>
+              <td>${m.especialidade ?? ''}</td>
+              <td>${m.cedulaProfissional ?? ''}</td>
+              <td>${m.contacto ?? ''}</td>
+              <td>
+                <button class="btn-acao btn-editar" onclick="prepararEditarMedico(${m.id}, '${m.nome}', '${m.especialidade}', '${m.contacto}')">Editar</button>
+                <button class="btn-acao btn-eliminar" onclick="eliminarMedico(${m.id})">Apagar</button>
+              </td>
+            </tr>
+          `;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (erro) {
+        container.innerHTML = '<p>Erro ao carregar médicos.</p>';
+      }
+    }
+
+    async function buscarMedicoPorId() {
+      const id = document.getElementById('pesquisaMedicoId').value;
+      const container = document.getElementById('resultadoPesquisaMedico');
+      if (!id) { container.innerHTML = '<p class="erro">Insira um ID.</p>'; return; }
+      
+      container.innerHTML = '<p>A pesquisar...</p>';
+      try {
+        const resposta = await fetch(`/medico/${id}`);
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.erro || 'Médico não encontrado');
+        
+        container.innerHTML = `
+          <p class="sucesso"><strong>Encontrado:</strong> ID: ${dados.id} | Nome: ${dados.nome} | Especialidade: ${dados.especialidade}</p>
+        `;
+      } catch (erro) {
+        container.innerHTML = `<p class="erro">${erro.message}</p>`;
+      }
+    }
+
+    async function submeterMedico(event) {
+      event.preventDefault();
+      const erroBox = document.getElementById('erroMedico');
+      erroBox.textContent = '';
+      const id = document.getElementById('medicoId').value;
+      const url = id ? `/medico/${id}` : '/medico';
+      const method = id ? 'PUT' : 'POST';
+
+      const payload = {
+        nome: document.getElementById('medicoNome').value.trim(),
+        especialidade: document.getElementById('medicoEspecialidade').value.trim(),
+        contacto: document.getElementById('medicoContacto').value.trim()
+      };
+
+      if (!id) {
+        payload.cedulaProfissional = parseInt(document.getElementById('medicoCedula').value);
+        payload.dataNascimento = document.getElementById('medicoNascimento').value;
+        payload.sexo = document.getElementById('medicoSexo').value;
+      }
+
+      try {
+        const resposta = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!resposta.ok) {
+          const dados = await resposta.json();
+          throw new Error(dados.erro || 'Erro ao processar médico');
+        }
+        resetFormMedico();
+        await buscarMedicos();
+      } catch (erro) {
+        erroBox.textContent = erro.message;
+      }
+    }
+
+    function prepararEditarMedico(id, nome, especialidade, contacto) {
+      document.getElementById('medicoId').value = id;
+      document.getElementById('medicoNome').value = nome;
+      document.getElementById('medicoEspecialidade').value = especialidade;
+      document.getElementById('medicoContacto').value = contacto;
+
+      document.getElementById('medicoCedula').disabled = true;
+      document.getElementById('medicoNascimento').disabled = true;
+      document.getElementById('medicoSexo').disabled = true;
+
+      document.getElementById('tituloFormMedico').textContent = "Atualizar Médico";
+      document.getElementById('btnFormMedico').textContent = "Guardar Alterações";
+      document.getElementById('btnCancelarMedico').style.display = 'block';
+    }
+
+    function resetFormMedico() {
+      document.getElementById('formMedico').reset();
+      document.getElementById('medicoId').value = '';
+      document.getElementById('medicoCedula').disabled = false;
+      document.getElementById('medicoNascimento').disabled = false;
+      document.getElementById('medicoSexo').disabled = false;
+      document.getElementById('tituloFormMedico').textContent = "Registar Médico";
+      document.getElementById('btnFormMedico').textContent = "Registar Médico";
+      document.getElementById('btnCancelarMedico').style.display = 'none';
+      document.getElementById('erroMedico').textContent = '';
+    }
+
+    async function eliminarMedico(id) {
+      if (confirm('Deseja mesmo eliminar este médico?')) {
+        try {
+          const res = await fetch(`/medico/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Erro ao eliminar');
+          await buscarMedicos();
+        } catch (e) { alert(e.message); }
+      }
+    }
+
+    // ================= FUNÇÕES DE UTENTES =================
+    async function buscarUtentes() {
+      const container = document.getElementById('listaUtentes');
+      container.innerHTML = '<p>A carregar utentes...</p>';
+      try {
+        const resposta = await fetch('/utente');
+        const dados = await resposta.json();
+        if (!Array.isArray(dados) || dados.length === 0) {
+          container.innerHTML = '<p>Nenhum utente registado.</p>';
+          return;
+        }
+        let html = `
+          <table>
+            <thead>
+              <tr><th>#</th><th>Nome</th><th>Nº SNS</th><th>Nascimento</th><th>Sexo</th><th>Contacto</th><th>Médico ID</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+        `;
+        for (const u of dados) {
+          let dataFormatada = u.dataNascimento ? new Date(u.dataNascimento).toLocaleDateString('pt-PT') : '-';
+          html += `
+            <tr>
+              <td>${u.id ?? ''}</td>
+              <td>${u.nome ?? ''}</td>
+              <td>${u.numeroUtente ?? ''}</td>
+              <td>${dataFormatada}</td>
+              <td>${u.sexo ?? ''}</td>
+              <td>${u.contacto ?? ''}</td>
+              <td>${u.medicoId ?? ''}</td>
+              <td>
+                <button class="btn-acao btn-editar" onclick="prepararEditarUtente(${u.id}, '${u.nome}', '${u.contacto}', ${u.medicoId})">Editar</button>
+                <button class="btn-acao btn-eliminar" onclick="eliminarUtente(${u.id})">Apagar</button>
+              </td>
+            </tr>
+          `;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (erro) {
+        container.innerHTML = '<p>Erro ao carregar utentes.</p>';
+      }
+    }
+
+    async function buscarUtentePorId() {
+      const id = document.getElementById('pesquisaUtenteId').value;
+      const container = document.getElementById('resultadoPesquisaUtente');
+      if (!id) { container.innerHTML = '<p class="erro">Insira um ID.</p>'; return; }
+      
+      container.innerHTML = '<p>A pesquisar...</p>';
+      try {
+        const resposta = await fetch(`/utente/${id}`);
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.erro || 'Utente não encontrado');
+        
+        container.innerHTML = `
+          <p class="sucesso"><strong>Encontrado:</strong> ID: ${dados.id} | Nome: ${dados.nome} | Nº SNS: ${dados.numeroUtente}</p>
+        `;
+      } catch (erro) {
+        container.innerHTML = `<p class="erro">${erro.message}</p>`;
+      }
+    }
+
+    async function submeterUtente(event) {
+      event.preventDefault();
+      const erroBox = document.getElementById('erroUtente');
+      erroBox.textContent = '';
+      const id = document.getElementById('utenteId').value;
+      const url = id ? `/utente/${id}` : '/utente';
+      const method = id ? 'PUT' : 'POST';
+
+      const payload = {
+        nome: document.getElementById('utenteNome').value.trim(),
+        contacto: document.getElementById('utenteContacto').value.trim(),
+        medicoId: parseInt(document.getElementById('utenteMedicoId').value)
+      };
+
+      if (!id) {
+        payload.numeroUtente = parseInt(document.getElementById('utenteSNS').value);
+        payload.dataNascimento = document.getElementById('utenteNascimento').value;
+        payload.sexo = document.getElementById('utenteSexo').value;
+      }
+
+      try {
+        const resposta = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!resposta.ok) {
+          const dados = await resposta.json();
+          throw new Error(dados.erro || 'Erro ao processar utente');
+        }
+        resetFormUtente();
+        await buscarUtentes();
+      } catch (erro) {
+        erroBox.textContent = erro.message;
+      }
+    }
+
+    function prepararEditarUtente(id, nome, contacto, medicoId) {
+      document.getElementById('utenteId').value = id;
+      document.getElementById('utenteNome').value = nome;
+      document.getElementById('utenteContacto').value = contacto;
+      document.getElementById('utenteMedicoId').value = medicoId;
+
+      document.getElementById('utenteSNS').disabled = true;
+      document.getElementById('utenteNascimento').disabled = true;
+      document.getElementById('utenteSexo').disabled = true;
+
+      document.getElementById('tituloFormUtente').textContent = "Atualizar Utente";
+      document.getElementById('btnFormUtente').textContent = "Guardar Alterações";
+      document.getElementById('btnCancelarUtente').style.display = 'block';
+    }
+
+    function resetFormUtente() {
+      document.getElementById('formUtente').reset();
+      document.getElementById('utenteId').value = '';
+      document.getElementById('utenteSNS').disabled = false;
+      document.getElementById('utenteNascimento').disabled = false;
+      document.getElementById('utenteSexo').disabled = false;
+      document.getElementById('tituloFormUtente').textContent = "Registar Utente";
+      document.getElementById('btnFormUtente').textContent = "Registar Utente";
+      document.getElementById('btnCancelarUtente').style.display = 'none';
+      document.getElementById('erroUtente').textContent = '';
+    }
+
+    async function eliminarUtente(id) {
+      if (confirm('Deseja mesmo eliminar este utente?')) {
+        try {
+          const res = await fetch(`/utente/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Erro ao eliminar');
+          await buscarUtentes();
+        } catch (e) { alert(e.message); }
+      }
+    }
+
+    // ================= FUNÇÕES DE PRESCRIÇÕES =================
     async function buscarPrescricoes() {
-        alert('Aqui');
       const container = document.getElementById('listaPrescricoes');
       container.innerHTML = '<p>A carregar prescrições...</p>';
-
       try {
         const resposta = await fetch('/prescricoes');
         const dados = await resposta.json();
-
         if (!Array.isArray(dados) || dados.length === 0) {
           container.innerHTML = '<p>Nenhuma prescrição registada.</p>';
           return;
         }
-
         let html = `
           <table>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Medicamento</th>
-                <th>Dose</th>
-                <th>Médico</th>
-                <th>Data de Criação</th>
-              </tr>
+              <tr><th>#</th><th>Medicamento</th><th>Dose</th><th>Médico</th><th>Data de Validade</th></tr>
             </thead>
             <tbody>
         `;
-
         for (const p of dados) {
+          // Utiliza a dataValidade fornecida pelo teu ResponseDto
+          let dataFormatada = p.dataValidade ? new Date(p.dataValidade).toLocaleDateString('pt-PT') : 'Não exposta';
           html += `
             <tr>
               <td>${p.id ?? ''}</td>
               <td>${p.medicamento ?? ''}</td>
               <td>${p.dose ?? ''}</td>
               <td>${p.medico_nome ?? ''}</td>
-              <td>${p.dataCriacao ?? 'não exposta'}</td>
+              <td>${dataFormatada}</td>
             </tr>
           `;
         }
-
         html += '</tbody></table>';
         container.innerHTML = html;
       } catch (erro) {
@@ -218,74 +577,29 @@
       }
     }
 
-    async function buscarExames() {
-      const container = document.getElementById('listaExames');
-      container.innerHTML = '<p>A carregar exames...</p>';
-
-      try {
-        const resposta = await fetch('/exames');
-        const dados = await resposta.json();
-
-        if (!Array.isArray(dados) || dados.length === 0) {
-          container.innerHTML = '<p>Nenhum exame registado.</p>';
-          return;
-        }
-
-        let html = `
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nome</th>
-                <th>Código</th>
-                <th>Médico</th>
-                <th>Data de Criação</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-
-        for (const exame of dados) {
-          html += `
-            <tr>
-              <td>${exame.id ?? ''}</td>
-              <td>${exame.nome ?? ''}</td>
-              <td>${exame.codigo ?? ''}</td>
-              <td>${exame.medico_nome ?? ''}</td>
-              <td>${exame.dataCriacao ?? 'não exposta'}</td>
-            </tr>
-          `;
-        }
-
-        html += '</tbody></table>';
-        container.innerHTML = html;
-      } catch (erro) {
-        container.innerHTML = '<p>Erro ao carregar exames.</p>';
-      }
-    }
-
     async function criarPrescricao(event) {
       event.preventDefault();
-
       const erroPrescricao = document.getElementById('erroPrescricao');
       erroPrescricao.textContent = '';
 
-      const medicamento = document.getElementById('medicamento').value.trim();
-      const dose = document.getElementById('dose').value.trim();
-      const medico_nome = document.getElementById('medicoNome').value.trim();
+      // Mapeamento correto com o CreatePrescricaoDto
+      const payload = {
+        utenteId: parseInt(document.getElementById('prescUtenteId').value),
+        medico_nome: document.getElementById('prescMedicoNome').value.trim(),
+        medicamento: document.getElementById('medicamento').value.trim(),
+        dose: document.getElementById('dose').value.trim()
+      };
 
       try {
         const resposta = await fetch('/prescricoes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ medicamento, dose, medico_nome })
+          body: JSON.stringify(payload)
         });
-
         if (!resposta.ok) {
           const dados = await resposta.json();
           throw new Error(dados.erro || 'Erro ao criar prescrição');
         }
-
         document.getElementById('formPrescricao').reset();
         await buscarPrescricoes();
       } catch (erro) {
@@ -293,13 +607,80 @@
       }
     }
 
+    // ================= FUNÇÕES DE EXAMES =================
+    async function buscarExames() {
+      const container = document.getElementById('listaExames');
+      container.innerHTML = '<p>A carregar exames...</p>';
+      try {
+        const resposta = await fetch('/exames');
+        const dados = await resposta.json();
+        if (!Array.isArray(dados) || dados.length === 0) {
+          container.innerHTML = '<p>Nenhum exame registado.</p>';
+          return;
+        }
+        let html = `
+          <table>
+            <thead>
+              <tr><th>#</th><th>Nome</th><th>Código</th><th>Médico</th><th>Data de Validade</th></tr>
+            </thead>
+            <tbody>
+        `;
+        for (const exame of dados) {
+          // Utiliza a dataValidade fornecida pelo teu ResponseDto
+          let dataFormatada = exame.dataValidade ? new Date(exame.dataValidade).toLocaleDateString('pt-PT') : 'Não exposta';
+          html += `
+            <tr>
+              <td>${exame.id ?? ''}</td>
+              <td>${exame.nome ?? ''}</td>
+              <td>${exame.codigo ?? ''}</td>
+              <td>${exame.medico_nome ?? ''}</td>
+              <td>${dataFormatada}</td>
+            </tr>
+          `;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (erro) {
+        container.innerHTML = '<p>Erro ao carregar exames.</p>';
+      }
+    }
+
+    async function criarExame(event) {
+      event.preventDefault();
+      const erroExame = document.getElementById('erroExame');
+      erroExame.textContent = '';
+
+      // Mapeamento correto com o CreateExameDto
+      const payload = {
+        utenteId: parseInt(document.getElementById('exameUtenteId').value),
+        medico_nome: document.getElementById('exameMedicoNome').value.trim(),
+        nome: document.getElementById('exameNome').value.trim(),
+        codigo: document.getElementById('exameCodigo').value.trim()
+      };
+
+      try {
+        const resposta = await fetch('/exames', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!resposta.ok) {
+          const dados = await resposta.json();
+          throw new Error(dados.erro || 'Erro ao criar exame');
+        }
+        document.getElementById('formExame').reset();
+        await buscarExames();
+      } catch (erro) {
+        erroExame.textContent = erro.message;
+      }
+    }
+
+    // ================= CONSULTA FHIR =================
     async function pesquisarFhir(event) {
       event.preventDefault();
-
       const codigo = document.getElementById('codigoLoinc').value.trim();
       const resultado = document.getElementById('resultadoFhir');
       resultado.textContent = 'A pesquisar...';
-
       try {
         const resposta = await fetch(`/fhir/observations?code=${encodeURIComponent(codigo)}`);
         const dados = await resposta.json();
@@ -309,10 +690,13 @@
       }
     }
 
+    // --- LIGAÇÕES DOS EVENTOS AOS FORMULÁRIOS ---
+    document.getElementById('formMedico').addEventListener('submit', submeterMedico);
+    document.getElementById('formUtente').addEventListener('submit', submeterUtente);
     document.getElementById('formPrescricao').addEventListener('submit', criarPrescricao);
+    document.getElementById('formExame').addEventListener('submit', criarExame);
     document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
 
-    buscarPrescricoes();
   </script>
 </body>
 </html>

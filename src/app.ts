@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import { AppDataSource } from './database/database';
 
 //Importação das Entidades
@@ -10,7 +11,6 @@ import { Exame } from './models/exame.entity';
 import { AvaliacaoCarat } from './models/avaliacao-carat.entity';
 
 //Importação das Rotas
-import authRoutes from './routes/auth.routes'; 
 import utenteRoutes from './routes/utente.routes';
 import medicoRoutes from './routes/medico.routes';
 import exameRoutes from './routes/exame.routes';
@@ -18,9 +18,8 @@ import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
 
 const app = express();
-
+app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.json());
-app.use('/auth', authRoutes);
 app.use('/utente', utenteRoutes);
 app.use ('/medico', medicoRoutes);
 app.use('/exames', exameRoutes);
@@ -82,29 +81,46 @@ if (require.main === module) {
         //Prescrições Simuladas
         const prescricaoRepo = AppDataSource.getRepository(Prescricao);
         if (await prescricaoRepo.count() === 0) {
-            await prescricaoRepo.save({
-                medicamento: 'Aspirina',
-                dose: '500mg',
-                medico_nome: 'Dr. House',
-                dataCriacao: new Date()
-            });
+            const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
+            if (maria){
+                const dataCriacaoSimulada = new Date(); 
+                const dataValidadeSimulada = new Date();
+                dataValidadeSimulada.setDate(dataCriacaoSimulada.getDate() + 180);
+                
+                await prescricaoRepo.save({
+                    medicamento: 'Aspirina',
+                    dose: '500mg',
+                    medico_nome: 'Jorge Almeida',
+                    utenteId: maria.id,
+                    dataCriacao: dataCriacaoSimulada,
+                    dataValidade: dataValidadeSimulada
+                });
+            }
         }
 
         //Exames Simulados
         const exameRepo = AppDataSource.getRepository(Exame);
         if (await exameRepo.count() === 0) {
-            await exameRepo.save({
-                nome: 'RX Torax',
-                codigo: 'RX01',
-                medico_nome: 'Dr. House',
-                dataCriacao: new Date()
-            });
+            const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
+            if (antonio){
+                const dataCriacaoSimulada = new Date(); 
+                const dataValidadeSimulada = new Date();
+                dataValidadeSimulada.setDate(dataCriacaoSimulada.getDate() + 180);
+                
+                await exameRepo.save({
+                    nome: 'RX Torax',
+                    codigo: 'RX01',
+                    medico_nome: 'Jorge Almeida',
+                    utenteId: antonio.id,
+                    dataCriacao: dataCriacaoSimulada,
+                    dataValidade: dataValidadeSimulada
+                });
+            }
         }
         
         //Dados CARAT Simulados
         const caratRepo = AppDataSource.getRepository(AvaliacaoCarat);
         if (await caratRepo.count() === 0) {
-            console.log("A semear dados fictícios para o Módulo CARAT...");
             
             const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
             const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
