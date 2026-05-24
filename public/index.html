@@ -92,7 +92,7 @@
   <nav>
     <h2>Menu</h2>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
-    <button onclick="mostrarPagina('pagina-submissaoCARAT')">Início</button>
+    <button onclick="mostrarPagina('pagina-submissaoCARAT')">Questionário CARAT</button>
     <button onclick="mostrarPagina('pagina-prescricoes')">Prescrições</button>
     <button onclick="mostrarPagina('pagina-exames')">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
@@ -106,19 +106,130 @@
 
     <section id="pagina-submissaoCARAT" class="pagina">
       <h1>Questionário CARAT</h1>
+      <p>Controlo da Asma e da Rinite Alérgica</p>
 
-      <h2>Nova submissão</h2>
+      <h2>Nova Avaliação Clínica</h2>
+
+      <div style="margin-bottom: 15px;">
+        <label for="caratUtenteId"><strong>Selecione o ID do Utente para o teste:</strong></label>
+        <select id="caratUtenteId" onchange="buscarHistoricoCarat()">
+          <option value="1">1 (Maria Laurentina)</option>
+          <option value="2">2 (António Silva)</option>
+        </select>
+      </div>
+
       <form id="formCARAT">
-        <input id="medicamento" placeholder="Medicamento" required />
-        <input id="dose" placeholder="Dose" required />
-        <input id="medicoNome" placeholder="Nome do médico" required />
-        <button class="form-btn" type="submit">Criar prescrição</button>
-        <p id="erroPrescricao" class="erro"></p>
+        <h3>Vias Aéreas Superiores (Rinite)</h3>
+        <div class="campo-pergunta">
+          <label>1. Nos últimos 15 dias, com que frequência teve congestão nasal (nariz entupido)?</label>
+          <select id="p1" required>
+            <option value="0">0 - Sempre / Quase sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>2. Nos últimos 15 dias, com que frequência teve corrimento nasal (nariz a pingar)?</label>
+          <select id="p2" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>3. Nos últimos 15 dias, com que frequência teve espirros seguidos?</label>
+          <select id="p3" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>4. Nos últimos 15 dias, com que frequência teve comichão no nariz ou nos olhos?</label>
+          <select id="p4" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+
+        <h3>Vias Aéreas Inferiores (Asma)</h3>
+        <div class="campo-pergunta">
+          <label>5. Nos últimos 15 dias, com que frequência sentiu falta de ar ou pieira (gatinhos no peito)?</label>
+          <select id="p5" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>6. Nos últimos 15 dias, com que frequência acordou de noite devido à asma ou rinite?</label>
+          <select id="p6" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>7. Nos últimos 15 dias, com que frequência a doença limitou as suas atividades diárias?</label>
+          <select id="p7" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>8. Nos últimos 15 dias, com que frequência teve de usar medicação de alívio (S.O.S.)?</label>
+          <select id="p8" required>
+            <option value="0">0 - Sempre</option>
+            <option value="1">1 - Muitas vezes</option>
+            <option value="2">2 - Poucas vezes</option>
+            <option value="3">3 - Nunca</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>9. Sente que a sua medicação habitual é eficaz no controlo dos sintomas?</label>
+          <select id="p9" required>
+            <option value="0">0 - Nada eficaz</option>
+            <option value="1">1 - Pouco eficaz</option>
+            <option value="2">2 - Razoavelmente eficaz</option>
+            <option value="3">3 - Totalmente eficaz</option>
+          </select>
+        </div>
+        <div class="campo-pergunta">
+          <label>10. Tem cumprido rigorosamente as tomas da medicação preventiva prescrita?</label>
+          <select id="p10" required>
+            <option value="0">0 - Nunca tomo</option>
+            <option value="1">1 - Falho quase sempre</option>
+            <option value="2">2 - Falho poucas vezes</option>
+            <option value="3">3 - Tomo sempre direito</option>
+          </select>
+        </div>
+
+        <button class="form-btn" type="submit">Submeter Questionário</button>
+        <p id="caratMensagem" class="sucesso"></p>
+        <p id="erroCarat" class="erro"></p>
       </form>
 
-      <h2>Lista de Prescrições</h2>
-      <div id="listaPrescricoes">
-        <p>A carregar prescrições...</p>
+      <div id="resultadoCaratBloco" class="bloco-resultado" style="display:none;">
+        <h3>Resultado Calculado</h3>
+        <p><strong>Score Total:</strong> <span id="resScore"></span>/30</p>
+        <p><strong>Sub-score Vias Superiores (Rinite):</strong> <span id="resSup"></span>/12</p>
+        <p><strong>Sub-score Vias Inferiores (Asma):</strong> <span id="resInf"></span>/18</p>
+        <p><strong>Interpretação Clínica:</strong> <span id="resInterp"></span></p>
+        <p><strong>Recomendações Geradas:</strong> <span id="resRecom"></span></p>
+      </div>
+
+      <h2>Histórico de Evolução Clínica (Dashboard)</h2>
+      <div id="listaCarat">
+        <p>A carregar histórico...</p>
       </div>
     </section>
 
@@ -168,6 +279,120 @@
       const paginaAtiva = document.getElementById(idPagina);
       if (paginaAtiva) {
         paginaAtiva.classList.add('ativa');
+      }
+
+      // Se mudar para a página do CARAT, recarrega o histórico automaticamente
+      if (idPagina === 'pagina-submissaoCARAT') {
+        buscarHistoricoCarat();
+      }
+    }
+
+    // Submeter novo questionário CARAT (POST)
+    async function criarAvaliacaoCarat(event) {
+      event.preventDefault();
+      
+      const msgSucesso = document.getElementById('caratMensagem');
+      const msgErro = document.getElementById('erroCarat');
+      const blocoResultado = document.getElementById('resultadoCaratBloco');
+      
+      msgSucesso.textContent = '';
+      msgErro.textContent = '';
+      blocoResultado.style.display = 'none';
+
+      const utenteId = document.getElementById('caratUtenteId').value;
+
+      // Recolha das 10 variáveis mapeadas por coluna
+      const payload = {
+        p1: parseInt(document.getElementById('p1').value),
+        p2: parseInt(document.getElementById('p2').value),
+        p3: parseInt(document.getElementById('p3').value),
+        p4: parseInt(document.getElementById('p4').value),
+        p5: parseInt(document.getElementById('p5').value),
+        p6: parseInt(document.getElementById('p6').value),
+        p7: parseInt(document.getElementById('p7').value),
+        p8: parseInt(document.getElementById('p8').value),
+        p9: parseInt(document.getElementById('p9').value),
+        p10: parseInt(document.getElementById('p10').value)
+      };
+
+      try {
+        const resposta = await fetch(`/utente/${utenteId}/carat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error(dados.erro || 'Erro ao submeter questionário.');
+        }
+
+        msgSucesso.textContent = dados.mensagem;
+        
+        // Preenche o quadro azul de resultados imediatos
+        document.getElementById('resScore').textContent = dados.resultado.scoreTotal;
+        document.getElementById('resSup').textContent = dados.resultado.viasSuperiores;
+        document.getElementById('resInf').textContent = dados.resultado.viasInferiores;
+        document.getElementById('resInterp').textContent = dados.resultado.interpretacao;
+        document.getElementById('resRecom').textContent = dados.resultado.recomendacoes;
+        blocoResultado.style.display = 'block';
+
+        document.getElementById('formCARAT').reset();
+        await buscarHistoricoCarat(); // Atualiza a tabela abaixo
+      } catch (erro) {
+        msgErro.textContent = erro.message;
+      }
+    }
+
+    // Obter histórico do utente selecionado (get)
+    async function buscarHistoricoCarat() {
+      const utenteId = document.getElementById('caratUtenteId').value;
+      const container = document.getElementById('listaCarat');
+      container.innerHTML = '<p>A carregar histórico clínico...</p>';
+
+      try {
+        const resposta = await fetch(`/utente/${utenteId}/carat`);
+        const dados = await resposta.json();
+
+        if (!Array.isArray(dados) || dados.length === 0) {
+          container.innerHTML = '<p>Nenhuma avaliação CARAT registada para este utente.</p>';
+          return;
+        }
+
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Perguntas (1 a 10)</th>
+                <th>Sub Vias Sup.</th>
+                <th>Sub Vias Inf.</th>
+                <th>Score Total</th>
+                <th>Interpretação Clínica</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        for (const c of dados) {
+          const dataFormatada = new Date(c.data).toLocaleString('pt-PT');
+          html += `
+            <tr>
+              <td>${dataFormatada}</td>
+              <td>[${c.p1}, ${c.p2}, ${c.p3}, ${c.p4}, ${c.p5}, ${c.p6}, ${c.p7}, ${c.p8}, ${c.p9}, ${c.p10}]</td>
+              <td><strong>${c.subScoreViasSuperiores}</strong>/12</td>
+              <td><strong>${c.subScoreViasInferiores}</strong>/18</td>
+              <td><span style="color: ${c.scoreTotal < 19 ? 'red' : 'green'}"><strong>${c.scoreTotal}</strong>/30</span></td>
+              <td><small>${c.interpretacao}</small></td>
+            </tr>
+          `;
+        }
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (erro) {
+        container.innerHTML = '<p>Erro ao carregar histórico do CARAT.</p>';
       }
     }
 
@@ -309,6 +534,7 @@
       }
     }
 
+    document.getElementById('formCARAT').addEventListener('submit', criarAvaliacaoCarat)
     document.getElementById('formPrescricao').addEventListener('submit', criarPrescricao);
     document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
 
