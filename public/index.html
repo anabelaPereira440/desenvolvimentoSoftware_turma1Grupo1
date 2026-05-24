@@ -275,7 +275,7 @@
       const container = document.getElementById('listaMedicos');
       container.innerHTML = '<p>A carregar médicos...</p>';
       try {
-        const resposta = await fetch('/medico'); // O teu endpoint no app.ts é /medico
+        const resposta = await fetch('/medico');
         const dados = await resposta.json();
         if (!Array.isArray(dados) || dados.length === 0) {
           container.innerHTML = '<p>Nenhum médico registado.</p>';
