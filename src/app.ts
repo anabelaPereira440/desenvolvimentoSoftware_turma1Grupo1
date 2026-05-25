@@ -9,6 +9,8 @@ import { Medico } from './models/medico.entity';
 import { Prescricao } from './models/prescricao.entity';
 import { Exame } from './models/exame.entity';
 import { AvaliacaoCarat } from './models/avaliacao-carat.entity';
+import { Alerta } from './models/alerta.entity';
+import { AlertaClinico, AlertaEstado, AlertaPrioridade, TipoAlerta } from './models/alerta.entity';
 
 //Importação das Rotas
 import utenteRoutes from './routes/utente.routes';
@@ -16,6 +18,7 @@ import medicoRoutes from './routes/medico.routes';
 import exameRoutes from './routes/exame.routes';
 import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
+import alertaRoutes from './routes/alerta.routes'; 
 
 const app = express();
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -25,6 +28,7 @@ app.use ('/medico', medicoRoutes);
 app.use('/exames', exameRoutes);
 app.use('/prescricoes', prescricaoRoutes);
 app.use('/utente', caratRoutes); // Vincula o CARAT ao prefixo /utente, resultando em /utente/:id/carat!
+app.use('/alertas', alertaRoutes); // Ativa os endpoints de alertas
 
 //Inicialização da base de dados e servidor
 if (require.main === module) {
@@ -169,6 +173,43 @@ if (require.main === module) {
         }
 
     
+        // Alertas Clínicos Simulados
+        const alertaRepo = AppDataSource.getRepository(Alerta);
+        if (await alertaRepo.count() === 0) {
+            // Vamos buscar os utentes à base de dados para garantir que usamos os IDs gerados automaticamente pelo TypeORM
+            const utentes = await utenteRepo.find();
+            
+            if (utentes.length >= 2) {
+                await alertaRepo.save([
+                    {
+                        utenteId: utentes[0].id,            // Maria Soares
+                        medicoResponsavelId: "1",           // Associado ao médico id 1 
+                        tipoGatilho: TipoAlerta.SCOREABAIXOLIMIAR,
+                        estado: AlertaEstado.NOVO,
+                        prioridade: AlertaPrioridade.ALTA,
+                        motivo: "Score CARAT abaixo do limiar. Utente Maria Soares apresenta queixas de dispneia ligeira."
+                    },
+                    {
+                        utenteId: utentes[1].id,            // António Silva
+                        medicoResponsavelId: "1",
+                        tipoGatilho: TipoAlerta.DETERIORACAOSCORE,
+                        estado: AlertaEstado.VISTO,
+                        prioridade: AlertaPrioridade.MEDIA,
+                        motivo: "Deterioração significativa do score CARAT em relação ao mês anterior."
+                    },
+                    {
+                        utenteId: utentes[0].id,            // Maria Soares
+                        medicoResponsavelId: "1",
+                        tipoGatilho: TipoAlerta.SINTOMAPERSISTENTE,
+                        estado: AlertaEstado.FECHADO,
+                        prioridade: AlertaPrioridade.BAIXA,
+                        motivo: "Sintoma persistente de tosse noturna reportado no diário clínico."
+                    }
+                ]);
+                console.log("Alertas clínicos simulados criados com sucesso!");
+            }
+        }
+
         app.listen(3000, () =>
             console.log("Servidor (TypeORM + SQLite) a correr na porta 3000")
         );
