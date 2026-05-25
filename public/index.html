@@ -138,7 +138,7 @@
     <h2>Menu</h2>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-submissaoCARAT')">Questionário CARAT</button>
-    <button onclick="mostrarPagina('pagina-alertas')">Alertas Clínicos (Médico)</button>
+    <button onclick="mostrarPagina('pagina-alertas')">Alertas Clínicos</button>
     <button onclick="mostrarPagina('pagina-prescricoes')">Prescrições</button>
     <button onclick="mostrarPagina('pagina-exames')">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
@@ -280,8 +280,7 @@
     </section>
 
     <section id="pagina-alertas" class="pagina">
-      <h1>Dashboard - Alertas Clínicos (BreathCare)</h1>
-      <p>Intervenção proativa com base na deterioração de scores do questionário CARAT ou sintomas persistentes.</p>
+      <h1>Alertas Clínicos</h1>
       
       <h2>Filtros de Auditoria</h2>
       <div class="pesquisa-box">
@@ -304,7 +303,7 @@
         <button class="form-btn" onclick="buscarAlertas()">Aplicar Filtros</button>
       </div>
 
-      <h2>Alertas Sob Alçada Médica</h2>
+      <h2>Alertas</h2>
       <div id="listaAlertas"><p>A carregar alertas clínicos...</p></div>
     </section>
 
@@ -690,7 +689,7 @@
         container.innerHTML = '<p class="erro">Erro ao carregar o painel de alertas clínicos da API.</p>';
       }
     }
-    
+
   </script>
 </body>
 </html> 
