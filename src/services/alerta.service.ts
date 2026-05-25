@@ -22,9 +22,9 @@ export class AlertaService {
     }): Promise<Alerta> {
         // O repository.create() instancia a classe da entidade permitindo que os ganchos @BeforeInsert funcionem
         const novoAlerta = this.repository.create({
-            utente: { id: dados.utenteId } as any,
+            utenteId: dados.utenteId,
             medicoResponsavelId: dados.medicoResponsavelId,
-            tipoGatilho: dados.tipoAlerta,
+            tipoAlerta: dados.tipoAlerta,
             avaliacaoCaratId: dados.avaliacaoCaratId,
             prioridade: dados.prioridade || AlertaPrioridade.MEDIA,
             estado: AlertaEstado.NOVO,

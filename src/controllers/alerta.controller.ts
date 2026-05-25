@@ -9,7 +9,6 @@ export class AlertaController {
 
        async criar(req: Request, res: Response) {
         try {
-            // Tipificamos o corpo da requisição com o teu DTO
             const dadosAlerta: CreateAlertaDto = req.body;
 
             // Validações mínimas obrigatórias na camada HTTP antes de chamar o serviço
@@ -47,8 +46,6 @@ export class AlertaController {
             return res.status(400).json({ erro: error.message });
         }
     }
-
-
 
     // Listar todos os alertas com filtros opcionais (médico, estado, prioridade)
     async listar(req: Request, res: Response) {

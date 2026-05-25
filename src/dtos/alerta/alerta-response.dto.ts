@@ -32,7 +32,7 @@ export function mapearParaAlertaResponse(alerta: any): AlertaResponseDto {
         utenteId: alerta.utenteId,
         medicoResponsavelId: alerta.medicoResponsavelId,
         motivo: alerta.motivo,
-        tipoAlerta: alerta.tipoGatilho,
+        tipoAlerta: alerta.tipoAlerta,
         avaliacaoCaratId: alerta.avaliacaoCaratId || null,
         estado: alerta.estado,
         prioridade: alerta.prioridade,
@@ -42,7 +42,7 @@ export function mapearParaAlertaResponse(alerta: any): AlertaResponseDto {
         utente: alerta.utente ? {
             id: alerta.utente.id,
             nome: alerta.utente.nome,
-        } : undefined, // Agora o TypeScript já sabe que 'undefined' é um valor legal aqui
+        } : undefined, 
         
         avaliacaoCarat: alerta.avaliacaoCarat ? {
             id: alerta.avaliacaoCarat.id,

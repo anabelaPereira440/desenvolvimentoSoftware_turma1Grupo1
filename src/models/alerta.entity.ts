@@ -11,7 +11,6 @@ import {
   BeforeUpdate
 } from 'typeorm';
 
-// IMPORTA as tuas entidades reais
 import { Utente } from './utente.entity';
 import { Medico } from './medico.entity';
 import { AvaliacaoCarat } from './avaliacao-carat.entity';
@@ -48,14 +47,14 @@ export class Alerta {
   id!: number;
 
   // Relações principais
-  @Column()
+  @Column({ type: 'integer' })
   utenteId!: number;
 
   @ManyToOne(() => Utente, { onDelete: 'CASCADE'})
   @JoinColumn({ name: 'utente_id' })
   utente!: Utente;
 
-  @Column()
+  @Column({type: 'varchar' })
   medicoResponsavelId!: string;
 
   @ManyToOne(() => Medico, { onDelete: 'RESTRICT'})
@@ -65,41 +64,41 @@ export class Alerta {
   @Column({ type: 'text' })
   motivo!: string;
 
-  // Contexto/justificação do alerta (gatilhos possíveis)
+  // Contexto/justificação do alerta
   @Column({
-    name: 'tipo_gatilho',
-    type: 'enum',
+    name: 'tipo_alerta',
+    type: 'simple-enum',
     enum: TipoAlerta,
   })
-  tipoGatilho!: TipoAlerta;
+  tipoAlerta!: TipoAlerta;
 
-  @Column({ name: 'avaliacao_carat_id', type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   avaliacaoCaratId?: string | null;
 
-  @ManyToOne(() => AvaliacaoCarat, { onDelete: 'SET NULL', nullable: true })
-  @JoinColumn({ name: 'avaliacao_carat_id' })
-  avaliacaoCarat?: AvaliacaoCarat | null;
+  @ManyToOne(() => AvaliacaoCarat, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'avaliacaoCaratId' })
+  avaliacaoCarat?: AvaliacaoCarat;
+  
 
   // Estado e prioridade (médico pode alterar)
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: AlertaEstado,
     default: AlertaEstado.NOVO,
   })
   estado!: AlertaEstado;
 
   @Column({
-    type: 'enum',
+    type: 'simple-enum',
     enum: AlertaPrioridade,
     default: AlertaPrioridade.MEDIA,
   })
   prioridade!: AlertaPrioridade;
 
-  // Timestamps
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn()
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn()
   updatedAt!: Date;
 
 // Conveniências de negócio
@@ -115,7 +114,7 @@ setPrioridade(p: AlertaPrioridade) {
   setMotivoPorTipoAlerta() {
     if (this.motivo && this.motivo.trim().length > 0) return;
   // Define texto padrão do motivo consoante o tipo de alerta
-    switch (this.tipoGatilho) {
+    switch (this.tipoAlerta) {
       case TipoAlerta.SCOREABAIXOLIMIAR:
         this.motivo = 'Score CARAT abaixo do limiar de controlo.';
         break;
@@ -143,7 +142,7 @@ setPrioridade(p: AlertaPrioridade) {
   validateIntegrity() {
     if (!this.utenteId) throw new Error('Alerta sem utente associado.');
     if (!this.medicoResponsavelId) throw new Error('Alerta sem médico responsável.');
-    if (!this.tipoGatilho) throw new Error('Tipo de alerta é obrigatório.');
+    if (!this.tipoAlerta) throw new Error('Tipo de alerta é obrigatório.');
     if (!this.motivo || !this.motivo.trim()) {
       throw new Error('Motivo é obrigatório.');
     }

@@ -176,31 +176,32 @@ if (require.main === module) {
         // Alertas Clínicos Simulados
         const alertaRepo = AppDataSource.getRepository(Alerta);
         if (await alertaRepo.count() === 0) {
-            // Vamos buscar os utentes à base de dados para garantir que usamos os IDs gerados automaticamente pelo TypeORM
-            const utentes = await utenteRepo.find();
-            
-            if (utentes.length >= 2) {
+
+            const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
+            const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
+
+            if (maria && antonio) {            
                 await alertaRepo.save([
                     {
-                        utenteId: utentes[0]!.id,            // Maria Soares
+                        utenteId: maria.id,            // Maria Laurentina
                         medicoResponsavelId: "1",           // Associado ao médico id 1 
-                        tipoGatilho: TipoAlerta.SCOREABAIXOLIMIAR,
+                        tipoAlerta: TipoAlerta.SCOREABAIXOLIMIAR,
                         estado: AlertaEstado.NOVO,
                         prioridade: AlertaPrioridade.ALTA,
-                        motivo: "Score CARAT abaixo do limiar. Utente Maria Soares apresenta queixas de dispneia ligeira."
+                        motivo: "Score CARAT abaixo do limiar. Utente Maria Laurentina apresenta queixas de dispneia ligeira."
                     },
                     {
-                        utenteId: utentes[1]!.id,            // António Silva
+                        utenteId: antonio.id,            // António Silva
                         medicoResponsavelId: "1",
-                        tipoGatilho: TipoAlerta.DETERIORACAOSCORE,
+                        tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
                         estado: AlertaEstado.VISTO,
                         prioridade: AlertaPrioridade.MEDIA,
                         motivo: "Deterioração significativa do score CARAT em relação ao mês anterior."
                     },
                     {
-                        utenteId: utentes[0]!.id,            // Maria Soares
+                        utenteId: maria.id,            // Maria Laurentina
                         medicoResponsavelId: "1",
-                        tipoGatilho: TipoAlerta.SINTOMAPERSISTENTE,
+                        tipoAlerta: TipoAlerta.SINTOMAPERSISTENTE,
                         estado: AlertaEstado.FECHADO,
                         prioridade: AlertaPrioridade.BAIXA,
                         motivo: "Sintoma persistente de tosse noturna reportado no diário clínico."
