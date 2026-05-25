@@ -1,4 +1,4 @@
-import { AlertaEstado, AlertaPrioridade, TipoAlerta } from './alerta.entity';
+import { AlertaEstado, AlertaPrioridade, TipoAlerta } from '../../models/alerta.entity';
 
 interface UtenteResumoDto {
     id: number;
@@ -14,12 +14,12 @@ interface AvaliacaoCaratResumoDto {
 export interface AlertaResponseDto {
     id: number;
     utenteId: number;
-    utente?: UtenteResumoDto;
+    utente?: UtenteResumoDto | undefined; 
     medicoResponsavelId: string;
     motivo: string;
     tipoAlerta: TipoAlerta;
     avaliacaoCaratId: string | null;
-    avaliacaoCarat?: AvaliacaoCaratResumoDto;
+    avaliacaoCarat?: AvaliacaoCaratResumoDto | undefined; 
     estado: AlertaEstado;
     prioridade: AlertaPrioridade;
     createdAt: Date;
@@ -42,7 +42,7 @@ export function mapearParaAlertaResponse(alerta: any): AlertaResponseDto {
         utente: alerta.utente ? {
             id: alerta.utente.id,
             nome: alerta.utente.nome,
-        } : undefined,
+        } : undefined, // Agora o TypeScript já sabe que 'undefined' é um valor legal aqui
         
         avaliacaoCarat: alerta.avaliacaoCarat ? {
             id: alerta.avaliacaoCarat.id,

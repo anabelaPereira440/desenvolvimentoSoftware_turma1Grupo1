@@ -1,4 +1,4 @@
-import { TipoAlerta, AlertaPrioridade } from './alerta.entity'; 
+import { TipoAlerta, AlertaPrioridade } from '../../models/alerta.entity'; 
 
 export interface CreateAlertaDto {
     utenteId: number;

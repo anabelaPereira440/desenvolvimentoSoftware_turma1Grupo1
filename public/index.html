@@ -138,6 +138,7 @@
     <h2>Menu</h2>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-submissaoCARAT')">Questionário CARAT</button>
+    <button onclick="mostrarPagina('pagina-alertas')">Alertas Clínicos (Médico)</button>
     <button onclick="mostrarPagina('pagina-prescricoes')">Prescrições</button>
     <button onclick="mostrarPagina('pagina-exames')">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
@@ -278,6 +279,34 @@
       </div>
     </section>
 
+    <section id="pagina-alertas" class="pagina">
+      <h1>Dashboard - Alertas Clínicos (BreathCare)</h1>
+      <p>Intervenção proativa com base na deterioração de scores do questionário CARAT ou sintomas persistentes.</p>
+      
+      <h2>Filtros de Auditoria</h2>
+      <div class="pesquisa-box">
+        <select id="filtroAlertaEstado" style="padding: 8px;">
+          <option value="">Todos os Estados</option>
+          <option value="NOVO">Novo</option>
+          <option value="VISTO">Visto</option>
+          <option value="EMSEGUIMENTO">Em Seguimento</option>
+          <option value="FECHADO">Fechado</option>
+        </select>
+
+        <select id="filtroAlertaPrioridade" style="padding: 8px;">
+          <option value="">Todas as Prioridades</option>
+          <option value="BAIXA">Baixa</option>
+          <option value="MEDIA">Média</option>
+          <option value="ALTA">Alta</option>
+          <option value="CRITICA">Crítica</option>
+        </select>
+
+        <button class="form-btn" onclick="buscarAlertas()">Aplicar Filtros</button>
+      </div>
+
+      <h2>Alertas Sob Alçada Médica</h2>
+      <div id="listaAlertas"><p>A carregar alertas clínicos...</p></div>
+    </section>
 
     <section id="pagina-prescricoes" class="pagina">
       <h1>Prescrições</h1>
@@ -330,6 +359,10 @@
       // Se mudar para a página do CARAT, recarrega o histórico automaticamente
       if (idPagina === 'pagina-submissaoCARAT') {
         buscarHistoricoCarat();
+      }
+
+      if (idPagina === 'pagina-alertas') {
+        buscarAlertas();
       }
     }
 
@@ -585,6 +618,79 @@
     document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
 
     buscarPrescricoes();
+
+    // Obter e listar os alertas clínicos aplicando filtros de Estado e Prioridade (GET)
+    async function buscarAlertas() {
+      const container = document.getElementById('listaAlertas');
+      
+      const estadoFiltro = document.getElementById('filtroAlertaEstado').value;
+      const prioridadeFiltro = document.getElementById('filtroAlertaPrioridade').value;
+      
+      container.innerHTML = '<p>A carregar alertas clínicos...</p>';
+
+      try {
+        // Constrói os parâmetros de pesquisa (Query Parameters) dinamicamente
+        const params = new URLSearchParams();
+        if (estadoFiltro) params.append('estado', estadoFiltro);
+        if (prioridadeFiltro) params.append('prioridade', prioridadeFiltro);
+
+        // Se houver filtros, junta-os ao URL (ex: /alertas?estado=VISTO&prioridade=ALTA)
+        const url = params.toString() ? `/alertas?${params.toString()}` : '/alertas';
+
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+
+        if (!Array.isArray(dados) || dados.length === 0) {
+          container.innerHTML = '<p>Nenhum alerta clínico encontrado para os filtros selecionados.</p>';
+          return;
+        }
+
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Utente ID</th>
+                <th>Tipo de Alerta</th>
+                <th>Descrição / Mensagem</th>
+                <th>Prioridade</th>
+                <th>Estado Atual</th>
+                <th>Ações Clínicas</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        for (const alerta of dados) {
+          // Define cores com base na prioridade para destacar visualmente no dashboard
+          let corPrioridade = 'black';
+          if (alerta.prioridade === 'CRITICA') corPrioridade = '#dc2626'; // Vermelho escuro
+          if (alerta.prioridade === 'ALTA') corPrioridade = 'red';
+          if (alerta.prioridade === 'MEDIA') corPrioridade = 'orange';
+          if (alerta.prioridade === 'BAIXA') corPrioridade = 'green';
+
+          html += `
+            <tr>
+              <td><strong>Utente ${alerta.utenteId || alerta.utente?.id || 'N/A'}</strong></td>
+              <td><span style="background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${alerta.tipo || ''}</span></td>
+              <td>${alerta.mensagem || ''}</td>
+              <td><span style="color: ${corPrioridade}; font-weight: bold;">${alerta.prioridade || ''}</span></td>
+              <td><strong style="font-size: 13px;">${alerta.estado || ''}</strong></td>
+              <td>
+                <button onclick="mudarEstadoAlerta(${alerta.id}, 'VISTO')" style="background: #e5e7eb; border: 1px solid #9ca3af; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Marcar Visto</button>
+                <button onclick="mudarEstadoAlerta(${alerta.id}, 'EMSEGUIMENTO')" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Acompanhar</button>
+                <button onclick="mudarEstadoAlerta(${alerta.id}, 'FECHADO')" style="background: #fee2e2; border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Fechar</button>
+              </td>
+            </tr>
+          `;
+        }
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (erro) {
+        container.innerHTML = '<p class="erro">Erro ao carregar o painel de alertas clínicos da API.</p>';
+      }
+    }
+    
   </script>
 </body>
 </html> 

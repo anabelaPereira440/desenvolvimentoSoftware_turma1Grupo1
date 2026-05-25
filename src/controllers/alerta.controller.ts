@@ -1,25 +1,42 @@
 import { Request, Response } from 'express';
-import { AlertaService } from '.alerta.service'; 
-import { AlertaEstado, AlertaPrioridade } from './alerta.entity';
-import { CreateAlertaDto } from './dto/create-alerta.dto';
-import { mapearParaAlertaResponse } from './dto/alerta-response.dto';
+import { AlertaService } from '../services/alerta.service'; 
+import { AlertaEstado, AlertaPrioridade } from '../models/alerta.entity';
+import { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto';
+import { mapearParaAlertaResponse } from '../dtos/alerta/alerta-response.dto';
 
 export class AlertaController {
     private service = new AlertaService();
 
-    async criar(req: Request, res: Response) {
+       async criar(req: Request, res: Response) {
         try {
-            // Tipificamos o corpo da requisição com o teu novo DTO
+            // Tipificamos o corpo da requisição com o teu DTO
             const dadosAlerta: CreateAlertaDto = req.body;
 
             // Validações mínimas obrigatórias na camada HTTP antes de chamar o serviço
-            if (!dadosAlerta.utenteId || !dadosAlerta.medicoResponsavelId || !dadosAlerta.tipoGatilho) {
+            if (!dadosAlerta.utenteId || !dadosAlerta.medicoResponsavelId || !dadosAlerta.tipoAlerta) {
                 return res.status(400).json({ 
-                    erro: "Os campos utenteId, medicoResponsavelId e tipoGatilho são obrigatórios." 
+                    erro: "Os campos utenteId, medicoResponsavelId e tipoAlerta são obrigatórios." 
                 });
             }
 
-            const novoAlerta = await this.service.criarAlerta(dadosAlerta);
+            // 1. Criamos a estrutura base com os campos estritamente obrigatórios
+            const payloadServico: any = {
+                utenteId: dadosAlerta.utenteId,
+                medicoResponsavelId: dadosAlerta.medicoResponsavelId,
+                tipoAlerta: dadosAlerta.tipoAlerta,
+                avaliacaoCaratId: dadosAlerta.avaliacaoCaratId ?? null
+            };
+
+            // 2. Só injetamos as propriedades opcionais se elas vieram preenchidas na rota
+            if (dadosAlerta.prioridade !== undefined) {
+                payloadServico.prioridade = dadosAlerta.prioridade;
+            }
+            if (dadosAlerta.motivo !== undefined) {
+                payloadServico.motivo = dadosAlerta.motivo;
+            }
+
+            // 3. Enviamos o objeto limpo para o serviço
+            const novoAlerta = await this.service.criarAlerta(payloadServico);
             
             // Formatamos a resposta usando o teu Mapper para enviar um JSON limpo
             return res.status(201).json({
@@ -30,6 +47,8 @@ export class AlertaController {
             return res.status(400).json({ erro: error.message });
         }
     }
+
+
 
     // Listar todos os alertas com filtros opcionais (médico, estado, prioridade)
     async listar(req: Request, res: Response) {

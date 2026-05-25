@@ -1,13 +1,13 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from ./database/database';
-import { AlertaClinico, AlertaEstado, AlertaPrioridade } from './alerta.entity';
+import { AppDataSource } from '../database/database';
+import { Alerta, AlertaEstado, AlertaPrioridade, TipoAlerta } from '../models/alerta.entity';
 
 export class AlertaService {
-    private repository: Repository<AlertaClinico>;
+    private repository: Repository<Alerta>;
 
     constructor() {
         // Inicializa o repositório a partir do DataSource global da aplicação
-        this.repository = AppDataSource.getRepository(AlertaClinico);
+        this.repository = AppDataSource.getRepository(Alerta);
     }
 
     //Criação de Alerta Clínico (Gatilho automático do BreathCare)
@@ -15,24 +15,23 @@ export class AlertaService {
     async criarAlerta(dados: {
         utenteId: number;
         medicoResponsavelId: string;
-        tipoGatilho: TipoAlerta;
+        tipoAlerta: TipoAlerta;
         avaliacaoCaratId?: string | null;
         prioridade?: AlertaPrioridade;
         motivo?: string; 
-    }): Promise<AlertaClinico> {
+    }): Promise<Alerta> {
         // O repository.create() instancia a classe da entidade permitindo que os ganchos @BeforeInsert funcionem
         const novoAlerta = this.repository.create({
-            utenteId: dados.utenteId,
+            utente: { id: dados.utenteId } as any,
             medicoResponsavelId: dados.medicoResponsavelId,
-            tipoGatilho: dados.tipoGatilho,
+            tipoGatilho: dados.tipoAlerta,
             avaliacaoCaratId: dados.avaliacaoCaratId,
             prioridade: dados.prioridade || AlertaPrioridade.MEDIA,
             estado: AlertaEstado.NOVO,
             motivo: dados.motivo
-        });
+        } as any);
 
-        // O save vai disparar o setMotivoPorTipoAlerta e o validateIntegrity automaticamente
-        return await this.repository.save(novoAlerta);
+        return await this.repository.save(novoAlerta) as any;
     }
 
     /**
@@ -43,7 +42,7 @@ export class AlertaService {
         medicoResponsavelId?: string; 
         estado?: AlertaEstado; 
         prioridade?: AlertaPrioridade; 
-    }): Promise<AlertaClinico[]> {
+    }): Promise<Alerta[]> {
         const { medicoResponsavelId, estado, prioridade } = filtros;
 
         // Construção dinâmica da cláusula WHERE com base nos parâmetros preenchidos
@@ -72,27 +71,22 @@ export class AlertaService {
     /**
      * REQUISITO: Permitir ao médico consultar os detalhes de um alerta clínico específico.
      */
-    async buscarPorId(id: number): Promise<AlertaClinico | null> {
+    async buscarPorId(id: number): Promise<Alerta | null> {
         return await this.repository.findOne({
             where: { id },
             relations: ['utente', 'avaliacaoCarat']
         });
     }
 
-    /**
-     * REQUISITO: Permitir consultar os alertas gerados especificamente para um utente.
-     * Útil quando o médico abre o perfil clínico e histórico completo do utente.
-     */
-    async buscarPorUtente(utenteId: number): Promise<AlertaClinico[]> {
+    async buscarPorUtente(utenteId: number): Promise<Alerta[]> {
         return await this.repository.find({
-            where: { utenteId },
+            // Se na entidade a relação se chama 'utente', filtramos pelo ID dela assim:
+            where: { utente: { id: utenteId } } as any,
             relations: ['avaliacaoCarat'],
-            order: {
-                createdAt: 'DESC'
-            }
+            order: { createdAt: 'DESC' }
         });
     }
-
+    
     /**
      * REQUISITO: Permitir que o médico altere o estado (Novo, Visto, Em Seguimento, Fechado)
      * ou atualize a prioridade de um alerta clínico após a sua análise.
@@ -100,7 +94,7 @@ export class AlertaService {
     async atualizarAlerta(
         id: number, 
         dadosAtualizacao: { estado?: AlertaEstado; prioridade?: AlertaPrioridade }
-    ): Promise<AlertaClinico> {
+    ): Promise<Alerta> {
         // 1. Verifica se o alerta de facto existe no sistema
         const alerta = await this.repository.findOne({ where: { id } });
         if (!alerta) {

@@ -10,7 +10,7 @@ import { Prescricao } from './models/prescricao.entity';
 import { Exame } from './models/exame.entity';
 import { AvaliacaoCarat } from './models/avaliacao-carat.entity';
 import { Alerta } from './models/alerta.entity';
-import { AlertaClinico, AlertaEstado, AlertaPrioridade, TipoAlerta } from './models/alerta.entity';
+import { AlertaEstado, AlertaPrioridade, TipoAlerta } from './models/alerta.entity';
 
 //Importação das Rotas
 import utenteRoutes from './routes/utente.routes';
@@ -182,7 +182,7 @@ if (require.main === module) {
             if (utentes.length >= 2) {
                 await alertaRepo.save([
                     {
-                        utenteId: utentes[0].id,            // Maria Soares
+                        utenteId: utentes[0]!.id,            // Maria Soares
                         medicoResponsavelId: "1",           // Associado ao médico id 1 
                         tipoGatilho: TipoAlerta.SCOREABAIXOLIMIAR,
                         estado: AlertaEstado.NOVO,
@@ -190,7 +190,7 @@ if (require.main === module) {
                         motivo: "Score CARAT abaixo do limiar. Utente Maria Soares apresenta queixas de dispneia ligeira."
                     },
                     {
-                        utenteId: utentes[1].id,            // António Silva
+                        utenteId: utentes[1]!.id,            // António Silva
                         medicoResponsavelId: "1",
                         tipoGatilho: TipoAlerta.DETERIORACAOSCORE,
                         estado: AlertaEstado.VISTO,
@@ -198,7 +198,7 @@ if (require.main === module) {
                         motivo: "Deterioração significativa do score CARAT em relação ao mês anterior."
                     },
                     {
-                        utenteId: utentes[0].id,            // Maria Soares
+                        utenteId: utentes[0]!.id,            // Maria Soares
                         medicoResponsavelId: "1",
                         tipoGatilho: TipoAlerta.SINTOMAPERSISTENTE,
                         estado: AlertaEstado.FECHADO,
