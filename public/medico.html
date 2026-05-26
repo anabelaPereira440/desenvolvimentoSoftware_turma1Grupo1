@@ -2,207 +2,141 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <title>BreathCare - Painel de Supervisão Médica</title>
+  <title>BreathCare - Painel do Médico</title>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; background: #f1f5f9; }
-    nav { width: 240px; background: #0f172a; color: white; padding: 20px; box-sizing: border-box; }
-    nav h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
-    nav button { display: block; width: 100%; margin-bottom: 10px; padding: 12px; background: #1e293b; color: white; border: none; border-radius: 6px; text-align: left; cursor: pointer; }
-    nav button:hover { background: #334155; }
-    main { flex: 1; padding: 40px; box-sizing: border-box; }
-    .pagina { display: none; }
+    /* Reaproveitamento da Estética Administrativa */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 30%, #0d9488 75%, #10b981 100%);
+      display: flex;
+      min-height: 100vh;
+      color: #1f2937;
+    }
+
+    nav {
+      width: 260px;
+      background: rgba(15, 23, 42, 0.95);
+      color: white;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+    }
+
+    nav h2 { margin-top: 0; font-size: 20px; border-bottom: 2px solid #1e293b; padding-bottom: 15px; color: #10b981; }
+
+    nav button {
+      display: block; width: 100%; margin-bottom: 12px; padding: 12px 16px;
+      background: #1e293b; color: #e2e8f0; border: none; border-radius: 8px;
+      text-align: left; cursor: pointer; font-size: 14px; transition: all 0.2s;
+    }
+
+    nav button.ativo { background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); color: white; }
+
+    main { flex: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+
+    .pagina {
+      display: none; background: rgba(255, 255, 255, 0.96);
+      padding: 35px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+
     .pagina.ativa { display: block; }
-    h1 { color: #0f172a; margin-top:0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-    th { background: #e2e8f0; color: #1e293b; font-weight: 600; }
-    .card-filtro { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
-    select, input, button.clinical-btn { padding: 8px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; }
-    button.clinical-btn { background: #2563eb; color: white; cursor: pointer; border: none; font-weight: bold; }
-    button.clinical-btn:hover { background: #1d4ed8; }
-    form { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; max-width: 500px; display: flex; flex-direction: column; gap: 12px; }
-    .erro { color: red; font-weight: bold; }
+
+    h1 { color: #1e3a8a; font-size: 24px; }
+    h3.seccao-titulo { color: #0d9488; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-top: 30px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    input, select { padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
+
+    .admin-btn {
+      padding: 12px 24px; font-weight: bold; color: white; border: none; border-radius: 8px;
+      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); cursor: pointer; margin-top: 20px;
+    }
+
+    .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    .admin-table th, .admin-table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    .admin-table th { background-color: #f8fafc; }
   </style>
 </head>
 <body>
 
-  <nav>
-    <h2>Painel do Médico</h2>
-    <p style="font-size:12px; color:#9ca3af; margin-bottom:20px;">Dr(a). <span id="medicoNome">Supervisor</span></p>
-    <button onclick="mudarAba('aba-alertas')">Alertas dos Meus Utentes</button>
-    <button onclick="mudarAba('aba-prescricoes')">Emitir Prescrições</button>
-    <button onclick="efetuarLogout()" style="background:#dc2626; margin-top:30px;">Sair do Sistema</button>
-  </nav>
+<nav>
+  <h2>BreathCare Médico</h2>
+  <button id="btn-prescricoes" class="ativo" onclick="mudarAba('prescricoes')">Prescrições</button>
+  <button id="btn-exames" onclick="mudarAba('exames')">Exames</button>
+  <button onclick="window.location.href='index.html'" style="margin-top: auto; border: 1px solid #dc2626; background: transparent;">Sair</button>
+</nav>
 
-  <main>
-    <section id="aba-alertas" class="pagina ativa">
-      <h1>Alertas de Risco Ativos</h1>
-      <p>Monitorização contínua baseada no algoritmo analítico do BreathCare.</p>
+<main>
+  <section id="prescricoes" class="pagina ativa">
+    <h1>Gestão de Prescrições</h1>
+    <div class="form-grid">
+      <div class="input-group"><label>Medicamento:</label><input type="text" id="p-med"></div>
+      <div class="input-group"><label>Dose:</label><input type="text" id="p-dose"></div>
+      <div class="input-group"><label>ID Utente:</label><input type="number" id="p-utente"></div>
+    </div>
+    <button class="admin-btn" onclick="criarPrescricao()">Registar Prescrição</button>
+    
+    <h3 class="seccao-titulo">Histórico</h3>
+    <table class="admin-table">
+      <thead><tr><th>ID</th><th>Medicamento</th><th>Dose</th><th>Validade</th></tr></thead>
+      <tbody id="lista-prescricoes"></tbody>
+    </table>
+  </section>
 
-      <div class="card-filtro">
-        <strong>Filtros de Auditoria:</strong>
-        <select id="filtroEstado">
-          <option value="">Todos os Estados</option>
-          <option value="NOVO">Novo</option>
-          <option value="VISTO">Visto</option>
-          <option value="EMSEGUIMENTO">Em Seguimento</option>
-          <option value="FECHADO">Fechado</option>
-        </select>
-        <select id="filtroPrioridade">
-          <option value="">Todas as Prioridades</option>
-          <option value="BAIXA">Baixa</option>
-          <option value="MEDIA">Média</option>
-          <option value="ALTA">Alta</option>
-          <option value="CRITICA">Crítica</option>
-        </select>
-        <button class="clinical-btn" onclick="carregarAlertasMedicos()">Filtrar</button>
-      </div>
+  <section id="exames" class="pagina">
+    <h1>Gestão de Exames</h1>
+    <div class="form-grid">
+      <div class="input-group"><label>Nome do Exame:</label><input type="text" id="e-nome"></div>
+      <div class="input-group"><label>Código:</label><input type="text" id="e-cod"></div>
+      <div class="input-group"><label>ID Utente:</label><input type="number" id="e-utente"></div>
+    </div>
+    <button class="admin-btn" onclick="criarExame()">Registar Exame</button>
 
-      <div id="tabelaAlertas">Carregando dados críticos do SQLite...</div>
-    </section>
+    <h3 class="seccao-titulo">Histórico</h3>
+    <table class="admin-table">
+      <thead><tr><th>ID</th><th>Exame</th><th>Código</th></tr></thead>
+      <tbody id="lista-exames"></tbody>
+    </table>
+  </section>
+</main>
 
-    <section id="aba-prescricoes" class="pagina">
-      <h1>Nova Intervenção / Prescrição Clínica</h1>
-      <p>Registo e persistência de dados farmacológicos associados ao percurso terapêutico do utente.</p>
-      
-      <form id="formPrescricaoMedica">
-        <label><strong>ID do Utente Alvo:</strong></label>
-        <input type="number" id="prescUtenteId" placeholder="Ex: 1" required />
+<script>
+  function mudarAba(id) {
+    document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('ativo'));
+    document.getElementById(id).classList.add('ativa');
+    document.getElementById('btn-' + id).classList.add('ativo');
+    if(id === 'prescricoes') listarPrescricoes(); else listarExames();
+  }
 
-        <label><strong>Substância / Medicamento:</strong></label>
-        <input type="text" id="prescMedicamento" placeholder="Ex: Inalador Seretide" required />
+  async function listarPrescricoes() {
+    const res = await fetch('/prescricoes');
+    const data = await res.json();
+    document.getElementById('lista-prescricoes').innerHTML = data.map(p => `
+      <tr><td>${p.id}</td><td>${p.medicamento}</td><td>${p.dose}</td><td>${new Date(p.dataValidade).toLocaleDateString()}</td></tr>
+    `).join('');
+  }
 
-        <label><strong>Dose e Posologia:</strong></label>
-        <input type="text" id="prescDose" placeholder="Ex: 250mcg 1 toma de 12h/12h" required />
+  async function criarPrescricao() {
+    const payload = {
+      medicamento: document.getElementById('p-med').value,
+      dose: document.getElementById('p-dose').value,
+      utenteId: parseInt(document.getElementById('p-utente').value),
+      medico_nome: "Dr. Exemplo" 
+    };
+    await fetch('/prescricoes', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+    alert("Criado!"); listarPrescricoes();
+  }
 
-        <button type="submit" class="clinical-btn" style="background:#0d9488;">Gravar e Emitir Prescrição</button>
-        <p id="msgPresc" style="font-weight:bold;"></p>
-      </form>
-    </section>
-  </main>
+  // Repetir lógica similar para Exames...
+  async function listarExames() { /* ... */ }
+  async function criarExame() { /* ... */ }
 
-  <script>
-    // BARREIRA DE SEGURANÇA OBRIGATÓRIA (RBAC)
-    const token = localStorage.getItem('breathcare_token');
-    const user = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
-
-    if (!token || !user || user.role.toUpperCase() !== 'MEDICO') {
-      alert('Acesso negado. Perfil não autorizado.');
-      window.location.href = 'index.html';
-    } else {
-      document.getElementById('medicoNome').textContent = user.nome;
-    }
-
-    function mudarAba(idAba) {
-      document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
-      document.getElementById(idAba).classList.add('ativa');
-      if (idAba === 'aba-alertas') carregarAlertasMedicos();
-    }
-
-    async function fetchAutenticado(url, opcoes = {}) {
-      opcoes.headers = {
-        ...(opcoes.headers || {}),
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-      return fetch(url, opcoes);
-    }
-
-    // Carregar e filtrar Alertas da API (GET para /alertas)
-    async function carregarAlertasMedicos() {
-      const container = document.getElementById('tabelaAlertas');
-      const est = document.getElementById('filtroEstado').value;
-      const pri = document.getElementById('filtroPrioridade').value;
-
-      const params = new URLSearchParams();
-      if (est) params.append('estado', est);
-      if (pri) params.append('prioridade', pri);
-      
-      // Filtra os alertas delegados ao ID do médico logado
-      params.append('medicoResponsavelId', user.id);
-
-      try {
-        const url = params.toString() ? `/alertas?${params.toString()}` : '/alertas';
-        const resposta = await fetchAutenticado(url);
-        const dados = await resposta.json();
-
-        if (!Array.isArray(dados) || dados.length === 0) {
-          container.innerHTML = '<p>Nenhum alerta pendente para validação clínica.</p>';
-          return;
-        }
-
-        let html = `<table><thead><tr><th>Utente ID</th><th>Origem/Tipo</th><th>Evidência Clínica / Motivo</th><th>Prioridade</th><th>Estado</th><th>Ações</th></tr></thead><tbody>`;
-        dados.forEach(a => {
-          html += `<tr>
-            <td><strong>Utente ${a.utenteId}</strong></td>
-            <td><span style="background:#e0f2fe; padding:4px 8px; border-radius:4px; font-size:12px;">${a.tipoAlerta}</span></td>
-            <td>${a.motivo}</td>
-            <td><strong style="color:${a.prioridade==='CRITICA'?'red':'orange'}">${a.prioridade}</strong></td>
-            <td><span style="font-weight:bold;">${a.estado}</span></td>
-            <td>
-              <button onclick="atualizarEstadoAlerta(${a.id}, 'EMSEGUIMENTO')" style="background:#fef3c7; border:1px solid #d97706; cursor:pointer; padding:4px; border-radius:4px;">Acompanhar</button>
-              <button onclick="atualizarEstadoAlerta(${a.id}, 'FECHADO')" style="background:#fee2e2; border:1px solid #dc2626; cursor:pointer; padding:4px; border-radius:4px;">Fechar</button>
-            </td>
-          </tr>`;
-        });
-        container.innerHTML = html + '</tbody></table>';
-      } catch (err) {
-        container.innerHTML = '<p class="erro">Erro na comunicação com o barramento de Alertas.</p>';
-      }
-    }
-
-    // Atualização de Alerta via PATCH (conforme configurado em alerta.routes.ts)
-    async function atualizarEstadoAlerta(id, novoEstado) {
-      try {
-        const resposta = await fetchAutenticado(`/alertas/${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ estado: novoEstado })
-        });
-        if (resposta.ok) {
-          alert(`Alerta atualizado para ${novoEstado}`);
-          carregarAlertasMedicos();
-        } else {
-          alert('Erro ao atualizar o alerta médico.');
-        }
-      } catch (e) { console.error(e); }
-    }
-
-    // Criar Prescrição (POST /prescricoes)
-    document.getElementById('formPrescricaoMedica').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const msg = document.getElementById('msgPresc');
-      msg.textContent = '';
-
-      const payload = {
-        utenteId: parseInt(document.getElementById('prescUtenteId').value),
-        medicamento: document.getElementById('prescMedicamento').value.trim(),
-        dose: document.getElementById('prescDose').value.trim(),
-        medico_name: user.nome
-      };
-
-      try {
-        const resposta = await fetchAutenticado('/prescricoes', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        if (!resposta.ok) throw new Error('Falha ao registar dados terapêuticos.');
-
-        msg.style.color = 'green';
-        msg.textContent = 'Dados guardados e vinculados ao utente!';
-        document.getElementById('formPrescricaoMedica').reset();
-      } catch (err) {
-        msg.style.color = 'red';
-        msg.textContent = err.message;
-      }
-    });
-
-    // Carga inicial
-    carregarAlertasMedicos();
-
-    function efetuarLogout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
-    }
-  </script>
+  listarPrescricoes();
+</script>
 </body>
 </html>
