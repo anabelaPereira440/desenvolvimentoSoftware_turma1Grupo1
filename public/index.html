@@ -130,47 +130,46 @@
       border: 1px solid #bfdbfe;
       margin-top: 10px;
     }
-
   </style>
 </head>
 <body>
+
   <section id="pagina-login" class="pagina ativa" style="margin:auto; padding:50px;">
-  <h1>BreathCare - Autenticação</h1>
+    <h1>BreathCare - Autenticação</h1>
 
-  <div id="bloco-login">
-    <h2>Login</h2>
-    <form id="formLogin">
-      <input id="loginEmail" type="email" placeholder="Email" required />
-      <input id="loginPassword" type="password" placeholder="Password" required />
-      <button class="form-btn" type="submit">Entrar</button>
-      <p id="erroLogin" class="erro"></p>
-    </form>
-    <p>Não tens conta? <a href="#" onclick="alternarLoginRegisto()">Regista-te</a></p>
-  </div>
+    <div id="bloco-login">
+      <h2>Login</h2>
+      <form id="formLogin">
+        <input id="loginUsername" type="text" placeholder="Nome de utilizador (Username)" required />
+        <input id="loginPassword" type="password" placeholder="Password" required />
+        <button class="form-btn" type="submit">Entrar</button>
+        <p id="erroLogin" class="erro"></p>
+      </form>
+      <p>Não tens conta? <a href="#" onclick="alternarLoginRegisto()">Regista-te</a></p>
+    </div>
 
-  <div id="bloco-registo" style="display:none;">
-    <h2>Registo</h2>
-    <form id="formRegisto">
-      <input id="regNome" placeholder="Nome completo" required />
-      <input id="regEmail" type="email" placeholder="Email" required />
-      <input id="regPassword" type="password" placeholder="Password (mín. 6 caracteres)" required />
-      <select id="regRole" required>
-        <option value="UTENTE">Utente</option>
-        <option value="MEDICO">Médico</option>
-        <option value="ADMIN">Administrador</option>
-      </select>
-      <button class="form-btn" type="submit">Registar</button>
-      <p id="erroRegisto" class="erro"></p>
-    </form>
-    <p>Já tens conta? <a href="#" onclick="alternarLoginRegisto()">Faz login</a></p>
-  </div>
-</section>
-  <nav>
-    <nav id="menuPrincipal" style="display:none;">
-  <h2>Menu</h2>
+    <div id="bloco-registo" style="display:none;">
+      <h2>Registo</h2>
+      <form id="formRegisto">
+        <input id="regNome" placeholder="Nome completo" required />
+        <input id="regUsername" type="text" placeholder="Nome de utilizador (Username)" required />
+        <input id="regPassword" type="password" placeholder="Password (mín. 6 caracteres)" required />
+        <select id="regRole" required>
+          <option value="UTENTE">Utente</option>
+          <option value="MEDICO">Médico</option>
+          <option value="ADMIN">Administrador</option>
+        </select>
+        <button class="form-btn" type="submit">Registar</button>
+        <p id="erroRegisto" class="erro"></p>
+      </form>
+      <p>Já tens conta? <a href="#" onclick="alternarLoginRegisto()">Faz login</a></p>
+    </div>
+  </section>
+
+  <nav id="menuPrincipal" style="display:none;">
+    <h2>Menu</h2>
     <p style="font-size:13px; color:#9ca3af;">Olá, <span id="navNome"></span></p>
     <p style="font-size:11px; color:#9ca3af;">Perfil: <span id="navRole"></span></p>
-    <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-submissaoCARAT')">Questionário CARAT</button>
     <button onclick="mostrarPagina('pagina-alertas')">Alertas Clínicos</button>
@@ -178,9 +177,9 @@
     <button onclick="mostrarPagina('pagina-exames')">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
     <button onclick="logout()" style="background:#dc2626; margin-top:20px;">Sair</button>
-</nav>
+  </nav>
 
-  <main>
+  <main id="conteudoPrincipal" style="display:none;">
     <section id="pagina-inicio" class="pagina ativa">
       <h1>BreathCare Health System</h1>
       <p>Escolha uma funcionalidade no menu.</p>
@@ -382,6 +381,10 @@
   </main>
 
   <script>
+    // Variáveis Globais de Estado da Autenticação
+    let tokenAtual = localStorage.getItem('breathcare_token');
+    let userAtual = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
+
     function mostrarPagina(idPagina) {
       const paginas = document.querySelectorAll('.pagina');
       paginas.forEach(pagina => pagina.classList.remove('ativa'));
@@ -391,7 +394,6 @@
         paginaAtiva.classList.add('ativa');
       }
 
-      // Se mudar para a página do CARAT, recarrega o histórico automaticamente
       if (idPagina === 'pagina-submissaoCARAT') {
         buscarHistoricoCarat();
       }
@@ -401,114 +403,101 @@
       }
     }
 
-    //Autenticação
-// Guardar token no localStorage
-let tokenAtual = localStorage.getItem('breathcare_token');
-let userAtual = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
+    function alternarLoginRegisto() {
+      const blocoLogin = document.getElementById('bloco-login');
+      const blocoRegisto = document.getElementById('bloco-registo');
+      blocoLogin.style.display = blocoLogin.style.display === 'none' ? 'block' : 'none';
+      blocoRegisto.style.display = blocoRegisto.style.display === 'none' ? 'block' : 'none';
+    }
 
-function alternarLoginRegisto() {
-  const blocoLogin = document.getElementById('bloco-login');
-  const blocoRegisto = document.getElementById('bloco-registo');
-  blocoLogin.style.display = blocoLogin.style.display === 'none' ? 'block' : 'none';
-  blocoRegisto.style.display = blocoRegisto.style.display === 'none' ? 'block' : 'none';
-}
+    // Função Central de Requisições Autenticadas (Padrão de Segurança da API)
+    async function fetchAutenticado(url, opcoes = {}) {
+      opcoes.headers = {
+        ...(opcoes.headers || {}),
+        'Authorization': `Bearer ${tokenAtual}`,
+        'Content-Type': 'application/json'
+      };
+      return fetch(url, opcoes);
+    }
 
-async function fazerLogin(event) {
-  event.preventDefault();
-  const erro = document.getElementById('erroLogin');
-  erro.textContent = '';
+    async function fazerLogin(event) {
+      event.preventDefault();
+      const erro = document.getElementById('erroLogin');
+      erro.textContent = '';
 
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
 
-  try {
-    const resposta = await fetch('/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const dados = await resposta.json();
-    if (!resposta.ok) throw new Error(dados.erro || 'Erro no login.');
+      try {
+        const resposta = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.erro || 'Erro no login.');
 
-    tokenAtual = dados.token;
-    userAtual = dados.user;
-    localStorage.setItem('breathcare_token', tokenAtual);
-    localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
+        tokenAtual = dados.token;
+        userAtual = dados.user;
+        localStorage.setItem('breathcare_token', tokenAtual);
+        localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
 
-    entrarNaApp();
-  } catch (e) {
-    erro.textContent = e.message;
-  }
-}
+        entrarNaApp();
+      } catch (e) {
+        erro.textContent = e.message;
+      }
+    }
 
-async function fazerRegisto(event) {
-  event.preventDefault();
-  const erro = document.getElementById('erroRegisto');
-  erro.textContent = '';
+    async function fazerRegisto(event) {
+      event.preventDefault();
+      const erro = document.getElementById('erroRegisto');
+      erro.textContent = '';
 
-  const payload = {
-    nome: document.getElementById('regNome').value.trim(),
-    email: document.getElementById('regEmail').value.trim(),
-    password: document.getElementById('regPassword').value,
-    role: document.getElementById('regRole').value
-  };
+      const payload = {
+        nome: document.getElementById('regNome').value.trim(),
+        username: document.getElementById('regUsername').value.trim(),
+        password: document.getElementById('regPassword').value,
+        role: document.getElementById('regRole').value
+      };
 
-  try {
-    const resposta = await fetch('/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const dados = await resposta.json();
-    if (!resposta.ok) throw new Error(dados.erro || 'Erro no registo.');
+      try {
+        const resposta = await fetch('/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(dados.erro || 'Erro no registo.');
 
-    tokenAtual = dados.token;
-    userAtual = dados.user;
-    localStorage.setItem('breathcare_token', tokenAtual);
-    localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
+        tokenAtual = dados.token;
+        userAtual = dados.user;
+        localStorage.setItem('breathcare_token', tokenAtual);
+        localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
 
-    entrarNaApp();
-  } catch (e) {
-    erro.textContent = e.message;
-  }
-}
+        entrarNaApp();
+      } catch (e) {
+        erro.textContent = e.message;
+      }
+    }
 
-function entrarNaApp() {
-  document.getElementById('pagina-login').style.display = 'none';
-  document.getElementById('menuPrincipal').style.display = 'block';
-  document.getElementById('navNome').textContent = userAtual.nome;
-  document.getElementById('navRole').textContent = userAtual.role;
-  mostrarPagina('pagina-inicio');
-}
+    function entrarNaApp() {
+      document.getElementById('pagina-login').style.display = 'none';
+      document.getElementById('menuPrincipal').style.display = 'block';
+      document.getElementById('conteudoPrincipal').style.display = 'block';
+      document.getElementById('navNome').textContent = userAtual.nome;
+      document.getElementById('navRole').textContent = userAtual.role;
+      mostrarPagina('pagina-inicio');
+    }
 
-function logout() {
-  localStorage.removeItem('breathcare_token');
-  localStorage.removeItem('breathcare_user');
-  tokenAtual = null;
-  userAtual = null;
-  location.reload();
-}
+    function logout() {
+      localStorage.removeItem('breathcare_token');
+      localStorage.removeItem('breathcare_user');
+      tokenAtual = null;
+      userAtual = null;
+      location.reload();
+    }
 
-// Helper para fazer fetch autenticado em todas as outras chamadas à API
-async function fetchAutenticado(url, opcoes = {}) {
-  opcoes.headers = {
-    ...(opcoes.headers || {}),
-    'Authorization': `Bearer ${tokenAtual}`
-  };
-  return fetch(url, opcoes);
-}
-
-// Listeners
-document.getElementById('formLogin').addEventListener('submit', fazerLogin);
-document.getElementById('formRegisto').addEventListener('submit', fazerRegisto);
-
-// Se já houver token guardado, entrar direto
-if (tokenAtual && userAtual) {
-  entrarNaApp();
-}
-
-
-    // Submeter novo questionário CARAT (POST)
+    // Submeter novo questionário CARAT (POST Autenticado)
     async function criarAvaliacaoCarat(event) {
       event.preventDefault();
       
@@ -522,7 +511,6 @@ if (tokenAtual && userAtual) {
 
       const utenteId = document.getElementById('caratUtenteId').value;
 
-      // Recolha das 10 variáveis mapeadas por coluna
       const payload = {
         p1: parseInt(document.getElementById('p1').value),
         p2: parseInt(document.getElementById('p2').value),
@@ -537,21 +525,18 @@ if (tokenAtual && userAtual) {
       };
 
       try {
-        const resposta = await fetch(`/utente/${utenteId}/carat`, {
+        const resposta = await fetchAutenticado(`/utente/${utenteId}/carat`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
         const dados = await resposta.json();
-
         if (!resposta.ok) {
           throw new Error(dados.erro || 'Erro ao submeter questionário.');
         }
 
         msgSucesso.textContent = dados.mensagem;
         
-        // Preenche o quadro azul de resultados imediatos
         document.getElementById('resScore').textContent = dados.resultado.scoreTotal;
         document.getElementById('resSup').textContent = dados.resultado.viasSuperiores;
         document.getElementById('resInf').textContent = dados.resultado.viasInferiores;
@@ -560,20 +545,20 @@ if (tokenAtual && userAtual) {
         blocoResultado.style.display = 'block';
 
         document.getElementById('formCARAT').reset();
-        await buscarHistoricoCarat(); // Atualiza a tabela abaixo
+        await buscarHistoricoCarat(); 
       } catch (erro) {
         msgErro.textContent = erro.message;
       }
     }
 
-    // Obter histórico do utente selecionado (GET)
+    // Obter histórico do utente selecionado (GET Autenticado)
     async function buscarHistoricoCarat() {
       const utenteId = document.getElementById('caratUtenteId').value;
       const container = document.getElementById('listaCarat');
       container.innerHTML = '<p>A carregar histórico clínico...</p>';
 
       try {
-        const resposta = await fetch(`/utente/${utenteId}/carat`);
+        const resposta = await fetchAutenticado(`/utente/${utenteId}/carat`);
         const dados = await resposta.json();
 
         if (!Array.isArray(dados) || dados.length === 0) {
@@ -617,13 +602,13 @@ if (tokenAtual && userAtual) {
       }
     }
 
+    // Listar Prescrições (GET Autenticado)
     async function buscarPrescricoes() {
-        alert('Aqui');
       const container = document.getElementById('listaPrescricoes');
       container.innerHTML = '<p>A carregar prescrições...</p>';
 
       try {
-        const resposta = await fetch('/prescricoes');
+        const resposta = await fetchAutenticado('/prescricoes');
         const dados = await resposta.json();
 
         if (!Array.isArray(dados) || dados.length === 0) {
@@ -652,7 +637,7 @@ if (tokenAtual && userAtual) {
               <td>${p.medicamento ?? ''}</td>
               <td>${p.dose ?? ''}</td>
               <td>${p.medico_nome ?? ''}</td>
-              <td>${p.dataCriacao ?? 'não exposta'}</td>
+              <td>${p.dataCriacao ? new Date(p.dataCriacao).toLocaleDateString('pt-PT') : 'Não exposta'}</td>
             </tr>
           `;
         }
@@ -664,12 +649,13 @@ if (tokenAtual && userAtual) {
       }
     }
 
+    // Listar Exames (GET Autenticado)
     async function buscarExames() {
       const container = document.getElementById('listaExames');
       container.innerHTML = '<p>A carregar exames...</p>';
 
       try {
-        const resposta = await fetch('/exames');
+        const resposta = await fetchAutenticado('/exames');
         const dados = await resposta.json();
 
         if (!Array.isArray(dados) || dados.length === 0) {
@@ -698,7 +684,7 @@ if (tokenAtual && userAtual) {
               <td>${exame.nome ?? ''}</td>
               <td>${exame.codigo ?? ''}</td>
               <td>${exame.medico_nome ?? ''}</td>
-              <td>${exame.dataCriacao ?? 'não exposta'}</td>
+              <td>${exame.dataCriacao ? new Date(exame.dataCriacao).toLocaleDateString('pt-PT') : 'Não exposta'}</td>
             </tr>
           `;
         }
@@ -710,6 +696,7 @@ if (tokenAtual && userAtual) {
       }
     }
 
+    // Criar Prescrição (POST Autenticado)
     async function criarPrescricao(event) {
       event.preventDefault();
 
@@ -721,9 +708,8 @@ if (tokenAtual && userAtual) {
       const medico_nome = document.getElementById('medicoNome').value.trim();
 
       try {
-        const resposta = await fetch('/prescricoes', {
+        const resposta = await fetchAutenticado('/prescricoes', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ medicamento, dose, medico_nome })
         });
 
@@ -739,6 +725,7 @@ if (tokenAtual && userAtual) {
       }
     }
 
+    // Consultar Servidor de Interoperabilidade FHIR (GET Autenticado)
     async function pesquisarFhir(event) {
       event.preventDefault();
 
@@ -747,7 +734,7 @@ if (tokenAtual && userAtual) {
       resultado.textContent = 'A pesquisar...';
 
       try {
-        const resposta = await fetch(`/fhir/observations?code=${encodeURIComponent(codigo)}`);
+        const resposta = await fetchAutenticado(`/fhir/observations?code=${encodeURIComponent(codigo)}`);
         const dados = await resposta.json();
         resultado.textContent = JSON.stringify(dados, null, 2);
       } catch (erro) {
@@ -755,31 +742,22 @@ if (tokenAtual && userAtual) {
       }
     }
 
-    document.getElementById('formCARAT').addEventListener('submit', criarAvaliacaoCarat);
-    document.getElementById('formPrescricao').addEventListener('submit', criarPrescricao);
-    document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
-
-    buscarPrescricoes();
-
-    // Obter e listar os alertas clínicos aplicando filtros de Estado e Prioridade (GET)
+    // Listar Alertas Clínicos com Filtros (GET Autenticado)
     async function buscarAlertas() {
       const container = document.getElementById('listaAlertas');
-      
       const estadoFiltro = document.getElementById('filtroAlertaEstado').value;
       const prioridadeFiltro = document.getElementById('filtroAlertaPrioridade').value;
       
       container.innerHTML = '<p>A carregar alertas clínicos...</p>';
 
       try {
-        // Constrói os parâmetros de pesquisa (Query Parameters) dinamicamente
         const params = new URLSearchParams();
         if (estadoFiltro) params.append('estado', estadoFiltro);
         if (prioridadeFiltro) params.append('prioridade', prioridadeFiltro);
 
-        // Se houver filtros, junta-os ao URL (ex: /alertas?estado=VISTO&prioridade=ALTA)
         const url = params.toString() ? `/alertas?${params.toString()}` : '/alertas';
 
-        const resposta = await fetch(url);
+        const resposta = await fetchAutenticado(url);
         const dados = await resposta.json();
 
         if (!Array.isArray(dados) || dados.length === 0) {
@@ -793,35 +771,29 @@ if (tokenAtual && userAtual) {
               <tr>
                 <th>Utente ID</th>
                 <th>Tipo de Alerta</th>
-                <th>Descrição / Mensagem</th>
+                <th>Descrição / Motivo</th>
                 <th>Prioridade</th>
                 <th>Estado Atual</th>
-                <th>Ações Clínicas</th>
               </tr>
             </thead>
             <tbody>
         `;
 
         for (const alerta of dados) {
-          // Define cores com base na prioridade para destacar visualmente no dashboard
           let corPrioridade = 'black';
-          if (alerta.prioridade === 'CRITICA') corPrioridade = '#dc2626'; // Vermelho escuro
+          if (alerta.prioridade === 'CRITICA') corPrioridade = '#dc2626';
           if (alerta.prioridade === 'ALTA') corPrioridade = 'red';
           if (alerta.prioridade === 'MEDIA') corPrioridade = 'orange';
           if (alerta.prioridade === 'BAIXA') corPrioridade = 'green';
 
+          // Atualizado para ler as propriedades corretas retornadas pela sementeira da app.ts (tipoAlerta e motivo)
           html += `
             <tr>
-              <td><strong>Utente ${alerta.utenteId || alerta.utente?.id || 'N/A'}</strong></td>
-              <td><span style="background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${alerta.tipo || ''}</span></td>
-              <td>${alerta.mensagem || ''}</td>
+              <td><strong>Utente ${alerta.utenteId || 'N/A'}</strong></td>
+              <td><span style="background: #e0f2fe; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${alerta.tipoAlerta || ''}</span></td>
+              <td>${alerta.motivo || ''}</td>
               <td><span style="color: ${corPrioridade}; font-weight: bold;">${alerta.prioridade || ''}</span></td>
               <td><strong style="font-size: 13px;">${alerta.estado || ''}</strong></td>
-              <td>
-                <button onclick="mudarEstadoAlerta(${alerta.id}, 'VISTO')" style="background: #e5e7eb; border: 1px solid #9ca3af; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Marcar Visto</button>
-                <button onclick="mudarEstadoAlerta(${alerta.id}, 'EMSEGUIMENTO')" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Acompanhar</button>
-                <button onclick="mudarEstadoAlerta(${alerta.id}, 'FECHADO')" style="background: #fee2e2; border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; padding: 3px 6px;">Fechar</button>
-              </td>
             </tr>
           `;
         }
@@ -833,6 +805,17 @@ if (tokenAtual && userAtual) {
       }
     }
 
+    // Event Listeners Obrigatórios
+    document.getElementById('formLogin').addEventListener('submit', fazerLogin);
+    document.getElementById('formRegisto').addEventListener('submit', fazerRegisto);
+    document.getElementById('formCARAT').addEventListener('submit', criarAvaliacaoCarat);
+    document.getElementById('formPrescricao').addEventListener('submit', criarPrescricao);
+    document.getElementById('formFhir').addEventListener('submit', pesquisarFhir);
+
+    // Fluxo de Inicialização Contínua: Se houver credenciais guardadas, restaura a sessão ativa
+    if (tokenAtual && userAtual) {
+      entrarNaApp();
+    }
   </script>
 </body>
-</html> 
+</html>
