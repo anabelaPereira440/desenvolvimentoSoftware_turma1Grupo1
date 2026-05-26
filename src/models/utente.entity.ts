@@ -22,4 +22,7 @@ export class Utente {
 
     @Column()
     medicoId!: number;
+
+    @Column()
+    utilizadorId!: number;
 }

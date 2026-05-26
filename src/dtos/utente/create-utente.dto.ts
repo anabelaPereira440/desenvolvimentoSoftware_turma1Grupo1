@@ -6,6 +6,7 @@ export interface CreateUtenteDTO {
     sexo: string;
     contacto: string;
     medicoId: number;
+    utilizadorId: number;
 }
 
 export interface UpdateUtenteDTO {

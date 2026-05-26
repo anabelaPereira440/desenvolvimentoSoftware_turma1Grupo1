@@ -22,4 +22,7 @@ export class Medico {
 
     @Column()
     contacto!: string;
+
+    @Column()
+    utilizadorId!: number;
 }

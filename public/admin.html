@@ -4,89 +4,539 @@
   <meta charset="UTF-8" />
   <title>BreathCare - Administração Central</title>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; background: #fafafa; }
-    nav { width: 240px; background: #111827; color: white; padding: 20px; box-sizing: border-box; }
-    nav h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #1f2937; padding-bottom: 10px; }
-    nav button { display: block; width: 100%; margin-bottom: 10px; padding: 12px; background: #1f2937; color: white; border: none; border-radius: 6px; text-align: left; cursor: pointer; }
-    nav button:hover { background: #374151; }
-    main { flex: 1; padding: 40px; box-sizing: border-box; }
-    .pagina { display: none; }
-    .pagina.ativa { display: block; }
-    h1 { color: #111827; margin-top: 0; }
-    form { background: white; padding: 25px; border-radius: 10px; border: 1px solid #e5e7eb; max-width: 550px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    input, select, button.admin-btn { padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #d1d5db; }
-    button.admin-btn { background: #4f46e5; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button.admin-btn:hover { background: #4338ca; }
-    .btn-perigo { background: #dc2626; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-perigo:hover { background: #b91c1c; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 30%, #0d9488 75%, #10b981 100%);
+      display: flex;
+      min-height: 100vh;
+      color: #1f2937;
+    }
+
+    /* Menu de Navegação Lateral */
+    nav {
+      width: 260px;
+      background: rgba(15, 23, 42, 0.95);
+      color: white;
+      padding: 30px 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+    }
+
+    nav h2 {
+      margin-top: 0;
+      font-size: 20px;
+      font-weight: 600;
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 15px;
+      color: #10b981;
+    }
+
+    .user-info-box {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 25px;
+    }
+
+    .user-info-box span {
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    nav button {
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    nav button:hover, nav button.ativo {
+      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+      color: white;
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    nav button.btn-logout {
+      background: transparent;
+      border: 2px solid #dc2626;
+      color: #fca5a5;
+      margin-top: auto;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    nav button.btn-logout:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    /* Área de Conteúdo Principal */
+    main {
+      flex: 1;
+      padding: 40px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .pagina {
+      display: none;
+      background: rgba(255, 255, 255, 0.96);
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .pagina.ativa {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      color: #1e3a8a;
+      margin-top: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    p.subtitulo {
+      color: #4b5563;
+      font-size: 14px;
+      margin-top: -8px;
+      margin-bottom: 25px;
+    }
+
+    /* Formulários e Inputs Organizáveis */
+    h3.seccao-titulo {
+      color: #0d9488;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+      margin-top: 30px;
+      font-size: 18px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 800px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    input, select {
+      padding: 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      outline: none;
+      background-color: #ffffff;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
+    /* Botões Padrão Administrativos */
+    button.admin-btn {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      align-self: flex-start;
+    }
+
+    button.admin-btn:hover {
+      opacity: 0.93;
+    }
+
+    /* Tabelas de Visualização */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .admin-table th, .admin-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .admin-table th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .admin-table tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* Alertas e Status */
+    .msg-feedback {
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .btn-perigo {
+      background: #dc2626;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .btn-perigo:hover {
+      background: #b91c1c;
+    }
+
+    /* ==========================================
+       ESTILOS DOS MODAIS (NOVOS)
+       ========================================== */
+    .modal-overlay {
+        display: none; 
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s;
+    }
+
+    .modal-box {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 350px;
+        max-width: 90%;
+    }
+
+    .modal-box h3 { margin-top: 0; color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+    .modal-box input {
+        width: 100%; padding: 10px; margin-bottom: 12px;
+        border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;
+    }
+    .modal-box label { font-size: 13px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
+    .modal-box .error-msg { color: #dc2626; font-size: 0.85em; display: none; margin-top: -8px; margin-bottom: 12px; font-weight: bold; }
+    
+    .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-cancelar { background: #94a3b8; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+    .btn-cancelar:hover { background: #64748b; }
+    .btn-confirmar { background: #0d9488; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+    .btn-confirmar:hover { background: #0f766e; }
+    
   </style>
 </head>
 <body>
 
   <nav>
-    <h2>Consola ADMIN</h2>
-    <p style="font-size:12px; color:#9ca3af; margin-bottom:20px;">Utilizador: <span id="adminNome">Config</span></p>
-    <button onclick="mudarAba('aba-usuarios')">Gerir Utilizadores (CRUD)</button>
-    <button onclick="mudarAba('aba-config')">Configurar Parâmetros</button>
-    <button onclick="mudarAba('aba-simulados')">Dados Simulados / Seeds</button>
-    <button onclick="efetuarLogout()" style="background:#b91c1c; margin-top:30px;">Terminar Administração</button>
+    <h2>BreathCare Central</h2>
+    <div class="user-info-box">
+      Administrador: <br><span id="adminNome">A carregar...</span>
+    </div>
+    <button id="btn-aba-usuarios" class="ativo" onclick="mudarAba('aba-usuarios')">Gerir Utentes e Médicos</button>
+    <button id="btn-aba-config" onclick="mudarAba('aba-config')">Configurar Parâmetros</button>
+    <button id="btn-aba-simulados" onclick="mudarAba('aba-simulados')">Manutenção / Seeds</button>
+    
+    <button onclick="efetuarLogout()" class="btn-logout">Terminar Administração</button>
   </nav>
 
   <main>
+    
     <section id="aba-usuarios" class="pagina ativa">
       <h1>Criação de Registos Clínicos e Administrativos</h1>
-      <p>Provisionamento centralizado de novos perfis na base de dados SQLite do sistema.</p>
+      <p class="subtitulo">Provisionamento unificado de credenciais e fichas de saúde no ecossistema.</p>
       
+      <h3 class="seccao-titulo">Passo 1: Registar Credenciais de Acesso (Login)</h3>
       <form id="formCriarUtilizador">
-        <label><strong>Nome do Profissional/Doente:</strong></label>
-        <input type="text" id="utilNome" placeholder="Ex: Maria Laurentina" required />
-
-        <label><strong>Nome de Utilizador único (Username):</strong></label>
-        <input type="text" id="utilUsername" placeholder="Ex: maria.laurentina" required />
-
-        <label><strong>Palavra-passe Inicial:</strong></label>
-        <input type="password" id="utilPassword" placeholder="Mínimo de 6 caracteres" required />
-
-        <label><strong>Perfil de Acesso do Utilizador:</strong></label>
-        <select id="utilRole" required>
-          <option value="UTENTE">Utente (Sujeito à monitorização CARAT)</option>
-          <option value="MEDICO">Médico (Profissional de Saúde responsável)</option>
-          <option value="ADMIN">Administrador (Gestão de Infraestrutura)</option>
-        </select>
-
-        <button type="submit" class="admin-btn">Gravar Novo Utilizador na BD</button>
-        <p id="msgUser" style="font-weight:bold;"></p>
+        <div class="form-grid">
+          <div class="input-group">
+            <label>Nome Completo:</label>
+            <input type="text" id="utilNome" placeholder="Ex: Maria Laurentina" required />
+          </div>
+          <div class="input-group">
+            <label>Nome de Utilizador (Username):</label>
+            <input type="text" id="utilUsername" placeholder="Ex: maria.laurentina" required />
+          </div>
+          <div class="input-group">
+            <label>Palavra-passe Inicial:</label>
+            <input type="password" id="utilPassword" placeholder="Mínimo 6 carateres" required />
+          </div>
+          <div class="input-group">
+            <label>Perfil de Acesso (Role):</label>
+            <select id="utilRole" required>
+              <option value="UTENTE">Utente (Sujeito à monitorização CARAT)</option>
+              <option value="MEDICO">Médico (Profissional Supervisor)</option>
+              <option value="ADMIN">Administrador (Infraestrutura)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="admin-btn">Gravar Conta na BD</button>
+        <p id="msgUser" class="msg-feedback"></p>
       </form>
+
+      <div id="blocoUtente" style="display: none;">
+        <h3 class="seccao-titulo">Passo 2: Criar Ficha Clínica do Utente</h3>
+        <form id="formCriarUtenteClinico">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome do Utente:</label>
+              <input type="text" id="cliniNomeUtente" required />
+            </div>
+            <div class="input-group">
+              <label>Número de Utente (9 dígitos):</label>
+              <input type="number" id="cliniNumUtente" pattern="\d{9}" required />
+            </div>
+            <div class="input-group">
+              <label>Data de Nascimento:</label>
+              <input type="date" id="cliniDataNasc" required />
+            </div>
+            <div class="input-group">
+              <label>Sexo:</label>
+              <select id="cliniSexo" required>
+                <option value="M">M (Masculino)</option>
+                <option value="F">F (Feminino)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Contacto (9 dígitos):</label>
+              <input type="text" id="cliniContacto" pattern="\d{9}" placeholder="Ex: 912345678" required />
+            </div>
+            <div class="input-group">
+              <label>Médico Supervisor:</label>
+              <select id="cliniMedicoId" required>
+                <option value="">A carregar médicos...</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>ID da Conta Vinculada (Automático):</label>
+              <input type="number" id="cliniUtilId" readonly style="background-color: #f3f4f6; cursor: not-allowed;" required />
+            </div>
+          </div>
+          <button type="button" onclick="gravarPerfilUtente()" class="admin-btn" style="background: #0d9488;">Vincular Ficha de Utente</button>
+          <p id="msgUtente" class="msg-feedback"></p>
+        </form>
+      </div>
+
+      <div id="blocoMedico" style="display: none;">
+        <h3 class="seccao-titulo">Passo 2: Criar Perfil Profissional do Médico</h3>
+        <form id="formCriarMedicoClinico">
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome do Médico:</label>
+              <input type="text" id="medNome" required />
+            </div>
+            <div class="input-group">
+              <label>Especialidade:</label>
+              <select id="medEspecialidade" required>
+                <option value="Pneumologia">Pneumologia</option>
+                <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                <option value="Imunoalergologia">Imunoalergologia</option>
+                <option value="Outra">Outra</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Cédula Profissional (Apenas Números):</label>
+              <input type="number" id="medCedula" placeholder="Ex: 54321" required />
+            </div>
+            <div class="input-group">
+              <label>Data de Nascimento:</label>
+              <input type="date" id="medDataNasc" required />
+            </div>
+            <div class="input-group">
+              <label>Sexo:</label>
+              <select id="medSexo" required>
+                <option value="M">M (Masculino)</option>
+                <option value="F">F (Feminino)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Contacto (9 dígitos):</label>
+              <input type="text" id="medContacto" pattern="\d{9}" placeholder="Ex: 912345678" required />
+            </div>
+            <div class="input-group">
+              <label>ID da Conta Vinculada:</label>
+              <input type="number" id="medUtilId" readonly style="background-color: #f3f4f6; cursor: not-allowed;" required />
+            </div>
+          </div>
+          <button type="button" onclick="gravarPerfilMedico()" class="admin-btn" style="background: #1e3a8a;">Vincular Ficha de Médico</button>
+          <p id="msgMedico" class="msg-feedback"></p>
+        </form>
+      </div>
+
+      <hr style="margin: 40px 0; border: 1px solid #e5e7eb;">
+      <h2 class="seccao-titulo">Gestão de Registos Existentes</h2>
+      
+      <div style="margin-bottom: 30px;">
+        <h3 style="color: #1e3a8a;">Médicos Registados</h3>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Especialidade</th>
+              <th>Cédula</th>
+              <th>Contacto</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaCorpoMedicos">
+            </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3 style="color: #0d9488;">Utentes Registados</h3>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Nº Utente</th>
+              <th>ID Médico Resp.</th>
+              <th>Contacto</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaCorpoUtentes">
+            </tbody>
+        </table>
+      </div>
+
     </section>
 
     <section id="aba-config" class="pagina">
       <h1>Configuração Normativa do Sistema</h1>
-      <p>Definição automatizada dos limiares clínicos do motor analítico de alertas.</p>
+      <p class="subtitulo">Definição automatizada dos limiares clínicos do motor analítico de alertas.</p>
       
       <form id="formConfigLimiar">
-        <label><strong>Limiar Mínimo do Score CARAT para Geração de Alertas:</strong></label>
-        <input type="number" id="configLimiar" value="19" min="0" max="30" required />
-        <span style="font-size:12px; color:#6b7280;">Por defeito clínico, scores abaixo de 19 geram Alertas de Nível Alto automáticos para o médico supervisor.</span>
-
-        <button type="submit" class="admin-btn" style="background:#059669;">Atualizar Regras de Alerta</button>
-        <p id="msgConfig" style="color:green; font-weight:bold;"></p>
+        <div class="input-group">
+          <label><strong>Limiar Mínimo do Score CARAT para Geração de Alertas:</strong></label>
+          <input type="number" id="configLimiar" value="19" min="0" max="30" style="max-width: 150px;" required />
+          <span style="font-size:13px; color:#6b7280; margin-top: 4px;">
+            Por defeito clínico, scores estritamente inferiores a 19 despoletam Alertas de Nível Alto automáticos na consola do médico.
+          </span>
+        </div>
+        <button type="submit" class="admin-btn">Atualizar Regras de Alerta</button>
+        <p id="msgConfig" class="msg-feedback" style="color:green;"></p>
       </form>
     </section>
 
     <section id="aba-simulados" class="pagina">
       <h1>Manutenção e Sementeira de Dados</h1>
-      <p>Gestão rápida de dados simulados do ecossistema clínico para auditorias ou demonstração de testes ao professor.</p>
+      <p class="subtitulo">Gestão rápida de dados simulados do ecossistema clínico para auditorias ou demonstração.</p>
       
-      <div style="background:white; padding:30px; border-radius:10px; border:1px solid #e5e7eb; max-width:500px;">
-        <h3>Ações de Destruição Controlada</h3>
-        <p style="font-size:13px; color:#4b5563; margin-bottom:20px;">As operações abaixo modificam o estado imediato do ficheiro SQLite eliminando datasets obsoletos de simulação.</p>
+      <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; max-width: 550px;">
+        <h3 style="margin-top:0; color:#dc2626;">Ações de Destruição Controlada</h3>
+        <p style="font-size:13px; color:#4b5563; margin-bottom:20px;">
+          As operações abaixo modificam o estado imediato do ficheiro SQLite eliminando datasets obsoletos de simulação.
+        </p>
         <button class="btn-perigo" onclick="limparDadosDeTeste()">Limpar Todos os Registos Simulados</button>
       </div>
     </section>
   </main>
 
+  <div id="modalApagar" class="modal-overlay">
+      <div class="modal-box">
+          <h3>Confirmar Remoção</h3>
+          <p id="msgModalApagar" style="color: #4b5563; font-size: 14px;">Tens a certeza que pretendes apagar este registo?</p>
+          <div class="modal-buttons">
+              <button class="btn-cancelar" onclick="fecharModal('modalApagar')">Cancelar</button>
+              <button class="btn-perigo" onclick="confirmarApagar()">Apagar</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalEditarUtente" class="modal-overlay">
+      <div class="modal-box">
+          <h3>Editar Utente</h3>
+          
+          <label>Nome do Utente:</label>
+          <input type="text" id="editUtenteNome" placeholder="Nome">
+          
+          <label>Contacto (9 dígitos):</label>
+          <input type="text" id="editUtenteContacto" placeholder="Ex: 912345678" maxlength="9">
+          <span id="erroContactoUtente" class="error-msg">O contacto deve ter 9 dígitos.</span>
+          
+          <label>ID do Médico Responsável:</label>
+          <input type="number" id="editUtenteMedicoId" placeholder="ID (ex: 1)">
+          
+          <div class="modal-buttons">
+              <button class="btn-cancelar" onclick="fecharModal('modalEditarUtente')">Cancelar</button>
+              <button class="btn-confirmar" onclick="guardarEdicaoUtente()">Guardar</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="modalEditarMedico" class="modal-overlay">
+      <div class="modal-box">
+          <h3>Editar Médico</h3>
+          
+          <label>Nome do Médico:</label>
+          <input type="text" id="editMedicoNome" placeholder="Nome">
+          
+          <label>Contacto (9 dígitos):</label>
+          <input type="text" id="editMedicoContacto" placeholder="Ex: 912345678" maxlength="9">
+          <span id="erroContactoMedico" class="error-msg">O contacto deve ter 9 dígitos.</span>
+          
+          <div class="modal-buttons">
+              <button class="btn-cancelar" onclick="fecharModal('modalEditarMedico')">Cancelar</button>
+              <button class="btn-confirmar" onclick="guardarEdicaoMedico()">Guardar</button>
+          </div>
+      </div>
+  </div>
+
   <script>
-    // BARREIRA DE SEGURANÇA OBRIGATÓRIA (RBAC)
+    // 1. BARREIRA DE SEGURANÇA OBRIGATÓRIA (RBAC)
     const token = localStorage.getItem('breathcare_token');
     const user = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
 
@@ -97,11 +547,21 @@
       document.getElementById('adminNome').textContent = user.nome;
     }
 
+    // 2. ALTERNADOR DE ABAS ATUALIZADO
     function mudarAba(idAba) {
       document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('ativo'));
+      
       document.getElementById(idAba).classList.add('ativa');
+      document.getElementById('btn-' + idAba).classList.add('ativo');
+
+      if(idAba === 'aba-usuarios') {
+        desenharTabelaMedicos();
+        desenharTabelaUtentes();
+      }
     }
 
+    // 3. INJETOR AUTOMÁTICO DE AUTHORIZATION HEADERS
     async function fetchAutenticado(url, opcoes = {}) {
       opcoes.headers = {
         ...(opcoes.headers || {}),
@@ -111,11 +571,266 @@
       return fetch(url, opcoes);
     }
 
-    // CRUD: Criar novo Utilizador (POST para /auth/register)
+    // ==========================================
+    // FUNÇÕES CRUD DE BASE (APIs)
+    // ==========================================
+    
+    // -- UTENTES --
+    async function listarUtentes() {
+      const resposta = await fetchAutenticado('/utente');
+      return await resposta.json();
+    }
+    async function buscarUtentePorId(id) {
+      const resposta = await fetchAutenticado(`/utente/${id}`);
+      return await resposta.json();
+    }
+    async function atualizarUtente(id, dadosAtualizados) {
+      const resposta = await fetchAutenticado(`/utente/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(dadosAtualizados)
+      });
+      return await resposta.json();
+    }
+    async function eliminarUtente(id) {
+      const resposta = await fetchAutenticado(`/utente/${id}`, { method: 'DELETE' });
+      return resposta.ok;
+    }
+
+    // -- MÉDICOS --
+    async function listarMedicos() {
+      const resposta = await fetchAutenticado('/medico');
+      return await resposta.json();
+    }
+    async function buscarMedicoPorId(id) {
+      const resposta = await fetchAutenticado(`/medico/${id}`);
+      return await resposta.json();
+    }
+    async function atualizarMedico(id, dadosAtualizados) {
+      const resposta = await fetchAutenticado(`/medico/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(dadosAtualizados)
+      });
+      return await resposta.json();
+    }
+    async function eliminarMedico(id) {
+      const resposta = await fetchAutenticado(`/medico/${id}`, { method: 'DELETE' });
+      return resposta.ok;
+    }
+
+
+    // ==========================================
+    // LÓGICA DE CONTROLO DE MODAIS
+    // ==========================================
+    let estadoModal = { tipo: null, id: null }; // Guarda quem estamos a editar/apagar
+
+    function fecharModal(idModal) {
+        document.getElementById(idModal).style.display = 'none';
+        document.getElementById('erroContactoUtente').style.display = 'none';
+        document.getElementById('erroContactoMedico').style.display = 'none';
+    }
+
+    function prepararApagar(tipo, id, nome) {
+        estadoModal = { tipo, id };
+        document.getElementById('msgModalApagar').innerHTML = `Tens a certeza que pretendes apagar o registo de <strong>${nome}</strong> (ID: ${id})? Esta ação é irreversível.`;
+        document.getElementById('modalApagar').style.display = 'flex';
+    }
+
+    async function confirmarApagar() {
+        const { tipo, id } = estadoModal;
+        let sucesso = false;
+
+        if (tipo === 'medico') {
+            sucesso = await eliminarMedico(id);
+            if (sucesso) { desenharTabelaMedicos(); carregarListaMedicosParaDropdown(); }
+        } else if (tipo === 'utente') {
+            sucesso = await eliminarUtente(id);
+            if (sucesso) { desenharTabelaUtentes(); }
+        }
+
+        if (!sucesso) {
+            alert('Erro ao apagar. Verifica se existem dados dependentes.');
+        }
+        fecharModal('modalApagar');
+    }
+
+    // Modal de Edição - Utentes
+    function iniciarEditarUtente(id, nomeAtual, contactoAtual, medicoIdAtual) {
+        estadoModal = { tipo: 'utente', id };
+        document.getElementById('editUtenteNome').value = nomeAtual;
+        document.getElementById('editUtenteContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
+        document.getElementById('editUtenteMedicoId').value = medicoIdAtual !== 'null' ? medicoIdAtual : '';
+        document.getElementById('modalEditarUtente').style.display = 'flex';
+    }
+
+    async function guardarEdicaoUtente() {
+        const { id } = estadoModal;
+        const novoNome = document.getElementById('editUtenteNome').value.trim();
+        const novoContacto = document.getElementById('editUtenteContacto').value.trim();
+        const novoMedicoId = document.getElementById('editUtenteMedicoId').value;
+        const msgErro = document.getElementById('erroContactoUtente');
+
+        // Validação estrita: 9 dígitos
+        if (!/^\d{9}$/.test(novoContacto)) {
+            msgErro.style.display = 'block';
+            return;
+        } else {
+            msgErro.style.display = 'none';
+        }
+
+        try {
+            const utenteAtual = await buscarUtentePorId(id);
+            const dadosAtualizados = { 
+                ...utenteAtual, 
+                nome: novoNome, 
+                contacto: novoContacto, 
+                medicoId: parseInt(novoMedicoId) || null 
+            };
+            
+            await atualizarUtente(id, dadosAtualizados);
+            fecharModal('modalEditarUtente');
+            desenharTabelaUtentes();
+        } catch (error) {
+            alert('Erro ao atualizar o utente.');
+        }
+    }
+
+    // Modal de Edição - Médicos
+    function iniciarEditarMedico(id, nomeAtual, contactoAtual) {
+        estadoModal = { tipo: 'medico', id };
+        document.getElementById('editMedicoNome').value = nomeAtual;
+        document.getElementById('editMedicoContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
+        document.getElementById('modalEditarMedico').style.display = 'flex';
+    }
+
+    async function guardarEdicaoMedico() {
+        const { id } = estadoModal;
+        const novoNome = document.getElementById('editMedicoNome').value.trim();
+        const novoContacto = document.getElementById('editMedicoContacto').value.trim();
+        const msgErro = document.getElementById('erroContactoMedico');
+
+        // Validação estrita: 9 dígitos
+        if (!/^\d{9}$/.test(novoContacto)) {
+            msgErro.style.display = 'block';
+            return;
+        } else {
+            msgErro.style.display = 'none';
+        }
+
+        try {
+            const medicoAtual = await buscarMedicoPorId(id);
+            const dadosAtualizados = { 
+                ...medicoAtual, 
+                nome: novoNome, 
+                contacto: novoContacto 
+            };
+            
+            await atualizarMedico(id, dadosAtualizados);
+            fecharModal('modalEditarMedico');
+            desenharTabelaMedicos();
+        } catch (error) {
+            alert('Erro ao atualizar o médico.');
+        }
+    }
+
+
+    // ==========================================
+    // LÓGICA VISUAL (TABELAS)
+    // ==========================================
+
+    // Desenhar Tabela de Médicos
+    async function desenharTabelaMedicos() {
+      const tbody = document.getElementById('tabelaCorpoMedicos');
+      tbody.innerHTML = '<tr><td colspan="6">A carregar médicos...</td></tr>';
+      
+      try {
+        const medicos = await listarMedicos();
+        tbody.innerHTML = '';
+        if(medicos.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">Nenhum médico registado.</td></tr>';
+          return;
+        }
+        
+        medicos.forEach(med => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${med.id}</td>
+              <td><strong>${med.nome}</strong></td>
+              <td>${med.especialidade}</td>
+              <td>${med.cedulaProfissional}</td>
+              <td>${med.contacto || 'N/A'}</td>
+              <td>
+                <button onclick="iniciarEditarMedico(${med.id}, '${med.nome}', '${med.contacto}')" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="prepararApagar('medico', ${med.id}, '${med.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red;">Erro ao carregar médicos: ${error.message}</td></tr>`;
+      }
+    }
+
+    // Desenhar Tabela de Utentes
+    async function desenharTabelaUtentes() {
+      const tbody = document.getElementById('tabelaCorpoUtentes');
+      tbody.innerHTML = '<tr><td colspan="6">A carregar utentes...</td></tr>';
+      
+      try {
+        const utentes = await listarUtentes();
+        tbody.innerHTML = '';
+        if(utentes.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">Nenhum utente registado.</td></tr>';
+          return;
+        }
+        
+        utentes.forEach(ut => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${ut.id}</td>
+              <td><strong>${ut.nome}</strong></td>
+              <td>${ut.numeroUtente}</td>
+              <td><span style="color:#4f46e5;">ID ${ut.medicoId}</span></td>
+              <td>${ut.contacto || 'N/A'}</td>
+              <td>
+                <button onclick="iniciarEditarUtente(${ut.id}, '${ut.nome}', '${ut.contacto}', ${ut.medicoId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="prepararApagar('utente', ${ut.id}, '${ut.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color: red;">Erro ao carregar utentes: ${error.message}</td></tr>`;
+      }
+    }
+
+    // ==========================================
+    // INICIALIZAÇÃO DOS FORMULÁRIOS
+    // ==========================================
+
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('cliniDataNasc').setAttribute('max', hoje);
+    document.getElementById('medDataNasc').setAttribute('max', hoje);
+
+    async function carregarListaMedicosParaDropdown() {
+      const select = document.getElementById('cliniMedicoId');
+      try {
+        const medicos = await listarMedicos();
+        select.innerHTML = '<option value="">-- Selecione um Médico --</option>';
+        medicos.forEach(m => {
+          select.innerHTML += `<option value="${m.id}">Dr(a). ${m.nome} (${m.especialidade})</option>`;
+        });
+      } catch (err) {
+        select.innerHTML = '<option value="">Erro ao carregar médicos</option>';
+      }
+    }
+
+    // POST: Criar Utilizador Base
     document.getElementById('formCriarUtilizador').addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = document.getElementById('msgUser');
       msg.textContent = '';
+      document.getElementById('blocoUtente').style.display = 'none';
+      document.getElementById('blocoMedico').style.display = 'none';
 
       const payload = {
         nome: document.getElementById('utilNome').value.trim(),
@@ -133,25 +848,110 @@
         
         if (!resposta.ok) throw new Error(dados.erro || 'Erro ao processar criação.');
 
-        msg.style.color = 'green';
-        msg.textContent = `Sucesso! Novo ${payload.role} registado e auditado.`;
+        msg.style.color = '#059669';
+        const novoId = dados.user?.id;
+        msg.textContent = `Sucesso! Conta criada (ID: ${novoId}). Preencha os dados abaixo.`;
+        
+        if (payload.role === 'UTENTE') {
+          document.getElementById('blocoUtente').style.display = 'block';
+          document.getElementById('cliniUtilId').value = novoId;
+          document.getElementById('cliniNomeUtente').value = payload.nome;
+        } else if (payload.role === 'MEDICO') {
+          document.getElementById('blocoMedico').style.display = 'block';
+          document.getElementById('medUtilId').value = novoId;
+          document.getElementById('medNome').value = payload.nome;
+        }
+
         document.getElementById('formCriarUtilizador').reset();
       } catch (err) {
-        msg.style.color = 'red';
+        msg.style.color = '#dc2626';
         msg.textContent = err.message;
       }
     });
 
-    // Configurações do Limiar de Alerta
+    // POST: Gravar Utente
+    async function gravarPerfilUtente() {
+      const msg = document.getElementById('msgUtente');
+      msg.textContent = '';
+
+      const payload = {
+        nome: document.getElementById('cliniNomeUtente').value.trim(),
+        numeroUtente: parseInt(document.getElementById('cliniNumUtente').value),
+        dataNascimento: document.getElementById('cliniDataNasc').value,
+        sexo: document.getElementById('cliniSexo').value,
+        contacto: document.getElementById('cliniContacto').value.trim(),
+        medicoId: parseInt(document.getElementById('cliniMedicoId').value),
+        utilizadorId: parseInt(document.getElementById('cliniUtilId').value)
+      };
+
+      try {
+        const resposta = await fetchAutenticado('/utente', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok) throw new Error(dados.erro || 'Erro ao vincular dados médicos.');
+
+        msg.style.color = '#059669';
+        msg.textContent = `Ficha de ${payload.nome} vinculada com sucesso!`;
+        document.getElementById('formCriarUtenteClinico').reset();
+        document.getElementById('blocoUtente').style.display = 'none'; 
+        desenharTabelaUtentes(); // Atualiza a tabela global
+      } catch (err) {
+        msg.style.color = '#dc2626';
+        msg.textContent = err.message;
+      }
+    }
+
+    // POST: Gravar Médico
+    async function gravarPerfilMedico() {
+      const msg = document.getElementById('msgMedico');
+      msg.textContent = '';
+
+      const payload = {
+        nome: document.getElementById('medNome').value.trim(),
+        especialidade: document.getElementById('medEspecialidade').value,
+        cedulaProfissional: parseInt(document.getElementById('medCedula').value),
+        dataNascimento: document.getElementById('medDataNasc').value,
+        sexo: document.getElementById('medSexo').value,
+        contacto: document.getElementById('medContacto').value.trim(),
+        utilizadorId: parseInt(document.getElementById('medUtilId').value)
+      };
+
+      try {
+        const resposta = await fetchAutenticado('/medico', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok) throw new Error(dados.erro || dados.message || 'Erro ao vincular Médico.');
+
+        msg.style.color = '#059669';
+        msg.textContent = `Dr(a). ${payload.nome} registado com sucesso!`;
+        document.getElementById('formCriarMedicoClinico').reset();
+        document.getElementById('blocoMedico').style.display = 'none'; 
+        desenharTabelaMedicos();
+        carregarListaMedicosParaDropdown(); 
+      } catch (err) {
+        msg.style.color = '#dc2626';
+        msg.textContent = err.message;
+      }
+    }
+
+    // ==========================================
+    // OUTRAS FUNÇÕES E ARRANQUE
+    // ==========================================
     document.getElementById('formConfigLimiar').addEventListener('submit', (e) => {
       e.preventDefault();
-      document.getElementById('msgConfig').textContent = 'Configuração gravada localmente na base de dados!';
+      const valor = document.getElementById('configLimiar').value;
+      document.getElementById('msgConfig').textContent = `Limiar atualizado para < ${valor} pontos.`;
     });
 
-    // Limpar Dados de Teste Simulado
     async function limparDadosDeTeste() {
-      if(confirm('Tem a certeza de que pretende remover os logs e dados clínicos de simulação do SQLite?')) {
-        alert('Ação processada com sucesso no servidor do BreathCare.');
+      if(confirm('Tem a certeza de que pretende remover os logs de simulação?')) {
+        alert('Ação processada com sucesso.');
       }
     }
 
@@ -159,6 +959,12 @@
       localStorage.clear();
       window.location.href = 'index.html';
     }
+
+    // Arranque Automático Inicial
+    carregarListaMedicosParaDropdown();
+    desenharTabelaMedicos();
+    desenharTabelaUtentes();
+
   </script>
 </body>
 </html>

@@ -66,6 +66,12 @@ if (require.main === module) {
                     username: 'maria.laurentina',
                     password: passwordHash,
                     role: 'UTENTE'
+                },
+                {
+                    nome: 'António Silva',
+                    username: 'antonio.silva',
+                    password: passwordHash,
+                    role: 'UTENTE'
                 }
             ]);
             console.log('Utilizadores simulados criados (password de todos: 123456)');
@@ -81,7 +87,8 @@ if (require.main === module) {
                 cedulaProfissional: 12345,
                 dataNascimento: new Date("1970-05-15"),
                 sexo: "Masculino",
-                contacto: "960000000"
+                contacto: "960000000",
+                utilizadorId: 2
             }); 
         }
         
@@ -95,7 +102,8 @@ if (require.main === module) {
                     dataNascimento: new Date("1965-04-12"), 
                     sexo: "Feminino", 
                     contacto: "912345678", 
-                    medicoId: 1 
+                    medicoId: 1,
+                    utilizadorId: 3 
                 },
                 { 
                     nome: "António Silva", 
@@ -103,7 +111,8 @@ if (require.main === module) {
                     dataNascimento: new Date("1958-11-23"), 
                     sexo: "Masculino", 
                     contacto: "934567890", 
-                    medicoId: 1 
+                    medicoId: 1,
+                    utilizadorId: 4
                 }
             ]);
         }

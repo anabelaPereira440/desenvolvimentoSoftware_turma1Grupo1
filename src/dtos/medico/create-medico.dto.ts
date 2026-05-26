@@ -6,6 +6,7 @@ export interface CreateMedicoDTO {
     dataNascimento: string;
     sexo: string;
     contacto: string;
+    utilizadorId: number;
 }
 
 export interface UpdateMedicoDTO {
