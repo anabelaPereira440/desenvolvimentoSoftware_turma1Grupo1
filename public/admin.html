@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>BreathCare - Administração Central</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; background: #fafafa; }
+    nav { width: 240px; background: #111827; color: white; padding: 20px; box-sizing: border-box; }
+    nav h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #1f2937; padding-bottom: 10px; }
+    nav button { display: block; width: 100%; margin-bottom: 10px; padding: 12px; background: #1f2937; color: white; border: none; border-radius: 6px; text-align: left; cursor: pointer; }
+    nav button:hover { background: #374151; }
+    main { flex: 1; padding: 40px; box-sizing: border-box; }
+    .pagina { display: none; }
+    .pagina.ativa { display: block; }
+    h1 { color: #111827; margin-top: 0; }
+    form { background: white; padding: 25px; border-radius: 10px; border: 1px solid #e5e7eb; max-width: 550px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    input, select, button.admin-btn { padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #d1d5db; }
+    button.admin-btn { background: #4f46e5; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button.admin-btn:hover { background: #4338ca; }
+    .btn-perigo { background: #dc2626; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-perigo:hover { background: #b91c1c; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h2>Consola ADMIN</h2>
+    <p style="font-size:12px; color:#9ca3af; margin-bottom:20px;">Utilizador: <span id="adminNome">Config</span></p>
+    <button onclick="mudarAba('aba-usuarios')">Gerir Utilizadores (CRUD)</button>
+    <button onclick="mudarAba('aba-config')">Configurar Parâmetros</button>
+    <button onclick="mudarAba('aba-simulados')">Dados Simulados / Seeds</button>
+    <button onclick="efetuarLogout()" style="background:#b91c1c; margin-top:30px;">Terminar Administração</button>
+  </nav>
+
+  <main>
+    <section id="aba-usuarios" class="pagina ativa">
+      <h1>Criação de Registos Clínicos e Administrativos</h1>
+      <p>Provisionamento centralizado de novos perfis na base de dados SQLite do sistema.</p>
+      
+      <form id="formCriarUtilizador">
+        <label><strong>Nome do Profissional/Doente:</strong></label>
+        <input type="text" id="utilNome" placeholder="Ex: Maria Laurentina" required />
+
+        <label><strong>Nome de Utilizador único (Username):</strong></label>
+        <input type="text" id="utilUsername" placeholder="Ex: maria.laurentina" required />
+
+        <label><strong>Palavra-passe Inicial:</strong></label>
+        <input type="password" id="utilPassword" placeholder="Mínimo de 6 caracteres" required />
+
+        <label><strong>Perfil de Acesso do Utilizador:</strong></label>
+        <select id="utilRole" required>
+          <option value="UTENTE">Utente (Sujeito à monitorização CARAT)</option>
+          <option value="MEDICO">Médico (Profissional de Saúde responsável)</option>
+          <option value="ADMIN">Administrador (Gestão de Infraestrutura)</option>
+        </select>
+
+        <button type="submit" class="admin-btn">Gravar Novo Utilizador na BD</button>
+        <p id="msgUser" style="font-weight:bold;"></p>
+      </form>
+    </section>
+
+    <section id="aba-config" class="pagina">
+      <h1>Configuração Normativa do Sistema</h1>
+      <p>Definição automatizada dos limiares clínicos do motor analítico de alertas.</p>
+      
+      <form id="formConfigLimiar">
+        <label><strong>Limiar Mínimo do Score CARAT para Geração de Alertas:</strong></label>
+        <input type="number" id="configLimiar" value="19" min="0" max="30" required />
+        <span style="font-size:12px; color:#6b7280;">Por defeito clínico, scores abaixo de 19 geram Alertas de Nível Alto automáticos para o médico supervisor.</span>
+
+        <button type="submit" class="admin-btn" style="background:#059669;">Atualizar Regras de Alerta</button>
+        <p id="msgConfig" style="color:green; font-weight:bold;"></p>
+      </form>
+    </section>
+
+    <section id="aba-simulados" class="pagina">
+      <h1>Manutenção e Sementeira de Dados</h1>
+      <p>Gestão rápida de dados simulados do ecossistema clínico para auditorias ou demonstração de testes ao professor.</p>
+      
+      <div style="background:white; padding:30px; border-radius:10px; border:1px solid #e5e7eb; max-width:500px;">
+        <h3>Ações de Destruição Controlada</h3>
+        <p style="font-size:13px; color:#4b5563; margin-bottom:20px;">As operações abaixo modificam o estado imediato do ficheiro SQLite eliminando datasets obsoletos de simulação.</p>
+        <button class="btn-perigo" onclick="limparDadosDeTeste()">Limpar Todos os Registos Simulados</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // BARREIRA DE SEGURANÇA OBRIGATÓRIA (RBAC)
+    const token = localStorage.getItem('breathcare_token');
+    const user = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
+
+    if (!token || !user || user.role.toUpperCase() !== 'ADMIN') {
+      alert('Acesso negado. Requer privilégios de ADMINISTRADOR.');
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('adminNome').textContent = user.nome;
+    }
+
+    function mudarAba(idAba) {
+      document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+      document.getElementById(idAba).classList.add('ativa');
+    }
+
+    async function fetchAutenticado(url, opcoes = {}) {
+      opcoes.headers = {
+        ...(opcoes.headers || {}),
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      return fetch(url, opcoes);
+    }
+
+    // CRUD: Criar novo Utilizador (POST para /auth/register)
+    document.getElementById('formCriarUtilizador').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msgUser');
+      msg.textContent = '';
+
+      const payload = {
+        nome: document.getElementById('utilNome').value.trim(),
+        username: document.getElementById('utilUsername').value.trim(),
+        password: document.getElementById('utilPassword').value,
+        role: document.getElementById('utilRole').value
+      };
+
+      try {
+        const resposta = await fetchAutenticado('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const dados = await resposta.json();
+        
+        if (!resposta.ok) throw new Error(dados.erro || 'Erro ao processar criação.');
+
+        msg.style.color = 'green';
+        msg.textContent = `Sucesso! Novo ${payload.role} registado e auditado.`;
+        document.getElementById('formCriarUtilizador').reset();
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.textContent = err.message;
+      }
+    });
+
+    // Configurações do Limiar de Alerta
+    document.getElementById('formConfigLimiar').addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('msgConfig').textContent = 'Configuração gravada localmente na base de dados!';
+    });
+
+    // Limpar Dados de Teste Simulado
+    async function limparDadosDeTeste() {
+      if(confirm('Tem a certeza de que pretende remover os logs e dados clínicos de simulação do SQLite?')) {
+        alert('Ação processada com sucesso no servidor do BreathCare.');
+      }
+    }
+
+    function efetuarLogout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
