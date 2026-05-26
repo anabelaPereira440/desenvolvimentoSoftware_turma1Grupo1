@@ -134,15 +134,51 @@
   </style>
 </head>
 <body>
+  <section id="pagina-login" class="pagina ativa" style="margin:auto; padding:50px;">
+  <h1>BreathCare - Autenticação</h1>
+
+  <div id="bloco-login">
+    <h2>Login</h2>
+    <form id="formLogin">
+      <input id="loginEmail" type="email" placeholder="Email" required />
+      <input id="loginPassword" type="password" placeholder="Password" required />
+      <button class="form-btn" type="submit">Entrar</button>
+      <p id="erroLogin" class="erro"></p>
+    </form>
+    <p>Não tens conta? <a href="#" onclick="alternarLoginRegisto()">Regista-te</a></p>
+  </div>
+
+  <div id="bloco-registo" style="display:none;">
+    <h2>Registo</h2>
+    <form id="formRegisto">
+      <input id="regNome" placeholder="Nome completo" required />
+      <input id="regEmail" type="email" placeholder="Email" required />
+      <input id="regPassword" type="password" placeholder="Password (mín. 6 caracteres)" required />
+      <select id="regRole" required>
+        <option value="UTENTE">Utente</option>
+        <option value="MEDICO">Médico</option>
+        <option value="ADMIN">Administrador</option>
+      </select>
+      <button class="form-btn" type="submit">Registar</button>
+      <p id="erroRegisto" class="erro"></p>
+    </form>
+    <p>Já tens conta? <a href="#" onclick="alternarLoginRegisto()">Faz login</a></p>
+  </div>
+</section>
   <nav>
-    <h2>Menu</h2>
+    <nav id="menuPrincipal" style="display:none;">
+  <h2>Menu</h2>
+    <p style="font-size:13px; color:#9ca3af;">Olá, <span id="navNome"></span></p>
+    <p style="font-size:11px; color:#9ca3af;">Perfil: <span id="navRole"></span></p>
+    <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-inicio')">Início</button>
     <button onclick="mostrarPagina('pagina-submissaoCARAT')">Questionário CARAT</button>
     <button onclick="mostrarPagina('pagina-alertas')">Alertas Clínicos</button>
     <button onclick="mostrarPagina('pagina-prescricoes')">Prescrições</button>
     <button onclick="mostrarPagina('pagina-exames')">Exames</button>
     <button onclick="mostrarPagina('pagina-fhir')">Consulta FHIR</button>
-  </nav>
+    <button onclick="logout()" style="background:#dc2626; margin-top:20px;">Sair</button>
+</nav>
 
   <main>
     <section id="pagina-inicio" class="pagina ativa">
@@ -364,6 +400,113 @@
         buscarAlertas();
       }
     }
+
+    //Autenticação
+// Guardar token no localStorage
+let tokenAtual = localStorage.getItem('breathcare_token');
+let userAtual = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
+
+function alternarLoginRegisto() {
+  const blocoLogin = document.getElementById('bloco-login');
+  const blocoRegisto = document.getElementById('bloco-registo');
+  blocoLogin.style.display = blocoLogin.style.display === 'none' ? 'block' : 'none';
+  blocoRegisto.style.display = blocoRegisto.style.display === 'none' ? 'block' : 'none';
+}
+
+async function fazerLogin(event) {
+  event.preventDefault();
+  const erro = document.getElementById('erroLogin');
+  erro.textContent = '';
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  try {
+    const resposta = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro || 'Erro no login.');
+
+    tokenAtual = dados.token;
+    userAtual = dados.user;
+    localStorage.setItem('breathcare_token', tokenAtual);
+    localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
+
+    entrarNaApp();
+  } catch (e) {
+    erro.textContent = e.message;
+  }
+}
+
+async function fazerRegisto(event) {
+  event.preventDefault();
+  const erro = document.getElementById('erroRegisto');
+  erro.textContent = '';
+
+  const payload = {
+    nome: document.getElementById('regNome').value.trim(),
+    email: document.getElementById('regEmail').value.trim(),
+    password: document.getElementById('regPassword').value,
+    role: document.getElementById('regRole').value
+  };
+
+  try {
+    const resposta = await fetch('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro || 'Erro no registo.');
+
+    tokenAtual = dados.token;
+    userAtual = dados.user;
+    localStorage.setItem('breathcare_token', tokenAtual);
+    localStorage.setItem('breathcare_user', JSON.stringify(userAtual));
+
+    entrarNaApp();
+  } catch (e) {
+    erro.textContent = e.message;
+  }
+}
+
+function entrarNaApp() {
+  document.getElementById('pagina-login').style.display = 'none';
+  document.getElementById('menuPrincipal').style.display = 'block';
+  document.getElementById('navNome').textContent = userAtual.nome;
+  document.getElementById('navRole').textContent = userAtual.role;
+  mostrarPagina('pagina-inicio');
+}
+
+function logout() {
+  localStorage.removeItem('breathcare_token');
+  localStorage.removeItem('breathcare_user');
+  tokenAtual = null;
+  userAtual = null;
+  location.reload();
+}
+
+// Helper para fazer fetch autenticado em todas as outras chamadas à API
+async function fetchAutenticado(url, opcoes = {}) {
+  opcoes.headers = {
+    ...(opcoes.headers || {}),
+    'Authorization': `Bearer ${tokenAtual}`
+  };
+  return fetch(url, opcoes);
+}
+
+// Listeners
+document.getElementById('formLogin').addEventListener('submit', fazerLogin);
+document.getElementById('formRegisto').addEventListener('submit', fazerRegisto);
+
+// Se já houver token guardado, entrar direto
+if (tokenAtual && userAtual) {
+  entrarNaApp();
+}
+
 
     // Submeter novo questionário CARAT (POST)
     async function criarAvaliacaoCarat(event) {

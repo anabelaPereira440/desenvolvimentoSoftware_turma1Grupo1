@@ -1,9 +1,12 @@
 import express from 'express';
 import path from 'path';
 import { AppDataSource } from './database/database';
+import bcrypt from 'bcryptjs';
+import { Log } from './models/log.entity';
+import authRoutes from './routes/auth.routes';
 
 //Importação das Entidades
-import { User } from './models/user.entity';
+import { Utilizador } from './models/utilizador.entity';
 import { Utente } from './models/utente.entity';
 import { Medico } from './models/medico.entity';
 import { Prescricao } from './models/prescricao.entity';
@@ -36,13 +39,31 @@ if (require.main === module) {
         console.log ("Base de Dados SQLite conectada com sucesso!");
 
         //Utilizadores Simulados
-        const userRepo = AppDataSource.getRepository(User);
+        const userRepo = AppDataSource.getRepository(Utilizador);
         if (await userRepo.count() === 0) {
-            await userRepo.save({
-                username: 'Jorge Almeida',
-                password: 'password123',
-                role: 'medico'
-            });
+        const passwordHash = await bcrypt.hash('123456', 10);
+
+            await userRepo.save([
+                {
+                nome: 'Administrador',
+                username: 'admin',
+                password: passwordHash,
+                role: 'ADMIN'
+                },
+                {
+                nome: 'Jorge Almeida',
+                username: 'jorge.almeida',
+                password: passwordHash,
+                role: 'MEDICO'
+                },
+                {
+                nome: 'Maria Laurentina',
+                username: 'maria.laurentina',
+                password: passwordHash,
+                role: 'UTENTE'
+                }
+            ]);
+        console.log('Utilizadores simulados criados (password de todos: 123456)');
         }
 
         //Médicos Simulados
