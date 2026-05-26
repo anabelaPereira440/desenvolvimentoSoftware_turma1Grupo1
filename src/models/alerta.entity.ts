@@ -31,9 +31,7 @@ export enum AlertaPrioridade {
 }
 
 export enum TipoAlerta {
-  SCOREABAIXOLIMIAR = 'SCORE_ABAIXO_LIMIAR',
   DETERIORACAOSCORE = 'DETERIORACAO_SCORE',
-  SINTOMAPERSISTENTE = 'SINTOMA_PERSISTENTE',
   INDICACAOEXAMES = 'INDICACAO_EXAMES',
   REVISAOTERAPEUTICA = 'REVISAO_TERAPEUTICA',
 }
@@ -115,14 +113,8 @@ setPrioridade(p: AlertaPrioridade) {
     if (this.motivo && this.motivo.trim().length > 0) return;
   // Define texto padrão do motivo consoante o tipo de alerta
     switch (this.tipoAlerta) {
-      case TipoAlerta.SCOREABAIXOLIMIAR:
-        this.motivo = 'Score CARAT abaixo do limiar de controlo.';
-        break;
       case TipoAlerta.DETERIORACAOSCORE:
         this.motivo = 'Deterioração significativa do score CARAT.';
-        break;
-      case TipoAlerta.SINTOMAPERSISTENTE:
-        this.motivo = 'Sintomas persistentes/severos registados.';
         break;
       case TipoAlerta.INDICACAOEXAMES:
         this.motivo = 'Indicação de exames complementares.';

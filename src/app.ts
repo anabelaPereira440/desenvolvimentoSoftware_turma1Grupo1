@@ -186,7 +186,7 @@ if (require.main === module) {
                         subScoreViasSuperiores: 8,
                         subScoreViasInferiores: 13,
                         interpretacao: "Doença Respiratória Parcialmente Controlada.",
-                        recomendacoes: "Manter o plano terapêutico habitual e agendar uma consulta de rotina para avaliação contínua.",
+                        recomendacoes: "Indicação para a realização de exames complementares de diagnóstico. Manter o plano terapêutico habitual e agendar uma consulta de rotina para avaliação contívua.",
                         utenteId: antonio.id
                     }
                 ]);
@@ -205,23 +205,15 @@ if (require.main === module) {
                     {
                         utenteId: maria.id,
                         medicoResponsavelId: "1",
-                        tipoAlerta: TipoAlerta.SCOREABAIXOLIMIAR,
+                        tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
                         estado: AlertaEstado.NOVO,
                         prioridade: AlertaPrioridade.ALTA,
                         motivo: "Score CARAT abaixo do limiar. Utente Maria Laurentina apresenta queixas de dispneia ligeira."
                     },
                     {
-                        utenteId: antonio.id,
-                        medicoResponsavelId: "1",
-                        tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
-                        estado: AlertaEstado.VISTO,
-                        prioridade: AlertaPrioridade.MEDIA,
-                        motivo: "Deterioração significativa do score CARAT em relação ao mês anterior."
-                    },
-                    {
                         utenteId: maria.id,
                         medicoResponsavelId: "1",
-                        tipoAlerta: TipoAlerta.SINTOMAPERSISTENTE,
+                        tipoAlerta: TipoAlerta.INDICACAOEXAMES,
                         estado: AlertaEstado.FECHADO,
                         prioridade: AlertaPrioridade.BAIXA,
                         motivo: "Sintoma persistente de tosse noturna reportado no diário clínico."
