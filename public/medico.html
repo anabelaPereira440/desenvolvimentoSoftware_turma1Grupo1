@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>BreathCare - Painel do Médico</title>
   <style>
-    /* Reaproveitamento da Estética Administrativa */
+    /* Estética Administrativa e Clínica Unificada */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,40 +25,182 @@
       box-shadow: 4px 0 15px rgba(0,0,0,0.2);
     }
 
-    nav h2 { margin-top: 0; font-size: 20px; border-bottom: 2px solid #1e293b; padding-bottom: 15px; color: #10b981; }
+    nav h2 { 
+      margin-top: 0; 
+      font-size: 20px; 
+      border-bottom: 2px solid #1e293b; 
+      padding-bottom: 15px; 
+      color: #10b981; 
+    }
 
     nav button {
-      display: block; width: 100%; margin-bottom: 12px; padding: 12px 16px;
-      background: #1e293b; color: #e2e8f0; border: none; border-radius: 8px;
-      text-align: left; cursor: pointer; font-size: 14px; transition: all 0.2s;
+      display: block; 
+      width: 100%; 
+      margin-bottom: 12px; 
+      padding: 12px 16px;
+      background: #1e293b; 
+      color: #e2e8f0; 
+      border: none; 
+      border-radius: 8px;
+      text-align: left; 
+      cursor: pointer; 
+      font-size: 14px; 
+      transition: all 0.2s;
     }
 
-    nav button.ativo { background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); color: white; }
+    nav button:hover, nav button.ativo { 
+      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); 
+      color: white; 
+    }
 
-    main { flex: 1; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+    nav button.btn-logout {
+      background: transparent;
+      border: 2px solid #dc2626;
+      color: #fca5a5;
+      margin-top: auto;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    nav button.btn-logout:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    main { 
+      flex: 1; 
+      padding: 40px; 
+      box-sizing: border-box; 
+      overflow-y: auto; 
+    }
 
     .pagina {
-      display: none; background: rgba(255, 255, 255, 0.96);
-      padding: 35px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      display: none; 
+      background: rgba(255, 255, 255, 0.96);
+      padding: 35px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      animation: fadeIn 0.3s ease-in-out;
     }
 
-    .pagina.ativa { display: block; }
+    .pagina.ativa { 
+      display: block; 
+    }
 
-    h1 { color: #1e3a8a; font-size: 24px; }
-    h3.seccao-titulo { color: #0d9488; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-top: 30px; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
-    .input-group { display: flex; flex-direction: column; gap: 6px; }
-    input, select { padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; }
+    h1 { 
+      color: #1e3a8a; 
+      font-size: 24px; 
+      margin-top: 0;
+    }
+
+    h3.seccao-titulo { 
+      color: #0d9488; 
+      border-bottom: 2px solid #e5e7eb; 
+      padding-bottom: 8px; 
+      margin-top: 35px; 
+    }
+
+    .form-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); 
+      gap: 16px; 
+    }
+
+    .input-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 6px; 
+    }
+
+    .input-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    input, select { 
+      padding: 12px; 
+      border-radius: 8px; 
+      border: 1px solid #d1d5db; 
+      outline: none;
+      background-color: #ffffff;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
 
     .admin-btn {
-      padding: 12px 24px; font-weight: bold; color: white; border: none; border-radius: 8px;
-      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); cursor: pointer; margin-top: 20px;
+      padding: 12px 24px; 
+      font-weight: bold; 
+      color: white; 
+      border: none; 
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1e40af 0%, #0d9488 100%); 
+      cursor: pointer; 
+      margin-top: 20px;
+      align-self: flex-start;
+      font-size: 14px;
     }
 
-    .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-    .admin-table th, .admin-table td { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: left; }
-    .admin-table th { background-color: #f8fafc; }
+    .admin-btn:hover {
+      opacity: 0.93;
+    }
+
+    .search-container {
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: #0d9488;
+    }
+
+    .admin-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 10px; 
+      background: white; 
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .admin-table th, .admin-table td { 
+      padding: 12px 16px; 
+      border-bottom: 1px solid #e5e7eb; 
+      text-align: left; 
+    }
+
+    .admin-table th { 
+      background-color: #f8fafc; 
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .admin-table tr:hover {
+      background-color: #f1f5f9;
+    }
   </style>
 </head>
 <body>
@@ -67,76 +209,284 @@
   <h2>BreathCare Médico</h2>
   <button id="btn-prescricoes" class="ativo" onclick="mudarAba('prescricoes')">Prescrições</button>
   <button id="btn-exames" onclick="mudarAba('exames')">Exames</button>
-  <button onclick="window.location.href='index.html'" style="margin-top: auto; border: 1px solid #dc2626; background: transparent;">Sair</button>
+  <button onclick="window.location.href='index.html'" class="btn-logout">Sair do Painel</button>
 </nav>
 
 <main>
-  <section id="prescricoes" class="pagina ativa">
-    <h1>Gestão de Prescrições</h1>
+  <section id="prescricoes" class="pagina active ativa">
+    <h1>Gestão de Prescrições Médicas</h1>
     <div class="form-grid">
-      <div class="input-group"><label>Medicamento:</label><input type="text" id="p-med"></div>
-      <div class="input-group"><label>Dose:</label><input type="text" id="p-dose"></div>
-      <div class="input-group"><label>ID Utente:</label><input type="number" id="p-utente"></div>
+      <div class="input-group">
+        <label>Medicamento:</label>
+        <input type="text" id="p-med" placeholder="Ex: Salbutamol">
+      </div>
+      <div class="input-group">
+        <label>Dose / Posologia:</label>
+        <input type="text" id="p-dose" placeholder="Ex: 2 microgramas / dia">
+      </div>
+      <div class="input-group">
+        <label>Utente Alvo:</label>
+        <select id="p-utente">
+          <option value="">A carregar utentes...</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Médico Prescritor:</label>
+        <select id="p-medico">
+          <option value="">A carregar médicos...</option>
+        </select>
+      </div>
     </div>
     <button class="admin-btn" onclick="criarPrescricao()">Registar Prescrição</button>
     
-    <h3 class="seccao-titulo">Histórico</h3>
+    <h3 class="seccao-titulo">Histórico Clínico de Prescrições</h3>
+    <div class="search-container">
+      <input type="text" class="search-box" id="search-prescricoes" placeholder="Procurar por ID, Medicamento ou Médico..." onkeyup="filtrarTabela('lista-prescricoes', this.value)">
+    </div>
     <table class="admin-table">
-      <thead><tr><th>ID</th><th>Medicamento</th><th>Dose</th><th>Validade</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Medicamento</th>
+          <th>Dose</th>
+          <th>Médico Supervisor</th>
+          <th>Data Validade</th>
+        </tr>
+      </thead>
       <tbody id="lista-prescricoes"></tbody>
     </table>
   </section>
 
   <section id="exames" class="pagina">
-    <h1>Gestão de Exames</h1>
+    <h1>Gestão de Exames Diagnósticos</h1>
     <div class="form-grid">
-      <div class="input-group"><label>Nome do Exame:</label><input type="text" id="e-nome"></div>
-      <div class="input-group"><label>Código:</label><input type="text" id="e-cod"></div>
-      <div class="input-group"><label>ID Utente:</label><input type="number" id="e-utente"></div>
+      <div class="input-group">
+        <label>Nome do Exame:</label>
+        <input type="text" id="e-nome" placeholder="Ex: Espirometria Forçada">
+      </div>
+      <div class="input-group">
+        <label>Código do Exame:</label>
+        <input type="text" id="e-cod" placeholder="Ex: EX-ESP-002">
+      </div>
+      <div class="input-group">
+        <label>Utente Alvo:</label>
+        <select id="e-utente">
+          <option value="">A carregar utentes...</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Médico Requisitante:</label>
+        <select id="e-medico">
+          <option value="">A carregar médicos...</option>
+        </select>
+      </div>
     </div>
     <button class="admin-btn" onclick="criarExame()">Registar Exame</button>
 
-    <h3 class="seccao-titulo">Histórico</h3>
+    <h3 class="seccao-titulo">Histórico Clínico de Exames</h3>
+    <div class="search-container">
+      <input type="text" class="search-box" id="search-exames" placeholder="Procurar por ID, Exame ou Médico..." onkeyup="filtrarTabela('lista-exames', this.value)">
+    </div>
     <table class="admin-table">
-      <thead><tr><th>ID</th><th>Exame</th><th>Código</th></tr></thead>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome do Exame</th>
+          <th>Código</th>
+          <th>Médico Supervisor</th>
+          <th>Data Validade</th>
+        </tr>
+      </thead>
       <tbody id="lista-exames"></tbody>
     </table>
   </section>
 </main>
 
 <script>
+  // Injetor de Headers de Autenticação (Caso uses RBAC/Tokens)
+  const token = localStorage.getItem('breathcare_token');
+  async function fetchClinico(url, opcoes = {}) {
+    opcoes.headers = {
+      ...(opcoes.headers || {}),
+      'Content-Type': 'application/json'
+    };
+    if (token) opcoes.headers['Authorization'] = `Bearer ${token}`;
+    return fetch(url, opcoes);
+  }
+
+  // Alternador de Abas Simétrico
   function mudarAba(id) {
     document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('ativo'));
+    
     document.getElementById(id).classList.add('ativa');
     document.getElementById('btn-' + id).classList.add('ativo');
-    if(id === 'prescricoes') listarPrescricoes(); else listarExames();
+    
+    if(id === 'prescricoes') listarPrescricoes();
+    if(id === 'exames') listarExames();
   }
 
+  // Carga Dinâmica de Entidades para os Dropdowns
+  async function carregarEntidadesDisponiveis() {
+    try {
+      const [resUtentes, resMedicos] = await Promise.all([
+        fetchClinico('/utente'),
+        fetchClinico('/medico')
+      ]);
+      
+      const utentes = await resUtentes.json();
+      const medicos = await resMedicos.json();
+
+      const dropdownsUtentes = ['p-utente', 'e-utente'];
+      const dropdownsMedicos = ['p-medico', 'e-medico'];
+
+      dropdownsUtentes.forEach(id => {
+        const el = document.getElementById(id);
+        if(utentes.length === 0) { el.innerHTML = '<option value="">Nenhum utente encontrado</option>'; }
+        else {
+          el.innerHTML = utentes.map(u => `<option value="${u.id}">${u.nome} (ID: ${u.id})</option>`).join('');
+        }
+      });
+
+      dropdownsMedicos.forEach(id => {
+        const el = document.getElementById(id);
+        if(medicos.length === 0) { el.innerHTML = '<option value="">Nenhum médico encontrado</option>'; }
+        else {
+          el.innerHTML = medicos.map(m => `<option value="${m.nome}">Dr(a). ${m.nome}</option>`).join('');
+        }
+      });
+    } catch (err) {
+      console.error("Erro ao popular dropdowns estruturais:", err);
+    }
+  }
+
+  // Filtragem Dinâmica em Tempo Real
+  function filtrarTabela(tbodyId, termo) {
+    const linhas = document.getElementById(tbodyId).getElementsByTagName('tr');
+    const filtro = termo.toLowerCase();
+    for (let linha of linhas) {
+      const texto = linha.textContent.toLowerCase();
+      linha.style.display = texto.includes(filtro) ? '' : 'none';
+    }
+  }
+
+  // --- MÓDULO: PRESCRIÇÕES ---
   async function listarPrescricoes() {
-    const res = await fetch('/prescricoes');
-    const data = await res.json();
-    document.getElementById('lista-prescricoes').innerHTML = data.map(p => `
-      <tr><td>${p.id}</td><td>${p.medicamento}</td><td>${p.dose}</td><td>${new Date(p.dataValidade).toLocaleDateString()}</td></tr>
-    `).join('');
+    const tbody = document.getElementById('lista-prescricoes');
+    try {
+      const res = await fetchClinico('/prescricoes');
+      const data = await res.json();
+      
+      if(data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Nenhuma prescrição registada no sistema.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(p => `
+        <tr>
+          <td><strong>#${p.id}</strong></td>
+          <td>${p.medicamento}</td>
+          <td>${p.dose}</td>
+          <td><span style="color:#0d9488; font-weight:600;">${p.medico_nome}</span></td>
+          <td>${new Date(p.dataValidade).toLocaleDateString('pt-PT')}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Falha ao ligar ao servidor.</td></tr>';
+    }
   }
 
   async function criarPrescricao() {
+    const selectMedico = document.getElementById('p-medico');
     const payload = {
-      medicamento: document.getElementById('p-med').value,
-      dose: document.getElementById('p-dose').value,
+      medicamento: document.getElementById('p-med').value.trim(),
+      dose: document.getElementById('p-dose').value.trim(),
       utenteId: parseInt(document.getElementById('p-utente').value),
-      medico_nome: "Dr. Exemplo" 
+      medico_nome: selectMedico.value
     };
-    await fetch('/prescricoes', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-    alert("Criado!"); listarPrescricoes();
+
+    if(!payload.medicamento || !payload.dose || !payload.utenteId || !payload.medico_nome) {
+      alert("Por favor, preencha todos os parâmetros clínicos.");
+      return;
+    }
+
+    const res = await fetchClinico('/prescricoes', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    if(res.ok) {
+      alert("Prescrição emitida com sucesso!");
+      document.getElementById('p-med').value = '';
+      document.getElementById('p-dose').value = '';
+      listarPrescricoes();
+    } else {
+      const erro = await res.json();
+      alert("Erro na validação: " + (erro.message || "Dados inválidos"));
+    }
   }
 
-  // Repetir lógica similar para Exames...
-  async function listarExames() { /* ... */ }
-  async function criarExame() { /* ... */ }
+  // --- MÓDULO: EXAMES ---
+  async function listarExames() {
+    const tbody = document.getElementById('lista-exames');
+    try {
+      const res = await fetchClinico('/exames');
+      const data = await res.json();
 
-  listarPrescricoes();
+      if(data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Nenhum exame clínico requisitado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(e => `
+        <tr>
+          <td><strong>#${e.id}</strong></td>
+          <td>${e.nome}</td>
+          <td><code>${e.codigo}</code></td>
+          <td><span style="color:#0d9488; font-weight:600;">${e.medico_nome}</span></td>
+          <td>${new Date(e.dataValidade).toLocaleDateString('pt-PT')}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Falha ao ligar ao servidor.</td></tr>';
+    }
+  }
+
+  async function criarExame() {
+    const selectMedico = document.getElementById('e-medico');
+    const payload = {
+      nome: document.getElementById('e-nome').value.trim(),
+      codigo: document.getElementById('e-cod').value.trim(),
+      utenteId: parseInt(document.getElementById('e-utente').value),
+      medico_nome: selectMedico.value
+    };
+
+    if(!payload.nome || !payload.codigo || !payload.utenteId || !payload.medico_nome) {
+      alert("Por favor, preencha todos os parâmetros clínicos.");
+      return;
+    }
+
+    const res = await fetchClinico('/exames', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    if(res.ok) {
+      alert("Requisição de Exame gravada com sucesso!");
+      document.getElementById('e-nome').value = '';
+      document.getElementById('e-cod').value = '';
+      listarExames();
+    } else {
+      const erro = await res.json();
+      alert("Erro na validação: " + (erro.message || "Dados inválidos"));
+    }
+  }
+
+  // Inicialização do Ecossistema Clínico
+  window.addEventListener('DOMContentLoaded', async () => {
+    await carregarEntidadesDisponiveis();
+    listarPrescricoes();
+  });
 </script>
 </body>
 </html>
