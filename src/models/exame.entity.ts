@@ -1,26 +1,46 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+} from 'typeorm';
+import { TipoExame } from '../enums/TipoExame.enum';
+import { Utente } from './utente.entity';
 
 @Entity()
 export class Exame {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @Column()
+  nome!: string;
 
-    @Column()
-    nome!: string;
+  @Column({
+    type: 'simple-enum',
+    enum: TipoExame,
+    default: TipoExame.OUTRO,
+  })
+  tipo!: TipoExame;
 
-    @Column()
-    codigo!: string;
+  @Column()
+  codigo!: string;
 
-    @Column()
-    medico_nome!: string;
+  @Column()
+  medico_nome!: string;
 
-    @Column()
-    utenteId!: number;
+  // Utente ao qual o exame está associado
+  @Column()
+  utenteId!: number;
 
-    @Column()
-    dataCriacao!: Date;
+  @ManyToOne(() => Utente, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'utenteId' })
+  utente!: Utente;
 
-    @Column()
-    dataValidade!: Date;
+  @CreateDateColumn()
+  dataCriacao!: Date;
+
+  @Column({ type: 'date' })
+  dataValidade!: Date;
 }

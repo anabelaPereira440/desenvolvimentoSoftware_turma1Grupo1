@@ -1,6 +1,10 @@
+import { TipoExame } from '../../enums/TipoExame.enum';
+
 export interface CreateExameDto {
-    nome: string;
-    codigo: string;
-    medico_nome: string;
-    utenteId: number;
+  nome: string;
+  tipo: TipoExame;
+  codigo: string;
+  medico_nome: string;
+  utenteId: number;
+  dataValidade?: string;
 }

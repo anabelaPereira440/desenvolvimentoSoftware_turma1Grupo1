@@ -7,62 +7,39 @@ import {
   UpdateDateColumn,
   Index,
   JoinColumn,
-  BeforeInsert,
-  BeforeUpdate
 } from 'typeorm';
-
+import { AlertaEstado } from '../enums/AlertaEstado.enum';
+import { AlertaPrioridade } from '../enums/AlertaPrioridade.enum';
+import { TipoAlerta } from '../enums/TipoAlerta.enum';
 import { Utente } from './utente.entity';
 import { Medico } from './medico.entity';
 import { AvaliacaoCarat } from './avaliacao-carat.entity';
-
-// Enums
-export enum AlertaEstado {
-  NOVO = 'NOVO',
-  VISTO = 'VISTO',
-  EMSEGUIMENTO = 'EM_SEGUIMENTO',
-  FECHADO = 'FECHADO',
-}
-
-export enum AlertaPrioridade {
-  BAIXA = 'BAIXA',
-  MEDIA = 'MEDIA',
-  ALTA = 'ALTA',
-  CRITICA = 'CRITICA',
-}
-
-export enum TipoAlerta {
-  DETERIORACAOSCORE = 'DETERIORACAO_SCORE',
-  INDICACAOEXAMES = 'INDICACAO_EXAMES',
-  REVISAOTERAPEUTICA = 'REVISAO_TERAPEUTICA',
-}
+import { Recomendacao } from './recomendacao.entity';
 
 @Entity()
-//Índice composto baseado em 3 colunas
 @Index(['medicoResponsavelId', 'estado', 'prioridade'])
 @Index(['utenteId', 'createdAt'])
 export class Alerta {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  // Relações principais
   @Column({ type: 'integer' })
   utenteId!: number;
 
-  @ManyToOne(() => Utente, { onDelete: 'CASCADE'})
-  @JoinColumn({ name: 'utente_id' })
+  @ManyToOne(() => Utente, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'utenteId' })
   utente!: Utente;
 
-  @Column({type: 'varchar' })
-  medicoResponsavelId!: string;
+  @Column({ type: 'integer' })
+  medicoResponsavelId!: number;
 
-  @ManyToOne(() => Medico, { onDelete: 'RESTRICT'})
-  @JoinColumn({ name: 'medico_responsavel_id' })
+  @ManyToOne(() => Medico, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'medicoResponsavelId' })
   medicoResponsavel!: Medico;
 
   @Column({ type: 'text' })
   motivo!: string;
 
-  // Contexto/justificação do alerta
   @Column({
     name: 'tipo_alerta',
     type: 'simple-enum',
@@ -70,15 +47,22 @@ export class Alerta {
   })
   tipoAlerta!: TipoAlerta;
 
+  // Avaliação CARAT que originou este alerta
   @Column({ type: 'varchar', nullable: true })
   avaliacaoCaratId?: string | null;
 
   @ManyToOne(() => AvaliacaoCarat, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'avaliacaoCaratId' })
   avaliacaoCarat?: AvaliacaoCarat;
-  
 
-  // Estado e prioridade (médico pode alterar)
+  // Recomendação que disparou este alerta (null para alertas de deterioração)
+  @Column({ type: 'integer', nullable: true })
+  recomendacaoId?: number | null;
+
+  @ManyToOne(() => Recomendacao, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'recomendacaoId' })
+  recomendacao?: Recomendacao;
+
   @Column({
     type: 'simple-enum',
     enum: AlertaEstado,
@@ -98,45 +82,4 @@ export class Alerta {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-// Conveniências de negócio
-setPrioridade(p: AlertaPrioridade) {
-    if (!Object.values(AlertaPrioridade).includes(p)) {
-      throw new Error('Prioridade inválida');
-    }
-    this.prioridade = p;
-  }
-
-  // Executa automaticamente antes de inserir na Base de Dados
-  @BeforeInsert()
-  setMotivoPorTipoAlerta() {
-    if (this.motivo && this.motivo.trim().length > 0) return;
-  // Define texto padrão do motivo consoante o tipo de alerta
-    switch (this.tipoAlerta) {
-      case TipoAlerta.DETERIORACAOSCORE:
-        this.motivo = 'Deterioração significativa do score CARAT.';
-        break;
-      case TipoAlerta.INDICACAOEXAMES:
-        this.motivo = 'Indicação de exames complementares.';
-        break;
-      case TipoAlerta.REVISAOTERAPEUTICA:
-        this.motivo = 'Indicação de revisão terapêutica.';
-        break;
-      default:
-        this.motivo = 'Alerta clínico.';
-    }
-  }
-
-  // Executa automaticamente antes de Inserir e Atualizar
-  @BeforeInsert()
-  @BeforeUpdate()
-// Valida integridade mínima antes de persistir (pode ser chamado no serviço)
-  validateIntegrity() {
-    if (!this.utenteId) throw new Error('Alerta sem utente associado.');
-    if (!this.medicoResponsavelId) throw new Error('Alerta sem médico responsável.');
-    if (!this.tipoAlerta) throw new Error('Tipo de alerta é obrigatório.');
-    if (!this.motivo || !this.motivo.trim()) {
-      throw new Error('Motivo é obrigatório.');
-    }
-  }
 }

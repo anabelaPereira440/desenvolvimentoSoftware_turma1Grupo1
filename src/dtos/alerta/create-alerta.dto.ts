@@ -1,8 +1,9 @@
-import { TipoAlerta, AlertaPrioridade } from '../../models/alerta.entity'; 
+import { TipoAlerta } from '../../enums/TipoAlerta.enum';
+import { AlertaPrioridade } from '../../enums/AlertaPrioridade.enum';
 
 export interface CreateAlertaDto {
     utenteId: number;
-    medicoResponsavelId: string;
+    medicoResponsavelId: number;
     tipoAlerta: TipoAlerta;
     avaliacaoCaratId?: string | null;
     prioridade?: AlertaPrioridade; 

@@ -1,20 +1,9 @@
-/*Esta classe AuthService é responsável por autenticar um utilizador.
-
-Ou seja, recebe:
-    •   username
-    •   password
-
-e verifica se:
-    1.  o utilizador existe
-    2.  a password está correta
-
-Se tudo correr bem, gera um token JWT que poderá depois ser usado nas rotas protegidas.*/
-
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../database/database';
 import { Utilizador } from '../models/utilizador.entity';
 import { Log } from '../models/log.entity';
+import { TipoUtilizador } from '../enums/TipoUtilizador.enum';
 import { appConfig } from '../config/app.config';
 
 export class AuthService {
@@ -49,9 +38,9 @@ export class AuthService {
       throw new Error('A password deve ter pelo menos 6 caracteres.');
     }
 
-    const roleFinal = (role || 'UTENTE').toUpperCase();
-    if (!['UTENTE', 'MEDICO', 'ADMIN'].includes(roleFinal)) {
-      throw new Error('Perfil inválido. Use UTENTE, MEDICO ou ADMIN.');
+    const roleFinal = (role || TipoUtilizador.UTENTE).toUpperCase() as TipoUtilizador;
+    if (!Object.values(TipoUtilizador).includes(roleFinal)) {
+      throw new Error(`Perfil inválido. Valores aceites: ${Object.values(TipoUtilizador).join(', ')}.`);
     }
 
     // Verificar se já existe
@@ -130,6 +119,21 @@ export class AuthService {
     };
   }
 
+  // Altera o perfil (role) de um utilizador existente
+  async alterarRole(utilizadorId: number, novoRole: string): Promise<Utilizador> {
+    const user = await this.userRepo.findOneBy({ id: utilizadorId });
+    if (!user) throw new Error('Utilizador não encontrado.');
+
+    const roleFinal = novoRole.toUpperCase() as TipoUtilizador;
+    if (!Object.values(TipoUtilizador).includes(roleFinal)) {
+      throw new Error(`Perfil inválido. Valores aceites: ${Object.values(TipoUtilizador).join(', ')}.`);
+    }
+
+    user.role = roleFinal;
+    await this.registarLog(user.id, user.username, 'ALTERACAO_ROLE', `Perfil alterado para ${roleFinal}`);
+    return this.userRepo.save(user);
+  }
+
   // Lista todos os logs (Uso exclusivo do perfil ADMIN)
   async listarLogs(): Promise<Log[]> {
     return this.logRepo.find({
@@ -140,7 +144,6 @@ export class AuthService {
 
   // Gera o JSON Web Token (JWT)
   private gerarToken(id: number, username: string, role: string): string {
-    // Solução: Tipificar o options como any remove a rigidez da biblioteca jwt
     const options: any = {
       expiresIn: appConfig.auth.jwtExpiresIn
     };

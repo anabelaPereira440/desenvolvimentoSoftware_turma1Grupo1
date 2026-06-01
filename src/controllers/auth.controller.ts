@@ -6,7 +6,6 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 
 export class AuthController {
-  // Instanciação única e limpa do Serviço de Autenticação
   private authService = new AuthService();
 
   // Utilização de Arrow Functions (= async (req, res) =>) para garantir 
@@ -44,6 +43,19 @@ export class AuthController {
       });
     } catch (error: any) {
       // Erro de validação de input ou utilizador já existente (400 Bad Request)
+      return res.status(400).json({ erro: error.message });
+    }
+  };
+
+  alterarRole = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const id = parseInt(req.params.id as string);
+      if (isNaN(id)) return res.status(400).json({ erro: 'ID inválido.' });
+      const { role } = req.body;
+      if (!role) return res.status(400).json({ erro: 'O campo role é obrigatório.' });
+      const resultado = await this.authService.alterarRole(id, role);
+      return res.json({ mensagem: 'Perfil atualizado com sucesso.', role: resultado.role });
+    } catch (error: any) {
       return res.status(400).json({ erro: error.message });
     }
   };

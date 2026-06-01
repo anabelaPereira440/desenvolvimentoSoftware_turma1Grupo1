@@ -3,275 +3,464 @@
 <head>
   <meta charset="UTF-8" />
   <title>BreathCare - Área do Utente</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; background: #f8fafc; }
-    nav { width: 240px; background: #1f2937; color: white; padding: 20px; box-sizing: border-box; }
-    nav h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #374151; padding-bottom: 10px; }
-    nav button { display: block; width: 100%; margin-bottom: 10px; padding: 12px; background: #374151; color: white; border: none; border-radius: 6px; text-align: left; cursor: pointer; font-size: 14px; }
-    nav button:hover { background: #4b5563; }
-    main { flex: 1; padding: 40px; box-sizing: border-box; }
-    .pagina { display: none; }
-    .pagina.ativa { display: block; }
-    h1 { color: #1e293b; margin-top: 0; }
-    form { display: flex; flex-direction: column; gap: 14px; max-width: 650px; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .campo-pergunta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
-    .campo-pergunta label { font-size: 14px; font-weight: 600; color: #334155; }
-    select, input, button.form-btn { padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; }
-    button.form-btn { background: #0d9488; color: white; font-weight: bold; cursor: pointer; border: none; transition: background 0.2s; }
-    button.form-btn:hover { background: #0f766e; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-    th { background: #f1f5f9; color: #475569; font-weight: 600; }
-    .erro { color: #dc2626; font-weight: bold; }
-    .sucesso { color: #16a34a; font-weight: bold; }
-    .bloco-resultado { background: #f0fdf4; padding: 20px; border-radius: 8px; border: 1px solid #bbf7d0; margin-top: 15px; color: #166534; }
-    .limiar-alerta { color: #dc2626; font-weight: bold; }
-    .limiar-controlado { color: #16a34a; font-weight: bold; }
+    body { margin:0; font-family:'Segoe UI',sans-serif; display:flex; min-height:100vh; background:#f8fafc; }
+    nav { width:240px; background:#1f2937; color:white; padding:20px; box-sizing:border-box; display:flex; flex-direction:column; }
+    nav h2 { margin-top:0; font-size:18px; border-bottom:1px solid #374151; padding-bottom:10px; }
+    nav button { display:block; width:100%; margin-bottom:10px; padding:12px; background:#374151; color:white; border:none; border-radius:6px; text-align:left; cursor:pointer; font-size:14px; }
+    nav button:hover { background:#4b5563; }
+    nav button.ativo { background:#0d9488; }
+    main { flex:1; padding:40px; box-sizing:border-box; overflow-y:auto; }
+    .pagina { display:none; }
+    .pagina.ativa { display:block; }
+    h1 { color:#1e293b; margin-top:0; }
+    h3.st { color:#0d9488; border-bottom:2px solid #e5e7eb; padding-bottom:8px; margin-top:30px; }
+    form { display:flex; flex-direction:column; gap:14px; max-width:650px; background:white; padding:25px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    .campo-pergunta { display:flex; flex-direction:column; gap:6px; }
+    .campo-pergunta label { font-size:14px; font-weight:600; color:#334155; }
+    select, input { padding:10px; font-size:14px; border-radius:6px; border:1px solid #cbd5e1; }
+    button.form-btn { padding:11px; font-size:14px; background:#0d9488; color:white; font-weight:bold; cursor:pointer; border:none; border-radius:6px; transition:background 0.2s; }
+    button.form-btn:hover { background:#0f766e; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; background:white; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    th,td { text-align:left; padding:11px 14px; border-bottom:1px solid #e2e8f0; font-size:14px; }
+    th { background:#f1f5f9; color:#475569; font-weight:600; }
+    .erro { color:#dc2626; font-weight:bold; }
+    .sucesso { color:#16a34a; font-weight:bold; }
+    .bloco-resultado { background:#f0fdf4; padding:20px; border-radius:8px; border:1px solid #bbf7d0; margin-top:15px; color:#166534; }
+    .limiar-alerta { color:#dc2626; font-weight:bold; }
+    .limiar-controlado { color:#16a34a; font-weight:bold; }
+    .limiar-parcial { color:#d97706; font-weight:bold; }
+    .badge { display:inline-block; padding:3px 8px; border-radius:10px; font-size:12px; font-weight:600; }
+    .badge-novo { background:#dbeafe; color:#1d4ed8; }
+    .badge-seguimento { background:#ffedd5; color:#9a3412; }
+    .badge-fechado { background:#dcfce7; color:#166534; }
+    .badge-alta { background:#fee2e2; color:#b91c1c; }
+    .badge-media { background:#fef9c3; color:#854d0e; }
+    .badge-baixa { background:#dcfce7; color:#166534; }
+    .card-rec { background:white; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-start; }
+    .card-rec .tipo { font-size:12px; font-weight:700; text-transform:uppercase; color:#0d9488; margin-bottom:6px; }
+    .card-rec .desc { font-size:14px; color:#374151; }
+    .card-rec .lida { font-size:12px; color:#9ca3af; margin-top:6px; }
+    .btn-lida { padding:6px 12px; background:#0d9488; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold; }
+    .btn-lida:hover { background:#0f766e; }
   </style>
 </head>
 <body>
 
   <nav>
     <h2>BreathCare Utente</h2>
-    <p style="font-size:12px; color:#9ca3af; margin-bottom:20px;">Olá, <span id="sessaoNome">Utente</span></p>
-    <button onclick="mudarAba('aba-inicio')">Início</button>
-    <button onclick="mudarAba('aba-carat')">Questionário CARAT</button>
-    <button onclick="mudarAba('aba-dashboard')">Meu Dashboard</button>
-    <button onclick="efetuarLogout()" style="background:#dc2626; margin-top:30px;">Terminar Sessão</button>
+    <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Olá, <span id="sessaoNome">Utente</span></p>
+    <button id="btn-aba-inicio"     class="ativo" onclick="mudarAba('aba-inicio')">Início</button>
+    <button id="btn-aba-carat"      onclick="mudarAba('aba-carat')">Questionário CARAT</button>
+    <button id="btn-aba-dashboard"  onclick="mudarAba('aba-dashboard')">Meu Dashboard</button>
+    <button id="btn-aba-alertas"    onclick="mudarAba('aba-alertas')">Os Meus Alertas</button>
+    <button id="btn-aba-recomendacoes" onclick="mudarAba('aba-recomendacoes')">Recomendações</button>
+    <button id="btn-aba-perfil" onclick="mudarAba('aba-perfil')">Os Meus Dados</button>
+    <button onclick="efetuarLogout()" style="background:#dc2626;margin-top:auto;">Terminar Sessão</button>
   </nav>
 
   <main>
+
+    <!-- INÍCIO -->
     <section id="aba-inicio" class="pagina ativa">
       <h1>Bem-vindo ao BreathCare</h1>
-      <p>Utilize o menu lateral para preencher as suas avaliações clínicas respiratórias e monitorizar o controlo da sua patologia crónica.</p>
+      <p>Utilize o menu lateral para preencher avaliações CARAT, consultar o seu histórico clínico, ver alertas e recomendações do seu médico.</p>
     </section>
 
+    <!-- CARAT -->
     <section id="aba-carat" class="pagina">
       <h1>Módulo Clínico CARAT</h1>
-      <p>Avaliação do Controlo da Asma e da Rinite Alérgica (Últimos 15 dias)</p>
-      
+      <p>Avaliação do Controlo da Asma e da Rinite Alérgica (Últimas 4 semanas)</p>
       <form id="formCARAT">
-        <h3 style="color:#0d9488; margin-top:0;">Vias Aéreas Superiores</h3>
+        <h3 style="color:#0d9488;margin-top:0;">Vias Aéreas Superiores (Rinite)</h3>
         <div class="campo-pergunta">
           <label>1. Com que frequência teve congestão nasal (nariz entupido)?</label>
           <select id="p1" required>
-            <option value="0">0 - Sempre / Quase sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre / Quase sempre</option>
+            <option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option>
+            <option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>2. Com que frequência teve corrimento nasal (nariz a pingar)?</label>
           <select id="p2" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>3. Com que frequência teve espirros seguidos?</label>
           <select id="p3" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>4. Com que frequência teve comichão no nariz ou nos olhos?</label>
           <select id="p4" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
-
-        <h3 style="color:#2563eb;">Vias Aéreas Inferiores</h3>
+        <h3 style="color:#2563eb;">Vias Aéreas Inferiores (Asma)</h3>
         <div class="campo-pergunta">
-          <label>5. Com que frequência sentiu falta de ar ou pieira (gatinhos no peito)?</label>
+          <label>5. Com que frequência sentiu falta de ar ou pieira?</label>
           <select id="p5" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>6. Com que frequência acordou de noite devido à asma ou rinite?</label>
           <select id="p6" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>7. Com que frequência a doença limitou as suas atividades diárias?</label>
           <select id="p7" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>8. Com que frequência teve de usar medicação de alívio (S.O.S.)?</label>
           <select id="p8" required>
-            <option value="0">0 - Sempre</option>
-            <option value="1">1 - Muitas vezes</option>
-            <option value="2">2 - Poucas vezes</option>
-            <option value="3">3 - Nunca</option>
+            <option value="0">0 — Sempre</option><option value="1">1 — Muitas vezes</option>
+            <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
         <div class="campo-pergunta">
           <label>9. Sente que a sua medicação habitual é eficaz no controlo dos sintomas?</label>
           <select id="p9" required>
-            <option value="0">0 - Nada eficaz</option>
-            <option value="1">1 - Pouco eficaz</option>
-            <option value="2">2 - Razoavelmente eficaz</option>
-            <option value="3">3 - Totalmente eficaz</option>
+            <option value="0">0 — Nada eficaz</option><option value="1">1 — Pouco eficaz</option>
+            <option value="2">2 — Razoavelmente eficaz</option><option value="3">3 — Totalmente eficaz</option>
           </select>
         </div>
         <div class="campo-pergunta">
-          <label>10. Tem cumprido rigorosamente as tomas da medicação preventiva?</label>
+          <label>10. Tem cumprido rigorosamente a medicação preventiva?</label>
           <select id="p10" required>
-            <option value="0">0 - Nunca tomo</option>
-            <option value="1">1 - Falho quase sempre</option>
-            <option value="2">2 - Falho poucas vezes</option>
-            <option value="3">3 - Tomo sempre direito</option>
+            <option value="0">0 — Nunca tomo</option><option value="1">1 — Falho quase sempre</option>
+            <option value="2">2 — Falho poucas vezes</option><option value="3">3 — Tomo sempre</option>
           </select>
         </div>
-
         <button class="form-btn" type="submit">Submeter Avaliação</button>
         <p id="caratMensagem" class="sucesso"></p>
         <p id="erroCarat" class="erro"></p>
       </form>
 
       <div id="resultadoCaratBloco" class="bloco-resultado" style="display:none;">
-        <h3 style="margin-top:0;">Avaliação Processada Autónomamente</h3>
-        <p><strong>Score Total Calculado:</strong> <span id="resScore"></span>/30</p>
+        <h3 style="margin-top:0;">Resultado da Avaliação</h3>
+        <p><strong>Score Total:</strong> <span id="resScore"></span>/30</p>
         <p><strong>Sub-score Vias Superiores (Rinite):</strong> <span id="resSup"></span>/12</p>
         <p><strong>Sub-score Vias Inferiores (Asma):</strong> <span id="resInf"></span>/18</p>
-        <p><strong>Interpretação Clínica:</strong> <span id="resInterp"></span></p>
-        <p><strong>Recomendações Automatizadas:</strong> <span id="resRecom"></span></p>
+        <p><strong>Nível de Controlo:</strong> <span id="resNivel"></span></p>
+        <p><strong>Interpretação:</strong> <span id="resInterp"></span></p>
+        <p><strong>Recomendações:</strong> <span id="resRecom"></span></p>
+        <p><strong>Próxima Avaliação Sugerida:</strong> <span id="resProxima"></span></p>
       </div>
     </section>
 
+    <!-- DASHBOARD -->
     <section id="aba-dashboard" class="pagina">
       <h1>Dashboard de Evolução Clínica</h1>
-      <p style="background:#f1f5f9; padding:10px; border-left:4px solid #475569; font-size:13px;">
-        <strong>Nota de Comparação Arquitetural:</strong> O limiar regulado para Controlo Insuficiente da Doença situa-se abaixo dos <strong>19 pontos</strong>.
+      <p style="background:#f1f5f9;padding:10px;border-left:4px solid #475569;font-size:13px;">
+        Scores a <strong style="color:#dc2626;">vermelho</strong> = Não Controlado |
+        <strong style="color:#d97706;">laranja</strong> = Parcialmente Controlado |
+        <strong style="color:#16a34a;">verde</strong> = Controlado — linha a tracejado = limiar mínimo
       </p>
-      
-      <h2>Histórico Abrangente de Avaliações</h2>
-      <div id="listaCaratUtente">Carregando dados...</div>
+      <div id="chartContainer" style="background:white;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:24px;display:none;">
+        <canvas id="chartCarat" height="100"></canvas>
+      </div>
+      <div id="listaCaratUtente">A carregar...</div>
     </section>
+
+    <!-- ALERTAS -->
+    <section id="aba-alertas" class="pagina">
+      <h1>Os Meus Alertas Clínicos</h1>
+      <p style="color:#4b5563;font-size:14px;">Alertas gerados automaticamente com base nas suas avaliações CARAT.</p>
+      <div id="listaAlertasUtente">A carregar...</div>
+    </section>
+
+    <!-- DADOS PESSOAIS -->
+    <section id="aba-perfil" class="pagina">
+      <h1>Os Meus Dados Pessoais</h1>
+      <p style="color:#4b5563;font-size:14px;">Actualize o seu nome e contacto telefónico.</p>
+      <form id="formPerfil" style="max-width:500px;">
+        <div class="campo-pergunta">
+          <label>Nome Completo:</label>
+          <input type="text" id="perfilNome" placeholder="O seu nome">
+        </div>
+        <div class="campo-pergunta">
+          <label>Contacto (9 dígitos):</label>
+          <input type="text" id="perfilContacto" placeholder="Ex: 912345678" maxlength="9">
+        </div>
+        <button class="form-btn" type="submit">Guardar Alterações</button>
+        <p id="msgPerfil" style="margin-top:8px;font-weight:bold;"></p>
+      </form>
+    </section>
+
+    <!-- RECOMENDAÇÕES -->
+    <section id="aba-recomendacoes" class="pagina">
+      <h1>As Minhas Recomendações</h1>
+      <p style="color:#4b5563;font-size:14px;">Recomendações geradas pelo sistema com base nas suas avaliações CARAT. Clique em "Marcar como lida" depois de consultar.</p>
+      <div id="listaRecomendacoes">A carregar...</div>
+    </section>
+
   </main>
 
   <script>
-    // BARREIRA DE SEGURANÇA OBRIGATÓRIA (RBAC)
+    // ── SEGURANÇA ────────────────────────────────────────────────────────────
     const token = localStorage.getItem('breathcare_token');
-    const user = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
-
+    const user  = JSON.parse(localStorage.getItem('breathcare_user') || 'null');
     if (!token || !user || user.role.toUpperCase() !== 'UTENTE') {
-      alert('Acesso negado. Token inválido ou perfil não autorizado.');
+      alert('Acesso negado.');
       window.location.href = 'index.html';
     } else {
       document.getElementById('sessaoNome').textContent = user.nome;
     }
 
+    let utenteId    = null;  // Utente.id (diferente de user.id que é Utilizador.id)
+    let chartCarat  = null;  // instância do Chart.js
+    let limiarScore = 19;    // actualizado ao carregar o dashboard
+
+    async function api(url, opts = {}) {
+      opts.headers = { ...(opts.headers||{}), 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+      return fetch(url, opts);
+    }
+
+    // ── RESOLUÇÃO DO UTENTE ──────────────────────────────────────────────────
+    // user.id é o Utilizador.id; precisamos do Utente.id para as chamadas clínicas
+    async function resolverUtente() {
+      const res  = await api(`/utente?utilizadorId=${user.id}`);
+      const lista = await res.json();
+      if (!lista || lista.length === 0) return; // utente sem ficha clínica ainda
+      utenteId = lista[0].id;
+    }
+
+    // ── NAVEGAÇÃO ────────────────────────────────────────────────────────────
     function mudarAba(idAba) {
       document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+      document.querySelectorAll('nav button[id]').forEach(b => b.classList.remove('ativo'));
       document.getElementById(idAba).classList.add('ativa');
-      if (idAba === 'aba-dashboard') carregarHistorico();
+      document.getElementById('btn-' + idAba).classList.add('ativo');
+      if (idAba === 'aba-dashboard')     carregarHistorico();
+      if (idAba === 'aba-alertas')       carregarAlertas();
+      if (idAba === 'aba-recomendacoes') carregarRecomendacoes();
+      if (idAba === 'aba-perfil')        carregarPerfil();
     }
 
-    async function fetchAutenticado(url, opcoes = {}) {
-      opcoes.headers = {
-        ...(opcoes.headers || {}),
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-      return fetch(url, opcoes);
-    }
-
-    // Submissão do CARAT (POST para /utente/:id/carat)
+    // ── CARAT ────────────────────────────────────────────────────────────────
     document.getElementById('formCARAT').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const msgSucesso = document.getElementById('caratMensagem');
-      const msgErro = document.getElementById('erroCarat');
-      const bloco = document.getElementById('resultadoCaratBloco');
-      
-      msgSucesso.textContent = ''; msgErro.textContent = ''; bloco.style.display = 'none';
+      const msgOk  = document.getElementById('caratMensagem');
+      const msgErr = document.getElementById('erroCarat');
+      const bloco  = document.getElementById('resultadoCaratBloco');
+      msgOk.textContent = ''; msgErr.textContent = ''; bloco.style.display = 'none';
 
-      const payload = {
-        p1: parseInt(document.getElementById('p1').value), p2: parseInt(document.getElementById('p2').value),
-        p3: parseInt(document.getElementById('p3').value), p4: parseInt(document.getElementById('p4').value),
-        p5: parseInt(document.getElementById('p5').value), p6: parseInt(document.getElementById('p6').value),
-        p7: parseInt(document.getElementById('p7').value), p8: parseInt(document.getElementById('p8').value),
-        p9: parseInt(document.getElementById('p9').value), p10: parseInt(document.getElementById('p10').value)
-      };
+      if (!utenteId) { msgErr.textContent = 'Ficha clínica não associada. Contacte o administrador.'; return; }
+
+      const payload = {};
+      for (let i = 1; i <= 10; i++) payload[`p${i}`] = parseInt(document.getElementById(`p${i}`).value);
 
       try {
-        const resposta = await fetchAutenticado(`/utente/${user.id}/carat`, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        const dados = await resposta.json();
-        if (!resposta.ok) throw new Error(dados.erro || 'Erro ao submeter.');
+        const res   = await api(`/utente/${utenteId}/carat`, { method:'POST', body:JSON.stringify(payload) });
+        const dados = await res.json();
+        if (!res.ok) throw new Error(dados.erro || 'Erro ao submeter.');
 
-        msgSucesso.textContent = "Avaliação guardada com sucesso!";
-        document.getElementById('resScore').textContent = dados.resultado.scoreTotal;
-        document.getElementById('resSup').textContent = dados.resultado.viasSuperiores;
-        document.getElementById('resInf').textContent = dados.resultado.viasInferiores;
-        document.getElementById('resInterp').textContent = dados.resultado.interpretacao;
-        document.getElementById('resRecom').textContent = dados.resultado.recomendacoes;
+        const r = dados.resultado;
+        const nivelCor = { CONTROLADO:'#16a34a', PARCIALMENTE_CONTROLADO:'#d97706', NAO_CONTROLADO:'#dc2626' };
+        const cor = nivelCor[r.nivelControlo] || '#374151';
+
+        msgOk.textContent = 'Avaliação guardada com sucesso!';
+        document.getElementById('resScore').textContent  = r.scoreTotal;
+        document.getElementById('resSup').textContent    = r.subScoreViasSuperiores;
+        document.getElementById('resInf').textContent    = r.subScoreViasInferiores;
+        document.getElementById('resNivel').innerHTML    = `<strong style="color:${cor}">${r.nivelControlo?.replace(/_/g,' ')}</strong>`;
+        document.getElementById('resInterp').textContent = r.interpretacao;
+        document.getElementById('resRecom').textContent  = r.recomendacoes;
+        document.getElementById('resProxima').textContent = r.proximaAvaliacao ? new Date(r.proximaAvaliacao).toLocaleDateString('pt-PT') : '—';
         bloco.style.display = 'block';
         document.getElementById('formCARAT').reset();
       } catch (err) {
-        msgErro.textContent = err.message;
+        msgErr.textContent = err.message;
       }
     });
 
-    // Carregar histórico do utente logado (GET de /utente/:id/carat)
+    // ── DASHBOARD + GRÁFICO ──────────────────────────────────────────────────
     async function carregarHistorico() {
       const container = document.getElementById('listaCaratUtente');
-      container.innerHTML = '<p>Buscando dados no SQLite...</p>';
+      if (!utenteId) { container.innerHTML = '<p>Ficha clínica não associada.</p>'; return; }
+      container.innerHTML = '<p>A carregar...</p>';
 
+      // Busca config para a linha de limiar
       try {
-        const resposta = await fetchAutenticado(`/utente/${user.id}/carat`);
-        const dados = await resposta.json();
+        const cfgRes = await api('/configuracao');
+        const cfg    = await cfgRes.json();
+        limiarScore  = cfg.limiarMinimoScore ?? 19;
+      } catch (_) { limiarScore = 19; }
 
-        if (!Array.isArray(dados) || dados.length === 0) {
-          container.innerHTML = '<p>Ainda não realizou nenhuma avaliação CARAT.</p>';
-          return;
+      const res  = await api(`/utente/${utenteId}/carat`);
+      const data = await res.json();
+
+      if (!Array.isArray(data) || !data.length) {
+        container.innerHTML = '<p>Ainda sem avaliações CARAT.</p>';
+        document.getElementById('chartContainer').style.display = 'none';
+        return;
+      }
+
+      // Gráfico — dados do mais antigo para o mais recente
+      const sorted = [...data].sort((a, b) => new Date(a.data) - new Date(b.data));
+      const labels  = sorted.map(c => new Date(c.data).toLocaleDateString('pt-PT'));
+      const scores  = sorted.map(c => c.scoreTotal);
+      const ptColor = s => s <= limiarScore ? '#dc2626' : s <= 24 ? '#d97706' : '#16a34a';
+
+      document.getElementById('chartContainer').style.display = 'block';
+      const ctx = document.getElementById('chartCarat').getContext('2d');
+      if (chartCarat) chartCarat.destroy();
+      chartCarat = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Score CARAT',
+              data: scores,
+              borderColor: '#0d9488',
+              backgroundColor: 'rgba(13,148,136,0.08)',
+              fill: true,
+              tension: 0.35,
+              pointBackgroundColor: scores.map(ptColor),
+              pointRadius: 6,
+              pointHoverRadius: 8,
+            },
+            {
+              label: `Limiar mínimo (${limiarScore} pts)`,
+              data: sorted.map(() => limiarScore),
+              borderColor: '#dc2626',
+              borderDash: [6, 4],
+              borderWidth: 2,
+              pointRadius: 0,
+              fill: false,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: true, position: 'top' } },
+          scales: {
+            y: { min: 0, max: 30, title: { display: true, text: 'Score (0 – 30)' } },
+            x: { title: { display: true, text: 'Data da avaliação' } }
+          }
         }
+      });
 
-        let html = `<table><thead><tr><th>Data</th><th>Pontuações [1-10]</th><th>Vias Sup.</th><th>Vias Inf.</th><th>Score Total</th><th>Interpretação e Recomendações</th></tr></thead><tbody>`;
-        dados.forEach(c => {
-          const clsLimiar = c.scoreTotal < 19 ? 'limiar-alerta' : 'limiar-controlado';
-          html += `<tr>
-            <td>${new Date(c.data).toLocaleDateString('pt-PT')}</td>
-            <td>[${c.p1},${c.p2},${c.p3},${c.p4},${c.p5},${c.p6},${c.p7},${c.p8},${c.p9},${c.p10}]</td>
-            <td>${c.subScoreViasSuperiores}/12</td>
-            <td>${c.subScoreViasInferiores}/18</td>
-            <td class="${clsLimiar}">${c.scoreTotal}/30</td>
-            <td><strong>${c.interpretacao}</strong><br><small style="color:#475569;">${c.recomendacoes || ''}</small></td>
-          </tr>`;
-        });
-        container.innerHTML = html + '</tbody></table>';
-      } catch (err) {
-        container.innerHTML = '<p class="erro">Falha ao ligar à API para carregar o histórico.</p>';
+      // Tabela
+      const cls = s => s <= limiarScore ? 'limiar-alerta' : s <= 24 ? 'limiar-parcial' : 'limiar-controlado';
+      container.innerHTML = `
+        <table>
+          <thead><tr><th>Data</th><th>Respostas</th><th>Sup./Inf.</th><th>Score</th><th>Nível</th><th>Próx. Avaliação</th><th>Interpretação</th></tr></thead>
+          <tbody>${data.map(c => `
+            <tr>
+              <td>${new Date(c.data).toLocaleDateString('pt-PT')}</td>
+              <td style="font-size:11px;color:#6b7280;">[${[c.p1,c.p2,c.p3,c.p4,c.p5,c.p6,c.p7,c.p8,c.p9,c.p10].join(',')}]</td>
+              <td>${c.subScoreViasSuperiores}/12 · ${c.subScoreViasInferiores}/18</td>
+              <td class="${cls(c.scoreTotal)}">${c.scoreTotal}/30</td>
+              <td style="font-size:12px;">${c.nivelControlo?.replace(/_/g,' ')}</td>
+              <td style="font-size:12px;">${c.proximaAvaliacao ? new Date(c.proximaAvaliacao).toLocaleDateString('pt-PT') : '—'}</td>
+              <td style="font-size:12px;"><strong>${c.interpretacao}</strong></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── ALERTAS ──────────────────────────────────────────────────────────────
+    async function carregarAlertas() {
+      const container = document.getElementById('listaAlertasUtente');
+      if (!utenteId) { container.innerHTML = '<p>Ficha clínica não associada.</p>'; return; }
+      container.innerHTML = '<p>A carregar...</p>';
+      const res  = await api(`/alertas/utente/${utenteId}`);
+      const data = await res.json();
+      if (!data.length) { container.innerHTML = '<p>Sem alertas activos.</p>'; return; }
+      const tipoLabel = t => ({'REVISAO_TERAPEUTICA':'Revisão Terapêutica','INDICACAO_EXAMES':'Indicação de Exames','DETERIORACAO_SCORE':'Deterioração do Score'}[t]||t);
+      const estadoBadge = e => ({'NOVO':'badge-novo','EM_SEGUIMENTO':'badge-seguimento','FECHADO':'badge-fechado'}[e]||'badge-novo');
+      const prioBadge   = p => ({'ALTA':'badge-alta','MEDIA':'badge-media','BAIXA':'badge-baixa'}[p]||'');
+      container.innerHTML = `
+        <table>
+          <thead><tr><th>Data</th><th>Tipo</th><th>Motivo</th><th>Estado</th><th>Prioridade</th></tr></thead>
+          <tbody>${data.map(a => `
+            <tr>
+              <td>${new Date(a.createdAt).toLocaleDateString('pt-PT')}</td>
+              <td style="font-size:12px;font-weight:600;">${tipoLabel(a.tipoAlerta)}</td>
+              <td style="font-size:13px;">${a.motivo}</td>
+              <td><span class="badge ${estadoBadge(a.estado)}">${a.estado?.replace(/_/g,' ')}</span></td>
+              <td><span class="badge ${prioBadge(a.prioridade)}">${a.prioridade}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── RECOMENDAÇÕES ────────────────────────────────────────────────────────
+    async function carregarRecomendacoes() {
+      const container = document.getElementById('listaRecomendacoes');
+      if (!utenteId) { container.innerHTML = '<p>Ficha clínica não associada.</p>'; return; }
+      container.innerHTML = '<p>A carregar...</p>';
+      const res  = await api(`/recomendacoes/utente/${utenteId}`);
+      const data = await res.json();
+      if (!data.length) { container.innerHTML = '<p>Sem recomendações.</p>'; return; }
+      const tipoLabel = t => ({'AUTOCUIDADO':'Autocuidado','REVISAO_TERAPEUTICA':'Revisão Terapêutica','INDICACAO_EXAME':'Indicação de Exame'}[t]||t);
+      container.innerHTML = data.map(r => `
+        <div class="card-rec">
+          <div>
+            <div class="tipo">${tipoLabel(r.tipo)}</div>
+            <div class="desc">${r.descricao}</div>
+            <div class="lida">${r.foiLida ? '✓ Lida' : 'Por ler'} · ${new Date(r.dataCriacao).toLocaleDateString('pt-PT')}</div>
+          </div>
+          ${!r.foiLida ? `<button class="btn-lida" onclick="marcarLida(${r.id}, this)">Marcar como lida</button>` : ''}
+        </div>`).join('');
+    }
+
+    async function marcarLida(id, btn) {
+      const res = await api(`/recomendacoes/${id}/lida`, { method:'PATCH' });
+      if (res.ok) {
+        btn.closest('.card-rec').querySelector('.lida').textContent = '✓ Lida';
+        btn.remove();
       }
     }
 
-    function efetuarLogout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
+    // ── DADOS PESSOAIS ───────────────────────────────────────────────────────
+    async function carregarPerfil() {
+      if (!utenteId) return;
+      const res  = await api(`/utente/${utenteId}`);
+      const data = await res.json();
+      document.getElementById('perfilNome').value     = data.nome     || '';
+      document.getElementById('perfilContacto').value = data.contacto || '';
     }
+
+    document.getElementById('formPerfil').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!utenteId) return;
+      const msg  = document.getElementById('msgPerfil');
+      const nome     = document.getElementById('perfilNome').value.trim();
+      const contacto = document.getElementById('perfilContacto').value.trim();
+
+      if (!/^\d{9}$/.test(contacto)) {
+        msg.style.color = '#dc2626'; msg.textContent = 'O contacto deve ter exactamente 9 dígitos.'; return;
+      }
+
+      const res   = await api(`/utente/${utenteId}`, { method: 'PUT', body: JSON.stringify({ nome, contacto }) });
+      const dados = await res.json();
+      if (!res.ok) { msg.style.color = '#dc2626'; msg.textContent = dados.erro || 'Erro ao guardar.'; return; }
+      msg.style.color = '#16a34a'; msg.textContent = 'Dados actualizados com sucesso!';
+    });
+
+    function efetuarLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    // ── ARRANQUE ─────────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => resolverUtente());
   </script>
 </body>
 </html>

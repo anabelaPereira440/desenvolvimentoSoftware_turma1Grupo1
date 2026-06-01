@@ -14,4 +14,8 @@ router.post('/register', controller.registar.bind(controller));
 router.get('/logs', authMiddleware, autorizar(['ADMIN']),
   controller.listarLogs.bind(controller));
 
+// Protegida — só admin pode alterar o perfil de um utilizador
+router.patch('/utilizador/:id', authMiddleware, autorizar(['ADMIN']),
+  controller.alterarRole.bind(controller));
+
 export default router;

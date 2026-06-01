@@ -1,16 +1,18 @@
-// Define os dados de entrada para criar um médico.
+import { SexoBiologico } from '../../enums/SexoBiologico.enum';
+import { EspecialidadeMedica } from '../../enums/EspecialidadeMedica.enum';
+
 export interface CreateMedicoDTO {
-    nome: string;
-    especialidade: string;
-    cedulaProfissional: number;
-    dataNascimento: string;
-    sexo: string;
-    contacto: string;
-    utilizadorId: number;
+  nome: string;
+  especialidade: EspecialidadeMedica;
+  cedulaProfissional: number;
+  dataNascimento: string;
+  sexo: SexoBiologico;
+  contacto: string;
+  utilizadorId: number;
 }
 
 export interface UpdateMedicoDTO {
-    nome?: string;
-    especialidade?: string;
-    contacto?: string;
+  nome?: string;
+  especialidade?: EspecialidadeMedica;
+  contacto?: string;
 }

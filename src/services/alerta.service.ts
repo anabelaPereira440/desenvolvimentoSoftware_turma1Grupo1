@@ -1,115 +1,110 @@
-import { Repository } from 'typeorm';
 import { AppDataSource } from '../database/database';
-import { Alerta, AlertaEstado, AlertaPrioridade, TipoAlerta } from '../models/alerta.entity';
+import { FindOptionsWhere } from 'typeorm';
+import { Alerta } from '../models/alerta.entity';
+import { AlertaEstado } from '../enums/AlertaEstado.enum';
+import { AlertaPrioridade } from '../enums/AlertaPrioridade.enum';
+import { TipoAlerta } from '../enums/TipoAlerta.enum';
 
 export class AlertaService {
-    private repository: Repository<Alerta>;
-
-    constructor() {
-        // Inicializa o repositório a partir do DataSource global da aplicação
-        this.repository = AppDataSource.getRepository(Alerta);
-    }
-
-    //Criação de Alerta Clínico (Gatilho automático do BreathCare)
+    private repo = AppDataSource.getRepository(Alerta);
 
     async criarAlerta(dados: {
         utenteId: number;
-        medicoResponsavelId: string;
+        medicoResponsavelId: number;
         tipoAlerta: TipoAlerta;
         avaliacaoCaratId?: string | null;
+        recomendacaoId?: number | null;
         prioridade?: AlertaPrioridade;
-        motivo?: string; 
+        motivo?: string;
     }): Promise<Alerta> {
-        // O repository.create() instancia a classe da entidade permitindo que os ganchos @BeforeInsert funcionem
-        const novoAlerta = this.repository.create({
+        if (!dados.utenteId) throw new Error('Alerta sem utente associado.');
+        if (!dados.medicoResponsavelId) throw new Error('Alerta sem médico responsável.');
+        if (!dados.tipoAlerta) throw new Error('Tipo de alerta é obrigatório.');
+
+        // Gera o motivo padrão se não for fornecido
+        const motivo = dados.motivo?.trim() || this.motivoPadrao(dados.tipoAlerta);
+
+        const novoAlerta = this.repo.create({
             utenteId: dados.utenteId,
             medicoResponsavelId: dados.medicoResponsavelId,
             tipoAlerta: dados.tipoAlerta,
-            avaliacaoCaratId: dados.avaliacaoCaratId,
-            prioridade: dados.prioridade || AlertaPrioridade.MEDIA,
+            avaliacaoCaratId: dados.avaliacaoCaratId ?? null,
+            recomendacaoId: dados.recomendacaoId ?? null,
+            prioridade: dados.prioridade ?? AlertaPrioridade.MEDIA,
             estado: AlertaEstado.NOVO,
-            motivo: dados.motivo
-        } as any);
+            motivo,
+        });
 
-        return await this.repository.save(novoAlerta) as any;
+        return this.repo.save(novoAlerta);
     }
 
-    /**
-     * REQUISITO: Listar os alertas com base em filtros opcionais (médico responsável, estado e prioridade).
-     * O médico deve auditar e listar os alertas sob a sua alçada.
-     */
-    async listarAlertas(filtros: { 
-        medicoResponsavelId?: string; 
-        estado?: AlertaEstado; 
-        prioridade?: AlertaPrioridade; 
+    async listarAlertas(filtros: {
+        medicoResponsavelId?: number;
+        estado?: AlertaEstado;
+        prioridade?: AlertaPrioridade;
     }): Promise<Alerta[]> {
-        const { medicoResponsavelId, estado, prioridade } = filtros;
+        const where: FindOptionsWhere<Alerta> = {};
 
-        // Construção dinâmica da cláusula WHERE com base nos parâmetros preenchidos
-        const where: any = {};
+        if (filtros.medicoResponsavelId) where.medicoResponsavelId = filtros.medicoResponsavelId;
+        if (filtros.estado) where.estado = filtros.estado;
+        if (filtros.prioridade) where.prioridade = filtros.prioridade;
 
-        if (medicoResponsavelId) {
-            where.medicoResponsavelId = medicoResponsavelId;
-        }
-        if (estado) {
-            where.estado = estado;
-        }
-        if (prioridade) {
-            where.prioridade = prioridade;
-        }
-
-        // Retorna a lista trazendo também as relações para o médico ver os dados nos dashboards
-        return await this.repository.find({
+        return this.repo.find({
             where,
-            relations: ['utente', 'avaliacaoCarat'], // Carrega os dados adjacentes do Utente e da Avaliação CARAT
-            order: {
-                createdAt: 'DESC' // Alertas mais recentes aparecem primeiro para rápida intervenção proativa
-            }
+            relations: ['utente', 'avaliacaoCarat'],
+            order: { createdAt: 'DESC' },
         });
     }
 
-    /**
-     * REQUISITO: Permitir ao médico consultar os detalhes de um alerta clínico específico.
-     */
     async buscarPorId(id: number): Promise<Alerta | null> {
-        return await this.repository.findOne({
+        return this.repo.findOne({
             where: { id },
-            relations: ['utente', 'avaliacaoCarat']
+            relations: ['utente', 'avaliacaoCarat'],
         });
     }
 
     async buscarPorUtente(utenteId: number): Promise<Alerta[]> {
-        return await this.repository.find({
-            // Se na entidade a relação se chama 'utente', filtramos pelo ID dela assim:
-            where: { utente: { id: utenteId } } as any,
+        return this.repo.find({
+            where: { utenteId },
             relations: ['avaliacaoCarat'],
-            order: { createdAt: 'DESC' }
+            order: { createdAt: 'DESC' },
         });
     }
-    
-    /**
-     * REQUISITO: Permitir que o médico altere o estado (Novo, Visto, Em Seguimento, Fechado)
-     * ou atualize a prioridade de um alerta clínico após a sua análise.
-     */
+
     async atualizarAlerta(
-        id: number, 
-        dadosAtualizacao: { estado?: AlertaEstado; prioridade?: AlertaPrioridade }
+        id: number,
+        dados: { estado?: AlertaEstado; prioridade?: AlertaPrioridade }
     ): Promise<Alerta> {
-        // 1. Verifica se o alerta de facto existe no sistema
-        const alerta = await this.repository.findOne({ where: { id } });
-        if (!alerta) {
-            throw new Error("Alerta clínico não encontrado na base de dados.");
+        const alerta = await this.repo.findOne({ where: { id } });
+        if (!alerta) throw new Error('Alerta clínico não encontrado.');
+
+        if (dados.estado !== undefined) {
+            if (!Object.values(AlertaEstado).includes(dados.estado)) {
+                throw new Error(`Estado inválido. Valores aceites: ${Object.values(AlertaEstado).join(', ')}.`);
+            }
+            alerta.estado = dados.estado;
         }
 
-        // 2. Aplica apenas as propriedades que foram enviadas no corpo do pedido
-        if (dadosAtualizacao.estado !== undefined) {
-            alerta.estado = dadosAtualizacao.estado;
-        }
-        if (dadosAtualizacao.prioridade !== undefined) {
-            alerta.prioridade = dadosAtualizacao.prioridade;
+        if (dados.prioridade !== undefined) {
+            if (!Object.values(AlertaPrioridade).includes(dados.prioridade)) {
+                throw new Error(`Prioridade inválida. Valores aceites: ${Object.values(AlertaPrioridade).join(', ')}.`);
+            }
+            alerta.prioridade = dados.prioridade;
         }
 
-        // 3. Persiste a alteração na base de dados (o TypeORM atualiza automaticamente a coluna updatedAt)
-        return await this.repository.save(alerta);
+        return this.repo.save(alerta);
+    }
+
+    private motivoPadrao(tipo: TipoAlerta): string {
+        switch (tipo) {
+            case TipoAlerta.DETERIORACAOSCORE:
+                return 'Deterioração significativa do score CARAT.';
+            case TipoAlerta.INDICACAOEXAMES:
+                return 'Score CARAT indica necessidade de exames complementares.';
+            case TipoAlerta.REVISAOTERAPEUTICA:
+                return 'Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente.';
+            default:
+                return 'Alerta clínico.';
+        }
     }
 }

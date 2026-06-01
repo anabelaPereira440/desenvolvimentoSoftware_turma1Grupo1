@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AlertaService } from '../services/alerta.service'; 
-import { AlertaEstado, AlertaPrioridade } from '../models/alerta.entity';
+import { AlertaEstado } from '../enums/AlertaEstado.enum';
+import { AlertaPrioridade } from '../enums/AlertaPrioridade.enum';
 import { CreateAlertaDto } from '../dtos/alerta/create-alerta.dto';
 import { mapearParaAlertaResponse } from '../dtos/alerta/alerta-response.dto';
 
@@ -55,7 +56,7 @@ export class AlertaController {
             // Criamos um objeto de filtros dinâmico
             const filtros: any = {};
             
-            if (medicoResponsavelId) filtros.medicoResponsavelId = medicoResponsavelId as string;
+            if (medicoResponsavelId) filtros.medicoResponsavelId = parseInt(medicoResponsavelId as string);
             if (estado) filtros.estado = estado as AlertaEstado;
             if (prioridade) filtros.prioridade = prioridade as AlertaPrioridade;
 

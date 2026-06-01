@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { TipoUtilizador } from '../enums/TipoUtilizador.enum';
 
 @Entity()
 export class Utilizador {
-
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -15,8 +15,11 @@ export class Utilizador {
   @Column()
   password!: string;
 
-  @Column()
-  role!: string; // 'UTENTE' | 'MEDICO' | 'ADMIN'
+  @Column({
+    type: 'simple-enum',
+    enum: TipoUtilizador,
+  })
+  role!: TipoUtilizador;
 
   @CreateDateColumn()
   dataCriacao!: Date;

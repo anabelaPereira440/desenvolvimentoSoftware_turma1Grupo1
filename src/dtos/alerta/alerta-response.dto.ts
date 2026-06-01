@@ -1,4 +1,6 @@
-import { AlertaEstado, AlertaPrioridade, TipoAlerta } from '../../models/alerta.entity';
+import { AlertaEstado } from '../../enums/AlertaEstado.enum';
+import { AlertaPrioridade } from '../../enums/AlertaPrioridade.enum';
+import { TipoAlerta } from '../../enums/TipoAlerta.enum';
 
 interface UtenteResumoDto {
     id: number;
@@ -15,7 +17,7 @@ export interface AlertaResponseDto {
     id: number;
     utenteId: number;
     utente?: UtenteResumoDto | undefined; 
-    medicoResponsavelId: string;
+    medicoResponsavelId: number;
     motivo: string;
     tipoAlerta: TipoAlerta;
     avaliacaoCaratId: string | null;

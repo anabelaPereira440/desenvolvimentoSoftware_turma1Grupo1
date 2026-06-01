@@ -1,0 +1,9 @@
+export enum ViaAdministracao {
+  ORAL = 'ORAL',
+  INALADA = 'INALADA',
+  INTRAVENOSA = 'INTRAVENOSA',
+  SUBCUTANEA = 'SUBCUTANEA',
+  TOPICA = 'TOPICA',
+  NASAL = 'NASAL',
+  NEBULIZACAO = 'NEBULIZACAO',
+}

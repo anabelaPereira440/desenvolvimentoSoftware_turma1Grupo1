@@ -4,13 +4,14 @@ import { MedicoService } from '../services/medico.service';
 export class MedicoController {
     private service = new MedicoService();
 
-    //Listar todos os médicos
+    // Listar médicos — aceita ?utilizadorId=X
     async listar(req: Request, res: Response) {
         try {
-            const medicos = await this.service.listarMedicos();
+            const utilizadorId = req.query.utilizadorId ? parseInt(req.query.utilizadorId as string) : undefined;
+            const medicos = await this.service.listarMedicos(utilizadorId);
             return res.json(medicos);
         } catch (error: any) {
-            return res.status(500).json({ erro: "Erro interno ao listar médicos.", detalhe: error.message });
+            return res.status(500).json({ erro: 'Erro interno ao listar médicos.', detalhe: error.message });
         }
     };
 

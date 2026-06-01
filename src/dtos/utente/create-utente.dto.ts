@@ -1,16 +1,17 @@
-// Define os dados de entrada para criar um utente.
+import { SexoBiologico } from '../../enums/SexoBiologico.enum';
+
 export interface CreateUtenteDTO {
-    nome: string;
-    numeroUtente: number;
-    dataNascimento: string;
-    sexo: string;
-    contacto: string;
-    medicoId: number;
-    utilizadorId: number;
+  nome: string;
+  numeroUtente: number;
+  dataNascimento: string;
+  sexo: SexoBiologico;
+  contacto: string;
+  medicoId: number;
+  utilizadorId: number;
 }
 
 export interface UpdateUtenteDTO {
-    nome?: string;
-    contacto?: string;
-    medicoId?: number;
+  nome?: string;
+  contacto?: string;
+  medicoId?: number;
 }

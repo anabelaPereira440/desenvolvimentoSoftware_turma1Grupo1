@@ -4,13 +4,17 @@ import { UtenteService } from '../services/utente.service';
 export class UtenteController {
     private service = new UtenteService();
 
-    //Listar todos os utentes
+    // Listar utentes — aceita ?medicoId=X ou ?utilizadorId=X
     async listar(req: Request, res: Response) {
         try {
-            const utentes = await this.service.listarUtentes();
+            const medicoId = req.query.medicoId ? parseInt(req.query.medicoId as string) : undefined;
+            const utilizadorId = req.query.utilizadorId ? parseInt(req.query.utilizadorId as string) : undefined;
+            if (medicoId !== undefined && isNaN(medicoId)) return res.status(400).json({ erro: 'medicoId inválido.' });
+            if (utilizadorId !== undefined && isNaN(utilizadorId)) return res.status(400).json({ erro: 'utilizadorId inválido.' });
+            const utentes = await this.service.listarUtentes(medicoId, utilizadorId);
             return res.json(utentes);
         } catch (error: any) {
-            return res.status(500).json({ erro: "Erro interno ao listar utentes.", detalhe: error.message });
+            return res.status(500).json({ erro: 'Erro interno ao listar utentes.', detalhe: error.message });
         }
     };
 

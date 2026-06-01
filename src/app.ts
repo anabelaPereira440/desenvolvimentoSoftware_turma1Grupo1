@@ -13,7 +13,16 @@ import { Prescricao } from './models/prescricao.entity';
 import { Exame } from './models/exame.entity';
 import { AvaliacaoCarat } from './models/avaliacao-carat.entity';
 import { Alerta } from './models/alerta.entity';
-import { AlertaEstado, AlertaPrioridade, TipoAlerta } from './models/alerta.entity';
+import { AlertaEstado } from './enums/AlertaEstado.enum';
+import { AlertaPrioridade } from './enums/AlertaPrioridade.enum';
+import { TipoAlerta } from './enums/TipoAlerta.enum';
+import { Configuracao } from './models/configuracao.entity';
+import { NivelControlo } from './enums/NivelControlo.enum';
+import { SexoBiologico } from './enums/SexoBiologico.enum';
+import { EspecialidadeMedica } from './enums/EspecialidadeMedica.enum';
+import { TipoUtilizador } from './enums/TipoUtilizador.enum';
+import { TipoExame } from './enums/TipoExame.enum';
+import { ViaAdministracao } from './enums/ViaAdministracao.enum';
 
 // Importação das Rotas
 import utenteRoutes from './routes/utente.routes';
@@ -21,7 +30,10 @@ import medicoRoutes from './routes/medico.routes';
 import examenRoutes from './routes/exame.routes';
 import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
-import alertaRoutes from './routes/alerta.routes'; 
+import alertaRoutes from './routes/alerta.routes';
+import configuracaoRoutes from './routes/configuracao.routes';
+import recomendacaoRoutes from './routes/recomendacao.routes';
+import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
@@ -35,8 +47,13 @@ app.use('/utente', utenteRoutes);
 app.use('/medico', medicoRoutes);
 app.use('/exames', examenRoutes);
 app.use('/prescricoes', prescricaoRoutes);
-app.use('/utente', caratRoutes); // Rota /utente/:id/carat
-app.use('/alertas', alertaRoutes); 
+app.use('/utente', caratRoutes);  // POST /utente/:id/carat  |  GET /utente/:id/carat
+app.use('/carat', caratRoutes);   // GET /carat/:evalId
+app.use('/alertas', alertaRoutes);
+app.use('/configuracao', configuracaoRoutes);
+app.use('/admin', adminRoutes);
+app.use('/recomendacoes', recomendacaoRoutes);
+
 
 // Inicialização da base de dados e servidor
 if (require.main === module) {
@@ -53,25 +70,25 @@ if (require.main === module) {
                     nome: 'Administrador',
                     username: 'admin',
                     password: passwordHash,
-                    role: 'ADMIN'
+                    role: TipoUtilizador.ADMIN
                 },
                 {
                     nome: 'Jorge Almeida',
                     username: 'jorge.almeida',
                     password: passwordHash,
-                    role: 'MEDICO'
+                    role: TipoUtilizador.MEDICO
                 },
                 {
                     nome: 'Maria Laurentina',
                     username: 'maria.laurentina',
                     password: passwordHash,
-                    role: 'UTENTE'
+                    role: TipoUtilizador.UTENTE
                 },
                 {
                     nome: 'António Silva',
                     username: 'antonio.silva',
                     password: passwordHash,
-                    role: 'UTENTE'
+                    role: TipoUtilizador.UTENTE
                 }
             ]);
             console.log('Utilizadores simulados criados (password de todos: 123456)');
@@ -81,36 +98,35 @@ if (require.main === module) {
         const medicoRepo = AppDataSource.getRepository(Medico);
         if (await medicoRepo.count() === 0) {
             await medicoRepo.save({
-                id: 1,
                 nome: 'Jorge Almeida',
-                especialidade: 'Pneumologia',
+                especialidade: EspecialidadeMedica.PNEUMOLOGIA,
                 cedulaProfissional: 12345,
                 dataNascimento: new Date("1970-05-15"),
-                sexo: "Masculino",
+                sexo: SexoBiologico.MASCULINO,
                 contacto: "960000000",
                 utilizadorId: 2
-            }); 
+            });
         }
         
         // Utentes Simulados
         const utenteRepo = AppDataSource.getRepository(Utente);
         if (await utenteRepo.count() === 0) {
             await utenteRepo.save([
-                { 
-                    nome: "Maria Laurentina", 
-                    numeroUtente: 123456789, 
-                    dataNascimento: new Date("1965-04-12"), 
-                    sexo: "Feminino", 
-                    contacto: "912345678", 
+                {
+                    nome: "Maria Laurentina",
+                    numeroUtente: 123456789,
+                    dataNascimento: new Date("1965-04-12"),
+                    sexo: SexoBiologico.FEMININO,
+                    contacto: "912345678",
                     medicoId: 1,
-                    utilizadorId: 3 
+                    utilizadorId: 3
                 },
-                { 
-                    nome: "António Silva", 
-                    numeroUtente: 987654321, 
-                    dataNascimento: new Date("1958-11-23"), 
-                    sexo: "Masculino", 
-                    contacto: "934567890", 
+                {
+                    nome: "António Silva",
+                    numeroUtente: 987654321,
+                    dataNascimento: new Date("1958-11-23"),
+                    sexo: SexoBiologico.MASCULINO,
+                    contacto: "934567890",
                     medicoId: 1,
                     utilizadorId: 4
                 }
@@ -121,17 +137,16 @@ if (require.main === module) {
         const prescricaoRepo = AppDataSource.getRepository(Prescricao);
         if (await prescricaoRepo.count() === 0) {
             const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
-            if (maria){
-                const dataCriacaoSimulada = new Date(); 
+            if (maria) {
                 const dataValidadeSimulada = new Date();
-                dataValidadeSimulada.setDate(dataCriacaoSimulada.getDate() + 180);
-                
+                dataValidadeSimulada.setDate(dataValidadeSimulada.getDate() + 180);
+
                 await prescricaoRepo.save({
                     medicamento: 'Aspirina',
                     dose: '500mg',
+                    viaAdministracao: ViaAdministracao.ORAL,
                     medico_nome: 'Jorge Almeida',
                     utenteId: maria.id,
-                    dataCriacao: dataCriacaoSimulada,
                     dataValidade: dataValidadeSimulada
                 });
             }
@@ -141,22 +156,28 @@ if (require.main === module) {
         const exameRepo = AppDataSource.getRepository(Exame);
         if (await exameRepo.count() === 0) {
             const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
-            if (antonio){
-                const dataCriacaoSimulada = new Date(); 
+            if (antonio) {
                 const dataValidadeSimulada = new Date();
-                dataValidadeSimulada.setDate(dataCriacaoSimulada.getDate() + 180);
-                
+                dataValidadeSimulada.setDate(dataValidadeSimulada.getDate() + 180);
+
                 await exameRepo.save({
-                    nome: 'RX Torax',
+                    nome: 'RX Tórax',
+                    tipo: TipoExame.RADIOGRAFIA_TORAX,
                     codigo: 'RX01',
                     medico_nome: 'Jorge Almeida',
                     utenteId: antonio.id,
-                    dataCriacao: dataCriacaoSimulada,
                     dataValidade: dataValidadeSimulada
                 });
             }
         }
         
+        // Configuração do Sistema (valores por defeito)
+        const configuracaoRepo = AppDataSource.getRepository(Configuracao);
+        if (await configuracaoRepo.count() === 0) {
+            await configuracaoRepo.save(new Configuracao());
+            console.log("Configuração do sistema criada com valores por defeito.");
+        }
+
         // Dados CARAT Simulados
         const caratRepo = AppDataSource.getRepository(AvaliacaoCarat);
         if (await caratRepo.count() === 0) {
@@ -164,6 +185,8 @@ if (require.main === module) {
             const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
 
             if (maria && antonio) {
+                const proxAvaliacao = new Date("2026-06-17"); // ~4 semanas após a última avaliação
+
                 await caratRepo.save([
                     {
                         data: new Date("2026-04-10"),
@@ -172,8 +195,10 @@ if (require.main === module) {
                         scoreTotal: 11,
                         subScoreViasSuperiores: 4,
                         subScoreViasInferiores: 7,
+                        nivelControlo: NivelControlo.NAO_CONTROLADO,
                         interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
-                        recomendacoes: "Revisão terapêutica urgente com o seu médico. Reforçar medidas de autocuidado e vigilância de sintomas severos.",
+                        recomendacoes: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente recomendada.",
+                        proximaAvaliacao: new Date("2026-05-08"),
                         utenteId: maria.id
                     },
                     {
@@ -183,8 +208,10 @@ if (require.main === module) {
                         scoreTotal: 25,
                         subScoreViasSuperiores: 11,
                         subScoreViasInferiores: 14,
+                        nivelControlo: NivelControlo.CONTROLADO,
                         interpretacao: "Doença Respiratória Controlada.",
-                        recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 3 meses.",
+                        recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 4 semanas.",
+                        proximaAvaliacao: proxAvaliacao,
                         utenteId: maria.id
                     },
                     {
@@ -194,8 +221,10 @@ if (require.main === module) {
                         scoreTotal: 21,
                         subScoreViasSuperiores: 8,
                         subScoreViasInferiores: 13,
+                        nivelControlo: NivelControlo.PARCIALMENTE_CONTROLADO,
                         interpretacao: "Doença Respiratória Parcialmente Controlada.",
-                        recomendacoes: "Indicação para a realização de exames complementares de diagnóstico. Manter o plano terapêutico habitual e agendar uma consulta de rotina para avaliação contívua.",
+                        recomendacoes: "Indicação para realização de exames complementares. Manter o plano terapêutico e agendar consulta de rotina.",
+                        proximaAvaliacao: proxAvaliacao,
                         utenteId: antonio.id
                     }
                 ]);
@@ -213,7 +242,7 @@ if (require.main === module) {
                 await alertaRepo.save([
                     {
                         utenteId: maria.id,
-                        medicoResponsavelId: "1",
+                        medicoResponsavelId: 1,
                         tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
                         estado: AlertaEstado.NOVO,
                         prioridade: AlertaPrioridade.ALTA,
@@ -221,7 +250,7 @@ if (require.main === module) {
                     },
                     {
                         utenteId: maria.id,
-                        medicoResponsavelId: "1",
+                        medicoResponsavelId: 1,
                         tipoAlerta: TipoAlerta.INDICACAOEXAMES,
                         estado: AlertaEstado.FECHADO,
                         prioridade: AlertaPrioridade.BAIXA,

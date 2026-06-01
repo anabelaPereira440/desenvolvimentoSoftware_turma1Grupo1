@@ -343,8 +343,8 @@
             <div class="input-group">
               <label>Sexo:</label>
               <select id="cliniSexo" required>
-                <option value="M">M (Masculino)</option>
-                <option value="F">F (Feminino)</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMININO">Feminino</option>
               </select>
             </div>
             <div class="input-group">
@@ -378,10 +378,12 @@
             <div class="input-group">
               <label>Especialidade:</label>
               <select id="medEspecialidade" required>
-                <option value="Pneumologia">Pneumologia</option>
-                <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
-                <option value="Imunoalergologia">Imunoalergologia</option>
-                <option value="Outra">Outra</option>
+                <option value="PNEUMOLOGIA">Pneumologia</option>
+                <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
+                <option value="MEDICINA_GERAL_FAMILIAR">Medicina Geral e Familiar</option>
+                <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
+                <option value="PEDIATRIA">Pediatria</option>
+                <option value="MEDICINA_INTERNA">Medicina Interna</option>
               </select>
             </div>
             <div class="input-group">
@@ -395,8 +397,8 @@
             <div class="input-group">
               <label>Sexo:</label>
               <select id="medSexo" required>
-                <option value="M">M (Masculino)</option>
-                <option value="F">F (Feminino)</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="FEMININO">Feminino</option>
               </select>
             </div>
             <div class="input-group">
@@ -456,18 +458,33 @@
 
     <section id="aba-config" class="pagina">
       <h1>Configuração Normativa do Sistema</h1>
-      <p class="subtitulo">Definição automatizada dos limiares clínicos do motor analítico de alertas.</p>
-      
+      <p class="subtitulo">Limiares clínicos que controlam a geração automática de alertas e recomendações.</p>
+
       <form id="formConfigLimiar">
-        <div class="input-group">
-          <label><strong>Limiar Mínimo do Score CARAT para Geração de Alertas:</strong></label>
-          <input type="number" id="configLimiar" value="19" min="0" max="30" style="max-width: 150px;" required />
-          <span style="font-size:13px; color:#6b7280; margin-top: 4px;">
-            Por defeito clínico, scores estritamente inferiores a 19 despoletam Alertas de Nível Alto automáticos na consola do médico.
-          </span>
+        <div class="form-grid">
+          <div class="input-group">
+            <label><strong>Limiar Mínimo do Score CARAT (0–30):</strong></label>
+            <input type="number" id="configLimiar" min="0" max="30" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Score ≤ este valor → Não Controlado → alerta de Revisão Terapêutica (padrão: 19)</span>
+          </div>
+          <div class="input-group">
+            <label><strong>Limiar para Indicação de Exame (0–30):</strong></label>
+            <input type="number" id="configLimiarExame" min="0" max="30" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Score entre limiar mínimo e este → Parcialmente Controlado → alerta de Exame (padrão: 24)</span>
+          </div>
+          <div class="input-group">
+            <label><strong>Pontos de Deterioração para Alerta:</strong></label>
+            <input type="number" id="configDeterioracao" min="1" max="30" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Queda ≥ este valor face à avaliação anterior → alerta de Deterioração (padrão: 4)</span>
+          </div>
+          <div class="input-group">
+            <label><strong>Semanas até à Próxima Avaliação:</strong></label>
+            <input type="number" id="configSemanas" min="1" max="52" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Sugestão de data para o utente realizar o próximo CARAT (padrão: 4)</span>
+          </div>
         </div>
-        <button type="submit" class="admin-btn">Atualizar Regras de Alerta</button>
-        <p id="msgConfig" class="msg-feedback" style="color:green;"></p>
+        <button type="submit" class="admin-btn">Guardar Configuração</button>
+        <p id="msgConfig" class="msg-feedback"></p>
       </form>
     </section>
 
@@ -499,17 +516,25 @@
   <div id="modalEditarUtente" class="modal-overlay">
       <div class="modal-box">
           <h3>Editar Utente</h3>
-          
+
           <label>Nome do Utente:</label>
           <input type="text" id="editUtenteNome" placeholder="Nome">
-          
+
           <label>Contacto (9 dígitos):</label>
           <input type="text" id="editUtenteContacto" placeholder="Ex: 912345678" maxlength="9">
           <span id="erroContactoUtente" class="error-msg">O contacto deve ter 9 dígitos.</span>
-          
+
           <label>ID do Médico Responsável:</label>
           <input type="number" id="editUtenteMedicoId" placeholder="ID (ex: 1)">
-          
+
+          <label>Alterar Perfil de Acesso:</label>
+          <select id="editUtenteRole">
+              <option value="">-- Não alterar --</option>
+              <option value="UTENTE">Utente</option>
+              <option value="MEDICO">Médico</option>
+              <option value="ADMIN">Administrador</option>
+          </select>
+
           <div class="modal-buttons">
               <button class="btn-cancelar" onclick="fecharModal('modalEditarUtente')">Cancelar</button>
               <button class="btn-confirmar" onclick="guardarEdicaoUtente()">Guardar</button>
@@ -520,14 +545,33 @@
   <div id="modalEditarMedico" class="modal-overlay">
       <div class="modal-box">
           <h3>Editar Médico</h3>
-          
+
           <label>Nome do Médico:</label>
           <input type="text" id="editMedicoNome" placeholder="Nome">
-          
+
+          <label>Especialidade:</label>
+          <select id="editMedicoEspecialidade">
+              <option value="">-- Não alterar --</option>
+              <option value="PNEUMOLOGIA">Pneumologia</option>
+              <option value="IMUNOALERGOLOGIA">Imunoalergologia</option>
+              <option value="MEDICINA_GERAL_FAMILIAR">Medicina Geral e Familiar</option>
+              <option value="OTORRINOLARINGOLOGIA">Otorrinolaringologia</option>
+              <option value="PEDIATRIA">Pediatria</option>
+              <option value="MEDICINA_INTERNA">Medicina Interna</option>
+          </select>
+
           <label>Contacto (9 dígitos):</label>
           <input type="text" id="editMedicoContacto" placeholder="Ex: 912345678" maxlength="9">
           <span id="erroContactoMedico" class="error-msg">O contacto deve ter 9 dígitos.</span>
-          
+
+          <label>Alterar Perfil de Acesso:</label>
+          <select id="editMedicoRole">
+              <option value="">-- Não alterar --</option>
+              <option value="UTENTE">Utente</option>
+              <option value="MEDICO">Médico</option>
+              <option value="ADMIN">Administrador</option>
+          </select>
+
           <div class="modal-buttons">
               <button class="btn-cancelar" onclick="fecharModal('modalEditarMedico')">Cancelar</button>
               <button class="btn-confirmar" onclick="guardarEdicaoMedico()">Guardar</button>
@@ -555,10 +599,8 @@
       document.getElementById(idAba).classList.add('ativa');
       document.getElementById('btn-' + idAba).classList.add('ativo');
 
-      if(idAba === 'aba-usuarios') {
-        desenharTabelaMedicos();
-        desenharTabelaUtentes();
-      }
+        if (idAba === 'aba-usuarios') { desenharTabelaMedicos(); desenharTabelaUtentes(); }
+      if (idAba === 'aba-config') { carregarConfiguracao(); }
     }
 
     // 3. INJETOR AUTOMÁTICO DE AUTHORIZATION HEADERS
@@ -654,39 +696,37 @@
     }
 
     // Modal de Edição - Utentes
-    function iniciarEditarUtente(id, nomeAtual, contactoAtual, medicoIdAtual) {
-        estadoModal = { tipo: 'utente', id };
+    function iniciarEditarUtente(id, nomeAtual, contactoAtual, medicoIdAtual, utilizadorId) {
+        estadoModal = { tipo: 'utente', id, utilizadorId };
         document.getElementById('editUtenteNome').value = nomeAtual;
         document.getElementById('editUtenteContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
         document.getElementById('editUtenteMedicoId').value = medicoIdAtual !== 'null' ? medicoIdAtual : '';
+        document.getElementById('editUtenteRole').value = '';
         document.getElementById('modalEditarUtente').style.display = 'flex';
     }
 
     async function guardarEdicaoUtente() {
-        const { id } = estadoModal;
+        const { id, utilizadorId } = estadoModal;
         const novoNome = document.getElementById('editUtenteNome').value.trim();
         const novoContacto = document.getElementById('editUtenteContacto').value.trim();
         const novoMedicoId = document.getElementById('editUtenteMedicoId').value;
+        const novoRole = document.getElementById('editUtenteRole').value;
         const msgErro = document.getElementById('erroContactoUtente');
 
-        // Validação estrita: 9 dígitos
-        if (!/^\d{9}$/.test(novoContacto)) {
-            msgErro.style.display = 'block';
-            return;
-        } else {
-            msgErro.style.display = 'none';
-        }
+        if (!/^\d{9}$/.test(novoContacto)) { msgErro.style.display = 'block'; return; }
+        msgErro.style.display = 'none';
 
         try {
-            const utenteAtual = await buscarUtentePorId(id);
-            const dadosAtualizados = { 
-                ...utenteAtual, 
-                nome: novoNome, 
-                contacto: novoContacto, 
-                medicoId: parseInt(novoMedicoId) || null 
-            };
-            
-            await atualizarUtente(id, dadosAtualizados);
+            await atualizarUtente(id, { nome: novoNome, contacto: novoContacto, medicoId: parseInt(novoMedicoId) || undefined });
+
+            if (novoRole && utilizadorId) {
+                const resRole = await fetchAutenticado(`/auth/utilizador/${utilizadorId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ role: novoRole })
+                });
+                if (!resRole.ok) { const d = await resRole.json(); alert('Erro ao alterar role: ' + (d.erro || '')); return; }
+            }
+
             fecharModal('modalEditarUtente');
             desenharTabelaUtentes();
         } catch (error) {
@@ -695,36 +735,39 @@
     }
 
     // Modal de Edição - Médicos
-    function iniciarEditarMedico(id, nomeAtual, contactoAtual) {
-        estadoModal = { tipo: 'medico', id };
+    function iniciarEditarMedico(id, nomeAtual, especialidadeAtual, contactoAtual, utilizadorId) {
+        estadoModal = { tipo: 'medico', id, utilizadorId };
         document.getElementById('editMedicoNome').value = nomeAtual;
+        document.getElementById('editMedicoEspecialidade').value = especialidadeAtual || '';
         document.getElementById('editMedicoContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
+        document.getElementById('editMedicoRole').value = '';
         document.getElementById('modalEditarMedico').style.display = 'flex';
     }
 
     async function guardarEdicaoMedico() {
-        const { id } = estadoModal;
+        const { id, utilizadorId } = estadoModal;
         const novoNome = document.getElementById('editMedicoNome').value.trim();
+        const novaEspecialidade = document.getElementById('editMedicoEspecialidade').value;
         const novoContacto = document.getElementById('editMedicoContacto').value.trim();
+        const novoRole = document.getElementById('editMedicoRole').value;
         const msgErro = document.getElementById('erroContactoMedico');
 
-        // Validação estrita: 9 dígitos
-        if (!/^\d{9}$/.test(novoContacto)) {
-            msgErro.style.display = 'block';
-            return;
-        } else {
-            msgErro.style.display = 'none';
-        }
+        if (!/^\d{9}$/.test(novoContacto)) { msgErro.style.display = 'block'; return; }
+        msgErro.style.display = 'none';
 
         try {
-            const medicoAtual = await buscarMedicoPorId(id);
-            const dadosAtualizados = { 
-                ...medicoAtual, 
-                nome: novoNome, 
-                contacto: novoContacto 
-            };
-            
-            await atualizarMedico(id, dadosAtualizados);
+            const payload = { nome: novoNome, contacto: novoContacto };
+            if (novaEspecialidade) payload.especialidade = novaEspecialidade;
+            await atualizarMedico(id, payload);
+
+            if (novoRole && utilizadorId) {
+                const resRole = await fetchAutenticado(`/auth/utilizador/${utilizadorId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ role: novoRole })
+                });
+                if (!resRole.ok) { const d = await resRole.json(); alert('Erro ao alterar role: ' + (d.erro || '')); return; }
+            }
+
             fecharModal('modalEditarMedico');
             desenharTabelaMedicos();
         } catch (error) {
@@ -759,7 +802,7 @@
               <td>${med.cedulaProfissional}</td>
               <td>${med.contacto || 'N/A'}</td>
               <td>
-                <button onclick="iniciarEditarMedico(${med.id}, '${med.nome}', '${med.contacto}')" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="iniciarEditarMedico(${med.id}, '${med.nome}', '${med.especialidade}', '${med.contacto}', ${med.utilizadorId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
                 <button onclick="prepararApagar('medico', ${med.id}, '${med.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
               </td>
             </tr>
@@ -792,7 +835,7 @@
               <td><span style="color:#4f46e5;">ID ${ut.medicoId}</span></td>
               <td>${ut.contacto || 'N/A'}</td>
               <td>
-                <button onclick="iniciarEditarUtente(${ut.id}, '${ut.nome}', '${ut.contacto}', ${ut.medicoId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="iniciarEditarUtente(${ut.id}, '${ut.nome}', '${ut.contacto}', ${ut.medicoId}, ${ut.utilizadorId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
                 <button onclick="prepararApagar('utente', ${ut.id}, '${ut.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
               </td>
             </tr>
@@ -943,15 +986,49 @@
     // ==========================================
     // OUTRAS FUNÇÕES E ARRANQUE
     // ==========================================
-    document.getElementById('formConfigLimiar').addEventListener('submit', (e) => {
+    async function carregarConfiguracao() {
+      try {
+        const res = await fetchAutenticado('/configuracao');
+        const config = await res.json();
+        document.getElementById('configLimiar').value = config.limiarMinimoScore;
+        document.getElementById('configLimiarExame').value = config.limiarScoreParaRecomendarExame;
+        document.getElementById('configDeterioracao').value = config.deterioracaoScore;
+        document.getElementById('configSemanas').value = config.proximaAvaliacaoSemanas;
+      } catch (err) {
+        document.getElementById('msgConfig').textContent = 'Erro ao carregar configuração.';
+      }
+    }
+
+    document.getElementById('formConfigLimiar').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const valor = document.getElementById('configLimiar').value;
-      document.getElementById('msgConfig').textContent = `Limiar atualizado para < ${valor} pontos.`;
+      const msg = document.getElementById('msgConfig');
+      const payload = {
+        limiarMinimoScore: parseFloat(document.getElementById('configLimiar').value),
+        limiarScoreParaRecomendarExame: parseFloat(document.getElementById('configLimiarExame').value),
+        deterioracaoScore: parseFloat(document.getElementById('configDeterioracao').value),
+        proximaAvaliacaoSemanas: parseInt(document.getElementById('configSemanas').value)
+      };
+      try {
+        const res = await fetchAutenticado('/configuracao', { method: 'PUT', body: JSON.stringify(payload) });
+        const dados = await res.json();
+        if (!res.ok) throw new Error(dados.erro || 'Erro ao guardar.');
+        msg.style.color = '#059669';
+        msg.textContent = 'Configuração guardada com sucesso!';
+      } catch (err) {
+        msg.style.color = '#dc2626';
+        msg.textContent = err.message;
+      }
     });
 
     async function limparDadosDeTeste() {
-      if(confirm('Tem a certeza de que pretende remover os logs de simulação?')) {
-        alert('Ação processada com sucesso.');
+      if (!confirm('Tem a certeza? Esta ação elimina todos os dados clínicos (CARAT, alertas, prescrições, exames) mas mantém os utilizadores, utentes e médicos.')) return;
+      try {
+        const res = await fetchAutenticado('/admin/simulados', { method: 'DELETE' });
+        const dados = await res.json();
+        if (!res.ok) throw new Error(dados.erro || 'Erro.');
+        alert(dados.mensagem);
+      } catch (err) {
+        alert('Erro: ' + err.message);
       }
     }
 
