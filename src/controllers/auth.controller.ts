@@ -4,6 +4,7 @@
 
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 export class AuthController {
   private authService = new AuthService();
@@ -57,6 +58,16 @@ export class AuthController {
       return res.json({ mensagem: 'Perfil atualizado com sucesso.', role: resultado.role });
     } catch (error: any) {
       return res.status(400).json({ erro: error.message });
+    }
+  };
+
+  logout = async (req: AuthRequest, res: Response): Promise<Response> => {
+    try {
+      const user = req.user!;
+      await this.authService.logout(user.id, user.username);
+      return res.status(200).json({ mensagem: 'Sessão terminada com sucesso.' });
+    } catch (error: any) {
+      return res.status(500).json({ erro: 'Erro ao terminar sessão.' });
     }
   };
 

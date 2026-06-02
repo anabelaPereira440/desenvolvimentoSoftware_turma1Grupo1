@@ -1,12 +1,12 @@
 export interface RegisterDTO {
   nome: string;
-  email: string;
+  username: string;
   password: string;
   role?: 'UTENTE' | 'MEDICO' | 'ADMIN';
 }
 
 export interface LoginDTO {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -15,7 +15,7 @@ export interface AuthResponseDTO {
   user: {
     id: number;
     nome: string;
-    email: string;
+    username: string;
     role: string;
   };
 }

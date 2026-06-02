@@ -6,9 +6,15 @@ import { autorizar } from '../middleware/autorizar.middleware';
 const router = Router();
 const controller = new AuthController();
 
-// Públicas
+// Pública
 router.post('/login', controller.login.bind(controller));
-router.post('/register', controller.registar.bind(controller));
+
+// Protegida — qualquer utilizador autenticado pode terminar sessão
+router.post('/logout', authMiddleware, controller.logout.bind(controller));
+
+// Protegida — só admin pode registar novos utilizadores
+router.post('/register', authMiddleware, autorizar(['ADMIN']),
+  controller.registar.bind(controller));
 
 // Protegida — só admin pode ver os logs
 router.get('/logs', authMiddleware, autorizar(['ADMIN']),

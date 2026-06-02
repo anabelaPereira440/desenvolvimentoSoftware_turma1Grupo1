@@ -134,6 +134,11 @@ export class AuthService {
     return this.userRepo.save(user);
   }
 
+  // Regista o logout do utilizador nos logs de auditoria
+  async logout(utilizadorId: number, username: string): Promise<void> {
+    await this.registarLog(utilizadorId, username, 'LOGOUT', 'Sessão terminada pelo utilizador');
+  }
+
   // Lista todos os logs (Uso exclusivo do perfil ADMIN)
   async listarLogs(): Promise<Log[]> {
     return this.logRepo.find({
@@ -163,8 +168,6 @@ async registarLog(
     detalhe: string
   ): Promise<void> {
     try {
-      // Solução: Fazemos o cast para any para o TypeScript aceitar o null/undefined 
-      // independentemente de como desenhaste a entidade Log
       const novoLog = this.logRepo.create({
         utilizadorId: (utilizadorId === null ? undefined : utilizadorId) as any,
         username,
