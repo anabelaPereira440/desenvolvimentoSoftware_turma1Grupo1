@@ -32,7 +32,6 @@ import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
 import alertaRoutes from './routes/alerta.routes';
 import configuracaoRoutes from './routes/configuracao.routes';
-import recomendacaoRoutes from './routes/recomendacao.routes';
 import adminRoutes from './routes/admin.routes';
 
 const app = express();
@@ -52,7 +51,6 @@ app.use('/carat', caratRoutes);   // GET /carat/:evalId
 app.use('/alertas', alertaRoutes);
 app.use('/configuracao', configuracaoRoutes);
 app.use('/admin', adminRoutes);
-app.use('/recomendacoes', recomendacaoRoutes);
 
 
 // Inicialização da base de dados e servidor
@@ -199,6 +197,8 @@ if (require.main === module) {
                         interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
                         recomendacoes: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente recomendada.",
                         proximaAvaliacao: new Date("2026-05-08"),
+                        limiarMinimoScoreUsado: 19,
+                        limiarScoreParaRecomendarExameUsado: 24,
                         utenteId: maria.id
                     },
                     {
@@ -212,6 +212,8 @@ if (require.main === module) {
                         interpretacao: "Doença Respiratória Controlada.",
                         recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 4 semanas.",
                         proximaAvaliacao: proxAvaliacao,
+                        limiarMinimoScoreUsado: 19,
+                        limiarScoreParaRecomendarExameUsado: 24,
                         utenteId: maria.id
                     },
                     {
@@ -225,6 +227,8 @@ if (require.main === module) {
                         interpretacao: "Doença Respiratória Parcialmente Controlada.",
                         recomendacoes: "Indicação para realização de exames complementares. Manter o plano terapêutico e agendar consulta de rotina.",
                         proximaAvaliacao: proxAvaliacao,
+                        limiarMinimoScoreUsado: 19,
+                        limiarScoreParaRecomendarExameUsado: 24,
                         utenteId: antonio.id
                     }
                 ]);

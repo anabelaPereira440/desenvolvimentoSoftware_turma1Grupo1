@@ -21,9 +21,17 @@ export class Configuracao {
   @Column({ type: 'float', default: 24 })
   limiarScoreParaRecomendarExame!: number;
 
-  // Número de semanas até à próxima avaliação CARAT sugerida (default: 4 semanas)
+  // Semanas até à próxima avaliação quando doença Controlada (default: 4 semanas)
   @Column({ type: 'int', default: 4 })
   proximaAvaliacaoSemanas!: number;
+
+  // Semanas até à próxima avaliação quando doença Parcialmente Controlada (default: 3 semanas)
+  @Column({ type: 'int', default: 3 })
+  proximaAvaliacaoSemanasParcialmControlo!: number;
+
+  // Semanas até à próxima avaliação quando doença Não Controlada (default: 2 semanas)
+  @Column({ type: 'int', default: 2 })
+  proximaAvaliacaoSemanasNaoControlado!: number;
 
   @UpdateDateColumn()
   ultimaAtualizacao!: Date;

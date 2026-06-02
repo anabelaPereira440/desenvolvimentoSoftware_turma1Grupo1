@@ -4,19 +4,12 @@ import { Alerta } from '../models/alerta.entity';
 import { AlertaEstado } from '../enums/AlertaEstado.enum';
 import { AlertaPrioridade } from '../enums/AlertaPrioridade.enum';
 import { TipoAlerta } from '../enums/TipoAlerta.enum';
+import { CreateAlertaDto, UpdateAlertaDto } from '../dtos/alerta/create-alerta.dto';
 
 export class AlertaService {
     private repo = AppDataSource.getRepository(Alerta);
 
-    async criarAlerta(dados: {
-        utenteId: number;
-        medicoResponsavelId: number;
-        tipoAlerta: TipoAlerta;
-        avaliacaoCaratId?: string | null;
-        recomendacaoId?: number | null;
-        prioridade?: AlertaPrioridade;
-        motivo?: string;
-    }): Promise<Alerta> {
+    async criarAlerta(dados: CreateAlertaDto): Promise<Alerta> {
         if (!dados.utenteId) throw new Error('Alerta sem utente associado.');
         if (!dados.medicoResponsavelId) throw new Error('Alerta sem médico responsável.');
         if (!dados.tipoAlerta) throw new Error('Tipo de alerta é obrigatório.');
@@ -29,7 +22,6 @@ export class AlertaService {
             medicoResponsavelId: dados.medicoResponsavelId,
             tipoAlerta: dados.tipoAlerta,
             avaliacaoCaratId: dados.avaliacaoCaratId ?? null,
-            recomendacaoId: dados.recomendacaoId ?? null,
             prioridade: dados.prioridade ?? AlertaPrioridade.MEDIA,
             estado: AlertaEstado.NOVO,
             motivo,
@@ -71,10 +63,7 @@ export class AlertaService {
         });
     }
 
-    async atualizarAlerta(
-        id: number,
-        dados: { estado?: AlertaEstado; prioridade?: AlertaPrioridade }
-    ): Promise<Alerta> {
+    async atualizarAlerta(id: number, dados: UpdateAlertaDto): Promise<Alerta> {
         const alerta = await this.repo.findOne({ where: { id } });
         if (!alerta) throw new Error('Alerta clínico não encontrado.');
 
@@ -99,8 +88,6 @@ export class AlertaService {
         switch (tipo) {
             case TipoAlerta.DETERIORACAOSCORE:
                 return 'Deterioração significativa do score CARAT.';
-            case TipoAlerta.INDICACAOEXAMES:
-                return 'Score CARAT indica necessidade de exames complementares.';
             case TipoAlerta.REVISAOTERAPEUTICA:
                 return 'Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente.';
             default:

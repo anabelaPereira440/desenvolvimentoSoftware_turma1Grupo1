@@ -266,6 +266,11 @@
             <td><span style="background:${bg};color:${fg};padding:3px 8px;border-radius:10px;font-size:12px;font-weight:600;">${c.nivelControlo?.replace(/_/g,' ')}</span></td>
             <td>${c.proximaAvaliacao ? new Date(c.proximaAvaliacao).toLocaleDateString('pt-PT') : '—'}</td>
             <td style="font-size:13px;">${c.interpretacao}</td>
+          </tr>
+          <tr>
+            <td colspan="6" style="font-size:11px;color:#9ca3af;padding:2px 14px 8px;border-bottom:2px solid #e5e7eb;">
+              Limiares usados nesta avaliação — Não Controlado: ≤ ${c.limiarMinimoScoreUsado ?? '—'} pts · Parcialmente Controlado: ≤ ${c.limiarScoreParaRecomendarExameUsado ?? '—'} pts
+            </td>
           </tr>`;
         }).join('')}</tbody>
       </table>`;
@@ -284,7 +289,7 @@
 
     const estadoBadge = e => ({'NOVO':'badge-novo','VISTO':'badge-visto','EM_SEGUIMENTO':'badge-seguimento','FECHADO':'badge-fechado'}[e]||'');
     const prioBadge   = p => ({'ALTA':'badge-alta','MEDIA':'badge-media','BAIXA':'badge-baixa','CRITICA':'badge-critica'}[p]||'');
-    const tipoLabel   = t => ({'REVISAO_TERAPEUTICA':'Revisão Terapêutica','INDICACAO_EXAMES':'Indicação Exames','DETERIORACAO_SCORE':'Deterioração Score'}[t]||t);
+    const tipoLabel   = t => ({'REVISAO_TERAPEUTICA':'Revisão Terapêutica','DETERIORACAO_SCORE':'Deterioração Score'}[t]||t);
 
     tbody.innerHTML = data.map(a => `
       <tr>

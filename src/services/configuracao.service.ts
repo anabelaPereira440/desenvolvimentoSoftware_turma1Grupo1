@@ -50,6 +50,20 @@ export class ConfiguracaoService {
       config.proximaAvaliacaoSemanas = dados.proximaAvaliacaoSemanas;
     }
 
+    if (dados.proximaAvaliacaoSemanasParcialmControlo !== undefined) {
+      if (!Number.isInteger(dados.proximaAvaliacaoSemanasParcialmControlo) || dados.proximaAvaliacaoSemanasParcialmControlo < 1 || dados.proximaAvaliacaoSemanasParcialmControlo > 52) {
+        throw new Error('proximaAvaliacaoSemanasParcialmControlo deve ser um inteiro entre 1 e 52.');
+      }
+      config.proximaAvaliacaoSemanasParcialmControlo = dados.proximaAvaliacaoSemanasParcialmControlo;
+    }
+
+    if (dados.proximaAvaliacaoSemanasNaoControlado !== undefined) {
+      if (!Number.isInteger(dados.proximaAvaliacaoSemanasNaoControlado) || dados.proximaAvaliacaoSemanasNaoControlado < 1 || dados.proximaAvaliacaoSemanasNaoControlado > 52) {
+        throw new Error('proximaAvaliacaoSemanasNaoControlado deve ser um inteiro entre 1 e 52.');
+      }
+      config.proximaAvaliacaoSemanasNaoControlado = dados.proximaAvaliacaoSemanasNaoControlado;
+    }
+
     return this.repo.save(config);
   }
 }

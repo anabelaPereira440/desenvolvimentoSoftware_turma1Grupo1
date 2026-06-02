@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/database';
 import { AvaliacaoCarat } from '../models/avaliacao-carat.entity';
 import { Alerta } from '../models/alerta.entity';
-import { Recomendacao } from '../models/recomendacao.entity';
 import { Prescricao } from '../models/prescricao.entity';
 import { Exame } from '../models/exame.entity';
 import { Log } from '../models/log.entity';
@@ -12,7 +11,6 @@ export class AdminController {
     async limparSimulados(req: Request, res: Response) {
         try {
             await AppDataSource.getRepository(Alerta).delete({});
-            await AppDataSource.getRepository(Recomendacao).delete({});
             await AppDataSource.getRepository(AvaliacaoCarat).delete({});
             await AppDataSource.getRepository(Prescricao).delete({});
             await AppDataSource.getRepository(Exame).delete({});

@@ -92,7 +92,6 @@
     <button id="btn-aba-carat"         onclick="mudarAba('aba-carat')">Questionário CARAT</button>
     <button id="btn-aba-dashboard"     onclick="mudarAba('aba-dashboard')">Meu Dashboard</button>
     <button id="btn-aba-alertas"       onclick="mudarAba('aba-alertas')">Os Meus Alertas</button>
-    <button id="btn-aba-recomendacoes" onclick="mudarAba('aba-recomendacoes')">Recomendações</button>
     <button id="btn-aba-perfil"        onclick="mudarAba('aba-perfil')">Os Meus Dados</button>
     <button onclick="efetuarLogout()" class="btn-logout">Terminar Sessão</button>
   </nav>
@@ -223,13 +222,6 @@
       <div id="listaAlertasUtente">A carregar...</div>
     </section>
 
-    <!-- RECOMENDAÇÕES -->
-    <section id="aba-recomendacoes" class="pagina">
-      <h1>As Minhas Recomendações</h1>
-      <p class="subtitulo">Recomendações geradas pelo sistema com base nas suas avaliações CARAT.</p>
-      <div id="listaRecomendacoes">A carregar...</div>
-    </section>
-
     <!-- DADOS PESSOAIS -->
     <section id="aba-perfil" class="pagina">
       <h1>Os Meus Dados Pessoais</h1>
@@ -285,10 +277,9 @@
       document.querySelectorAll('nav button[id]').forEach(b => b.classList.remove('ativo'));
       document.getElementById(idAba).classList.add('ativa');
       document.getElementById('btn-' + idAba).classList.add('ativo');
-      if (idAba === 'aba-dashboard')     carregarHistorico();
-      if (idAba === 'aba-alertas')       carregarAlertas();
-      if (idAba === 'aba-recomendacoes') carregarRecomendacoes();
-      if (idAba === 'aba-perfil')        carregarPerfil();
+      if (idAba === 'aba-dashboard') carregarHistorico();
+      if (idAba === 'aba-alertas')   carregarAlertas();
+      if (idAba === 'aba-perfil')    carregarPerfil();
     }
 
     // ── CARAT ────────────────────────────────────────────────────────────────
@@ -410,6 +401,11 @@
               <td style="font-size:12px;">${c.nivelControlo?.replace(/_/g,' ')}</td>
               <td style="font-size:12px;">${c.proximaAvaliacao ? new Date(c.proximaAvaliacao).toLocaleDateString('pt-PT') : '—'}</td>
               <td style="font-size:12px;"><strong>${c.interpretacao}</strong></td>
+            </tr>
+            <tr>
+              <td colspan="7" style="font-size:11px;color:#9ca3af;padding:2px 14px 8px;border-bottom:2px solid #e5e7eb;">
+                Limiares usados nesta avaliação — Não Controlado: ≤ ${c.limiarMinimoScoreUsado ?? '—'} pts · Parcialmente Controlado: ≤ ${c.limiarScoreParaRecomendarExameUsado ?? '—'} pts
+              </td>
             </tr>`).join('')}
           </tbody>
         </table>`;
@@ -423,7 +419,7 @@
       const res  = await api(`/alertas/utente/${utenteId}`);
       const data = await res.json();
       if (!data.length) { container.innerHTML = '<p>Sem alertas activos.</p>'; return; }
-      const tipoLabel = t => ({'REVISAO_TERAPEUTICA':'Revisão Terapêutica','INDICACAO_EXAMES':'Indicação de Exames','DETERIORACAO_SCORE':'Deterioração do Score'}[t]||t);
+      const tipoLabel = t => ({'REVISAO_TERAPEUTICA':'Revisão Terapêutica','DETERIORACAO_SCORE':'Deterioração do Score'}[t]||t);
       const estadoBadge = e => ({'NOVO':'badge-novo','EM_SEGUIMENTO':'badge-seguimento','FECHADO':'badge-fechado'}[e]||'badge-novo');
       const prioBadge   = p => ({'ALTA':'badge-alta','MEDIA':'badge-media','BAIXA':'badge-baixa'}[p]||'');
       container.innerHTML = `
@@ -439,34 +435,6 @@
             </tr>`).join('')}
           </tbody>
         </table>`;
-    }
-
-    // ── RECOMENDAÇÕES ────────────────────────────────────────────────────────
-    async function carregarRecomendacoes() {
-      const container = document.getElementById('listaRecomendacoes');
-      if (!utenteId) { container.innerHTML = '<p>Ficha clínica não associada.</p>'; return; }
-      container.innerHTML = '<p>A carregar...</p>';
-      const res  = await api(`/recomendacoes/utente/${utenteId}`);
-      const data = await res.json();
-      if (!data.length) { container.innerHTML = '<p>Sem recomendações.</p>'; return; }
-      const tipoLabel = t => ({'AUTOCUIDADO':'Autocuidado','REVISAO_TERAPEUTICA':'Revisão Terapêutica','INDICACAO_EXAME':'Indicação de Exame'}[t]||t);
-      container.innerHTML = data.map(r => `
-        <div class="card-rec">
-          <div>
-            <div class="tipo">${tipoLabel(r.tipo)}</div>
-            <div class="desc">${r.descricao}</div>
-            <div class="lida">${r.foiLida ? '✓ Lida' : 'Por ler'} · ${new Date(r.dataCriacao).toLocaleDateString('pt-PT')}</div>
-          </div>
-          ${!r.foiLida ? `<button class="btn-lida" onclick="marcarLida(${r.id}, this)">Marcar como lida</button>` : ''}
-        </div>`).join('');
-    }
-
-    async function marcarLida(id, btn) {
-      const res = await api(`/recomendacoes/${id}/lida`, { method:'PATCH' });
-      if (res.ok) {
-        btn.closest('.card-rec').querySelector('.lida').textContent = '✓ Lida';
-        btn.remove();
-      }
     }
 
     // ── DADOS PESSOAIS ───────────────────────────────────────────────────────

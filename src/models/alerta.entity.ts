@@ -14,7 +14,6 @@ import { TipoAlerta } from '../enums/TipoAlerta.enum';
 import { Utente } from './utente.entity';
 import { Medico } from './medico.entity';
 import { AvaliacaoCarat } from './avaliacao-carat.entity';
-import { Recomendacao } from './recomendacao.entity';
 
 @Entity()
 @Index(['medicoResponsavelId', 'estado', 'prioridade'])
@@ -48,20 +47,12 @@ export class Alerta {
   tipoAlerta!: TipoAlerta;
 
   // Avaliação CARAT que originou este alerta
-  @Column({ type: 'varchar', nullable: true })
-  avaliacaoCaratId?: string | null;
+  @Column({ type: 'integer', nullable: true })
+  avaliacaoCaratId?: number | null;
 
   @ManyToOne(() => AvaliacaoCarat, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'avaliacaoCaratId' })
   avaliacaoCarat?: AvaliacaoCarat;
-
-  // Recomendação que disparou este alerta (null para alertas de deterioração)
-  @Column({ type: 'integer', nullable: true })
-  recomendacaoId?: number | null;
-
-  @ManyToOne(() => Recomendacao, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'recomendacaoId' })
-  recomendacao?: Recomendacao;
 
   @Column({
     type: 'simple-enum',

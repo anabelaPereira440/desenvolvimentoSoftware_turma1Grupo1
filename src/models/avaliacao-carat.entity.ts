@@ -95,9 +95,16 @@ export class AvaliacaoCarat {
   @Column({ type: 'text' })
   recomendacoes!: string;
 
-  // Data sugerida para a próxima avaliação (calculada com base em proximaAvaliacaoSemanas da Configuracao)
+  // Data sugerida para a próxima avaliação (intervalo varia com o nível de controlo)
   @Column({ type: 'date', nullable: true })
   proximaAvaliacao?: Date;
+
+  // Limiares da Configuração vigentes no momento desta avaliação (para rastreabilidade histórica)
+  @Column({ type: 'float' })
+  limiarMinimoScoreUsado!: number;
+
+  @Column({ type: 'float' })
+  limiarScoreParaRecomendarExameUsado!: number;
 
   // --- Relação com o utente ---
 

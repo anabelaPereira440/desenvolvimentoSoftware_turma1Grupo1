@@ -1,9 +1,7 @@
 import { AppDataSource } from '../database/database';
 import { AvaliacaoCarat } from '../models/avaliacao-carat.entity';
 import { Utente } from '../models/utente.entity';
-import { Recomendacao } from '../models/recomendacao.entity';
 import { NivelControlo } from '../enums/NivelControlo.enum';
-import { TipoRecomendacao } from '../enums/TipoRecomendacao.enum';
 import { CreateCaratDto } from '../dtos/carat/create-carat.dto';
 import { ConfiguracaoService } from './configuracao.service';
 import { AlertaService } from './alerta.service';
@@ -13,7 +11,6 @@ import { AlertaPrioridade } from '../enums/AlertaPrioridade.enum';
 export class CaratService {
   private caratRepo = AppDataSource.getRepository(AvaliacaoCarat);
   private utenteRepo = AppDataSource.getRepository(Utente);
-  private recomendacaoRepo = AppDataSource.getRepository(Recomendacao);
   private configuracaoService = new ConfiguracaoService();
   private alertaService = new AlertaService();
 
@@ -64,9 +61,15 @@ export class CaratService {
       resumoRecomendacoes = `Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em ${config.proximaAvaliacaoSemanas} semanas.`;
     }
 
-    // ─── 6. Calcular data da próxima avaliação recomendada ────────────────────
+    // ─── 6. Calcular data da próxima avaliação consoante nível de controlo ───
+    const semanasPorNivel: Record<NivelControlo, number> = {
+      [NivelControlo.NAO_CONTROLADO]:         config.proximaAvaliacaoSemanasNaoControlado,
+      [NivelControlo.PARCIALMENTE_CONTROLADO]: config.proximaAvaliacaoSemanasParcialmControlo,
+      [NivelControlo.CONTROLADO]:              config.proximaAvaliacaoSemanas,
+    };
+    const semanasProxima = semanasPorNivel[nivelControlo];
     const proximaAvaliacao = new Date();
-    proximaAvaliacao.setDate(proximaAvaliacao.getDate() + config.proximaAvaliacaoSemanas * 7);
+    proximaAvaliacao.setDate(proximaAvaliacao.getDate() + semanasProxima * 7);
 
     // ─── 7. Guardar avaliação CARAT ───────────────────────────────────────────
     const novaAvaliacao = new AvaliacaoCarat();
@@ -89,71 +92,24 @@ export class CaratService {
     novaAvaliacao.interpretacao = interpretacao;
     novaAvaliacao.recomendacoes = resumoRecomendacoes;
     novaAvaliacao.proximaAvaliacao = proximaAvaliacao;
+    novaAvaliacao.limiarMinimoScoreUsado = config.limiarMinimoScore;
+    novaAvaliacao.limiarScoreParaRecomendarExameUsado = config.limiarScoreParaRecomendarExame;
 
     const avaliacaoSalva = await this.caratRepo.save(novaAvaliacao);
 
-    // ─── 8. Gerar Recomendacoes ───────────────────────────────────────────────
+    // ─── 8. Gerar Alerta se score NAO_CONTROLADO ──────────────────────────────
     const medicoId = utente.medicoId;
-    const recomendacoesParaCriar: Partial<Recomendacao>[] = [];
-
-    // Recomendação de autocuidado — gerada sempre, com texto adaptado ao nível de controlo
-    recomendacoesParaCriar.push({
-      tipo: TipoRecomendacao.AUTOCUIDADO,
-      descricao: this.getDescricaoAutocuidado(nivelControlo),
-      foiLida: false,
-      utenteId,
-      avaliacaoCaratId: avaliacaoSalva.id,
-    });
-
-    // Recomendação de revisão terapêutica — score NAO_CONTROLADO
     if (nivelControlo === NivelControlo.NAO_CONTROLADO) {
-      recomendacoesParaCriar.push({
-        tipo: TipoRecomendacao.REVISAO_TERAPEUTICA,
-        descricao: `Score CARAT de ${scoreTotal} (abaixo do limiar de ${config.limiarMinimoScore}). Revisão do plano terapêutico urgente.`,
-        foiLida: false,
-        utenteId,
-        avaliacaoCaratId: avaliacaoSalva.id,
-      });
-    }
-
-    // Recomendação de indicação de exame — score PARCIALMENTE_CONTROLADO
-    if (nivelControlo === NivelControlo.PARCIALMENTE_CONTROLADO) {
-      recomendacoesParaCriar.push({
-        tipo: TipoRecomendacao.INDICACAO_EXAME,
-        descricao: `Score CARAT de ${scoreTotal}. Indicação para realização de exames complementares de diagnóstico.`,
-        foiLida: false,
-        utenteId,
-        avaliacaoCaratId: avaliacaoSalva.id,
-      });
-    }
-
-    const recomendacoesSalvas = await this.recomendacaoRepo.save(recomendacoesParaCriar as Recomendacao[]);
-
-    // ─── 9. Gerar Alertas automáticos a partir das Recomendacoes de risco ─────
-    for (const rec of recomendacoesSalvas) {
       try {
-        if (rec.tipo === TipoRecomendacao.REVISAO_TERAPEUTICA) {
-          await this.alertaService.criarAlerta({
-            utenteId,
-            medicoResponsavelId: medicoId,
-            tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
-            prioridade: AlertaPrioridade.ALTA,
-            avaliacaoCaratId: String(avaliacaoSalva.id),
-            recomendacaoId: rec.id,
-          });
-        } else if (rec.tipo === TipoRecomendacao.INDICACAO_EXAME) {
-          await this.alertaService.criarAlerta({
-            utenteId,
-            medicoResponsavelId: medicoId,
-            tipoAlerta: TipoAlerta.INDICACAOEXAMES,
-            prioridade: AlertaPrioridade.MEDIA,
-            avaliacaoCaratId: String(avaliacaoSalva.id),
-            recomendacaoId: rec.id,
-          });
-        }
+        await this.alertaService.criarAlerta({
+          utenteId,
+          medicoResponsavelId: medicoId,
+          tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
+          prioridade: AlertaPrioridade.ALTA,
+          avaliacaoCaratId: avaliacaoSalva.id,
+        });
       } catch (erroAlerta) {
-        // Erro no alerta não deve impedir o registo da avaliação CARAT
-        console.error('[CaratService] Erro ao gerar alerta automático:', erroAlerta);
+        console.error('[CaratService] Erro ao gerar alerta de revisão terapêutica:', erroAlerta);
       }
     }
 
@@ -175,7 +131,7 @@ export class CaratService {
             medicoResponsavelId: medicoId,
             tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
             prioridade: AlertaPrioridade.ALTA,
-            avaliacaoCaratId: String(avaliacaoSalva.id),
+            avaliacaoCaratId: avaliacaoSalva.id,
             motivo: `Deterioração de ${queda} pontos no score CARAT (de ${avaliacaoAnterior.scoreTotal} para ${scoreTotal}).`,
           });
         }
@@ -202,18 +158,5 @@ export class CaratService {
       where: { utenteId },
       order: { data: 'DESC' },
     });
-  }
-
-  // ─── Helpers privados ─────────────────────────────────────────────────────
-
-  private getDescricaoAutocuidado(nivel: NivelControlo): string {
-    switch (nivel) {
-      case NivelControlo.NAO_CONTROLADO:
-        return 'A sua doença não está controlada. Siga rigorosamente o plano terapêutico, evite fatores desencadeantes (pó, pólenes, tabaco) e contacte o seu médico urgentemente.';
-      case NivelControlo.PARCIALMENTE_CONTROLADO:
-        return 'A sua doença está parcialmente controlada. Continue a tomar a medicação prescrita, identifique possíveis fatores que agravem os sintomas e agende uma consulta de revisão.';
-      case NivelControlo.CONTROLADO:
-        return 'Excelente! A sua doença está controlada. Continue com o plano prescrito, mantenha os hábitos saudáveis e realize a próxima avaliação CARAT na data sugerida.';
-    }
   }
 }

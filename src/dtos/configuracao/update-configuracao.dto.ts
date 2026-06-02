@@ -3,4 +3,6 @@ export interface UpdateConfiguracaoDto {
   deterioracaoScore?: number;
   limiarScoreParaRecomendarExame?: number;
   proximaAvaliacaoSemanas?: number;
+  proximaAvaliacaoSemanasParcialmControlo?: number;
+  proximaAvaliacaoSemanasNaoControlado?: number;
 }

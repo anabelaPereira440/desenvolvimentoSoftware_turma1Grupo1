@@ -476,9 +476,19 @@
             <span style="font-size:12px; color:#6b7280;">Queda ≥ este valor face à avaliação anterior → alerta de Deterioração (padrão: 4)</span>
           </div>
           <div class="input-group">
-            <label><strong>Semanas até à Próxima Avaliação:</strong></label>
+            <label><strong>Semanas até à Próxima Avaliação (Controlado):</strong></label>
             <input type="number" id="configSemanas" min="1" max="52" step="1" required />
-            <span style="font-size:12px; color:#6b7280;">Sugestão de data para o utente realizar o próximo CARAT (padrão: 4)</span>
+            <span style="font-size:12px; color:#6b7280;">Intervalo quando a doença está controlada (padrão: 4)</span>
+          </div>
+          <div class="input-group">
+            <label><strong>Semanas até à Próxima Avaliação (Parcialmente Controlado):</strong></label>
+            <input type="number" id="configSemanasParcialmControlo" min="1" max="52" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Intervalo quando a doença está parcialmente controlada (padrão: 3)</span>
+          </div>
+          <div class="input-group">
+            <label><strong>Semanas até à Próxima Avaliação (Não Controlado):</strong></label>
+            <input type="number" id="configSemanasNaoControlado" min="1" max="52" step="1" required />
+            <span style="font-size:12px; color:#6b7280;">Intervalo quando a doença não está controlada — seguimento mais rápido (padrão: 2)</span>
           </div>
         </div>
         <button type="submit" class="admin-btn">Guardar Configuração</button>
@@ -956,6 +966,8 @@
         document.getElementById('configLimiarExame').value = config.limiarScoreParaRecomendarExame;
         document.getElementById('configDeterioracao').value = config.deterioracaoScore;
         document.getElementById('configSemanas').value = config.proximaAvaliacaoSemanas;
+        document.getElementById('configSemanasParcialmControlo').value = config.proximaAvaliacaoSemanasParcialmControlo;
+        document.getElementById('configSemanasNaoControlado').value = config.proximaAvaliacaoSemanasNaoControlado;
       } catch (err) {
         document.getElementById('msgConfig').textContent = 'Erro ao carregar configuração.';
       }
@@ -968,7 +980,9 @@
         limiarMinimoScore: parseFloat(document.getElementById('configLimiar').value),
         limiarScoreParaRecomendarExame: parseFloat(document.getElementById('configLimiarExame').value),
         deterioracaoScore: parseFloat(document.getElementById('configDeterioracao').value),
-        proximaAvaliacaoSemanas: parseInt(document.getElementById('configSemanas').value)
+        proximaAvaliacaoSemanas: parseInt(document.getElementById('configSemanas').value),
+        proximaAvaliacaoSemanasParcialmControlo: parseInt(document.getElementById('configSemanasParcialmControlo').value),
+        proximaAvaliacaoSemanasNaoControlado: parseInt(document.getElementById('configSemanasNaoControlado').value)
       };
       try {
         const res = await fetchAutenticado('/configuracao', { method: 'PUT', body: JSON.stringify(payload) });
