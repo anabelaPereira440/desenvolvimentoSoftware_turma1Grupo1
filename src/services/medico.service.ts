@@ -98,6 +98,15 @@ export class MedicoService {
       medico.especialidade = dados.especialidade as EspecialidadeMedica;
     }
 
+    if (dados.cedulaProfissional !== undefined) {
+      if (typeof dados.cedulaProfissional !== 'number' || dados.cedulaProfissional <= 0) {
+        throw new Error("A cédula profissional deve ser um número positivo.");
+      }
+      const jaExiste = await this.repo.findOneBy({ cedulaProfissional: dados.cedulaProfissional });
+      if (jaExiste && jaExiste.id !== id) throw new Error("Já existe um médico registado com esta cédula profissional.");
+      medico.cedulaProfissional = dados.cedulaProfissional;
+    }
+
     if (dados.contacto !== undefined) {
       if (!/^\d{9}$/.test(dados.contacto.trim())) {
         throw new Error("O contacto deve conter exatamente 9 dígitos.");

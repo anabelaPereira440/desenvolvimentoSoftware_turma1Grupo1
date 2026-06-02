@@ -316,7 +316,6 @@
             <select id="utilRole" required>
               <option value="UTENTE">Utente (Sujeito à monitorização CARAT)</option>
               <option value="MEDICO">Médico (Profissional Supervisor)</option>
-              <option value="ADMIN">Administrador (Infraestrutura)</option>
             </select>
           </div>
         </div>
@@ -527,14 +526,6 @@
           <label>ID do Médico Responsável:</label>
           <input type="number" id="editUtenteMedicoId" placeholder="ID (ex: 1)">
 
-          <label>Alterar Perfil de Acesso:</label>
-          <select id="editUtenteRole">
-              <option value="">-- Não alterar --</option>
-              <option value="UTENTE">Utente</option>
-              <option value="MEDICO">Médico</option>
-              <option value="ADMIN">Administrador</option>
-          </select>
-
           <div class="modal-buttons">
               <button class="btn-cancelar" onclick="fecharModal('modalEditarUtente')">Cancelar</button>
               <button class="btn-confirmar" onclick="guardarEdicaoUtente()">Guardar</button>
@@ -560,17 +551,13 @@
               <option value="MEDICINA_INTERNA">Medicina Interna</option>
           </select>
 
+          <label>Cédula Profissional (deixar vazio para não alterar):</label>
+          <input type="number" id="editMedicoCedula" placeholder="Ex: 54321">
+          <span id="erroCedulaMedico" class="error-msg">A cédula deve ser um número positivo.</span>
+
           <label>Contacto (9 dígitos):</label>
           <input type="text" id="editMedicoContacto" placeholder="Ex: 912345678" maxlength="9">
           <span id="erroContactoMedico" class="error-msg">O contacto deve ter 9 dígitos.</span>
-
-          <label>Alterar Perfil de Acesso:</label>
-          <select id="editMedicoRole">
-              <option value="">-- Não alterar --</option>
-              <option value="UTENTE">Utente</option>
-              <option value="MEDICO">Médico</option>
-              <option value="ADMIN">Administrador</option>
-          </select>
 
           <div class="modal-buttons">
               <button class="btn-cancelar" onclick="fecharModal('modalEditarMedico')">Cancelar</button>
@@ -669,6 +656,7 @@
         document.getElementById(idModal).style.display = 'none';
         document.getElementById('erroContactoUtente').style.display = 'none';
         document.getElementById('erroContactoMedico').style.display = 'none';
+        document.getElementById('erroCedulaMedico').style.display = 'none';
     }
 
     function prepararApagar(tipo, id, nome) {
@@ -696,21 +684,19 @@
     }
 
     // Modal de Edição - Utentes
-    function iniciarEditarUtente(id, nomeAtual, contactoAtual, medicoIdAtual, utilizadorId) {
-        estadoModal = { tipo: 'utente', id, utilizadorId };
+    function iniciarEditarUtente(id, nomeAtual, contactoAtual, medicoIdAtual) {
+        estadoModal = { tipo: 'utente', id };
         document.getElementById('editUtenteNome').value = nomeAtual;
         document.getElementById('editUtenteContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
         document.getElementById('editUtenteMedicoId').value = medicoIdAtual !== 'null' ? medicoIdAtual : '';
-        document.getElementById('editUtenteRole').value = '';
         document.getElementById('modalEditarUtente').style.display = 'flex';
     }
 
     async function guardarEdicaoUtente() {
-        const { id, utilizadorId } = estadoModal;
+        const { id } = estadoModal;
         const novoNome = document.getElementById('editUtenteNome').value.trim();
         const novoContacto = document.getElementById('editUtenteContacto').value.trim();
         const novoMedicoId = document.getElementById('editUtenteMedicoId').value;
-        const novoRole = document.getElementById('editUtenteRole').value;
         const msgErro = document.getElementById('erroContactoUtente');
 
         if (!/^\d{9}$/.test(novoContacto)) { msgErro.style.display = 'block'; return; }
@@ -718,15 +704,6 @@
 
         try {
             await atualizarUtente(id, { nome: novoNome, contacto: novoContacto, medicoId: parseInt(novoMedicoId) || undefined });
-
-            if (novoRole && utilizadorId) {
-                const resRole = await fetchAutenticado(`/auth/utilizador/${utilizadorId}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ role: novoRole })
-                });
-                if (!resRole.ok) { const d = await resRole.json(); alert('Erro ao alterar role: ' + (d.erro || '')); return; }
-            }
-
             fecharModal('modalEditarUtente');
             desenharTabelaUtentes();
         } catch (error) {
@@ -735,39 +712,37 @@
     }
 
     // Modal de Edição - Médicos
-    function iniciarEditarMedico(id, nomeAtual, especialidadeAtual, contactoAtual, utilizadorId) {
-        estadoModal = { tipo: 'medico', id, utilizadorId };
+    function iniciarEditarMedico(id, nomeAtual, especialidadeAtual, contactoAtual, cedulaAtual) {
+        estadoModal = { tipo: 'medico', id };
         document.getElementById('editMedicoNome').value = nomeAtual;
         document.getElementById('editMedicoEspecialidade').value = especialidadeAtual || '';
+        document.getElementById('editMedicoCedula').value = '';
         document.getElementById('editMedicoContacto').value = contactoAtual !== 'null' && contactoAtual !== 'N/A' ? contactoAtual : '';
-        document.getElementById('editMedicoRole').value = '';
         document.getElementById('modalEditarMedico').style.display = 'flex';
     }
 
     async function guardarEdicaoMedico() {
-        const { id, utilizadorId } = estadoModal;
+        const { id } = estadoModal;
         const novoNome = document.getElementById('editMedicoNome').value.trim();
         const novaEspecialidade = document.getElementById('editMedicoEspecialidade').value;
+        const novaCedulaStr = document.getElementById('editMedicoCedula').value.trim();
         const novoContacto = document.getElementById('editMedicoContacto').value.trim();
-        const novoRole = document.getElementById('editMedicoRole').value;
-        const msgErro = document.getElementById('erroContactoMedico');
+        const msgErroContacto = document.getElementById('erroContactoMedico');
+        const msgErroCedula = document.getElementById('erroCedulaMedico');
 
-        if (!/^\d{9}$/.test(novoContacto)) { msgErro.style.display = 'block'; return; }
-        msgErro.style.display = 'none';
+        if (!/^\d{9}$/.test(novoContacto)) { msgErroContacto.style.display = 'block'; return; }
+        msgErroContacto.style.display = 'none';
+
+        if (novaCedulaStr && (isNaN(parseInt(novaCedulaStr)) || parseInt(novaCedulaStr) <= 0)) {
+            msgErroCedula.style.display = 'block'; return;
+        }
+        msgErroCedula.style.display = 'none';
 
         try {
             const payload = { nome: novoNome, contacto: novoContacto };
             if (novaEspecialidade) payload.especialidade = novaEspecialidade;
+            if (novaCedulaStr) payload.cedulaProfissional = parseInt(novaCedulaStr);
             await atualizarMedico(id, payload);
-
-            if (novoRole && utilizadorId) {
-                const resRole = await fetchAutenticado(`/auth/utilizador/${utilizadorId}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ role: novoRole })
-                });
-                if (!resRole.ok) { const d = await resRole.json(); alert('Erro ao alterar role: ' + (d.erro || '')); return; }
-            }
-
             fecharModal('modalEditarMedico');
             desenharTabelaMedicos();
         } catch (error) {
@@ -802,7 +777,7 @@
               <td>${med.cedulaProfissional}</td>
               <td>${med.contacto || 'N/A'}</td>
               <td>
-                <button onclick="iniciarEditarMedico(${med.id}, '${med.nome}', '${med.especialidade}', '${med.contacto}', ${med.utilizadorId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="iniciarEditarMedico(${med.id}, '${med.nome}', '${med.especialidade}', '${med.contacto}', ${med.cedulaProfissional})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
                 <button onclick="prepararApagar('medico', ${med.id}, '${med.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
               </td>
             </tr>
@@ -835,7 +810,7 @@
               <td><span style="color:#4f46e5;">ID ${ut.medicoId}</span></td>
               <td>${ut.contacto || 'N/A'}</td>
               <td>
-                <button onclick="iniciarEditarUtente(${ut.id}, '${ut.nome}', '${ut.contacto}', ${ut.medicoId}, ${ut.utilizadorId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="iniciarEditarUtente(${ut.id}, '${ut.nome}', '${ut.contacto}', ${ut.medicoId})" style="background: #eab308; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Editar</button>
                 <button onclick="prepararApagar('utente', ${ut.id}, '${ut.nome}')" style="background: #dc2626; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;">Apagar</button>
               </td>
             </tr>

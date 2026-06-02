@@ -14,5 +14,6 @@ export interface CreateMedicoDTO {
 export interface UpdateMedicoDTO {
   nome?: string;
   especialidade?: EspecialidadeMedica;
+  cedulaProfissional?: number;
   contacto?: string;
 }

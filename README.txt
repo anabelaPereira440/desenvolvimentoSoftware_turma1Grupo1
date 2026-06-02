@@ -68,8 +68,8 @@ Gestão de Utilizadores
 [FEITO] O sistema deve permitir associar utentes a médicos responsáveis.
 
 Gestão de dados simulados
-[FEITO] O sistema deve permitir ao administrador inserir dados clínicos simulados no sistema para fins de teste e demonstração;
-[FEITO] O sistema deve permitir ao administrador consultar e remover dados simulados.
+[ ] O sistema deve permitir ao administrador inserir dados clínicos simulados no sistema para fins de teste e demonstração;
+[ ] O sistema deve permitir ao administrador consultar e remover dados simulados.
 
 Configuração do Sistema
 [FEITO] O sistema deve permitir ao administrador definir o limiar mínimo do score CARAT utilizado para geração de alertas;
