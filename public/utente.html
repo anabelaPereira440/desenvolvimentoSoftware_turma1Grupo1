@@ -5,59 +5,96 @@
   <title>BreathCare - Área do Utente</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { margin:0; font-family:'Segoe UI',sans-serif; display:flex; min-height:100vh; background:#f8fafc; }
-    nav { width:240px; background:#1f2937; color:white; padding:20px; box-sizing:border-box; display:flex; flex-direction:column; }
-    nav h2 { margin-top:0; font-size:18px; border-bottom:1px solid #374151; padding-bottom:10px; }
-    nav button { display:block; width:100%; margin-bottom:10px; padding:12px; background:#374151; color:white; border:none; border-radius:6px; text-align:left; cursor:pointer; font-size:14px; }
-    nav button:hover { background:#4b5563; }
-    nav button.ativo { background:#0d9488; }
+    body { margin:0; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 30%,#0d9488 75%,#10b981 100%); display:flex; min-height:100vh; color:#1f2937; }
+
+    /* ── NAV ── */
+    nav { width:260px; background:rgba(15,23,42,0.95); color:white; padding:30px 20px; box-sizing:border-box; display:flex; flex-direction:column; box-shadow:4px 0 15px rgba(0,0,0,0.2); }
+    nav h2 { margin-top:0; font-size:20px; font-weight:600; border-bottom:2px solid #1e293b; padding-bottom:15px; color:#10b981; }
+    .user-info-box { font-size:13px; color:#9ca3af; margin-bottom:25px; }
+    .user-info-box span { color:#fff; font-weight:bold; }
+    nav button { display:block; width:100%; margin-bottom:12px; padding:12px 16px; background:#1e293b; color:#e2e8f0; border:1px solid transparent; border-radius:8px; text-align:left; cursor:pointer; font-size:14px; font-weight:500; transition:all 0.2s; }
+    nav button:hover, nav button.ativo { background:linear-gradient(135deg,#1e40af 0%,#0d9488 100%); color:white; border-color:rgba(255,255,255,0.1); }
+    nav button.btn-logout { background:transparent; border:2px solid #dc2626; color:#fca5a5; margin-top:auto; text-align:center; font-weight:bold; }
+    nav button.btn-logout:hover { background:#dc2626; color:white; }
+
+    /* ── MAIN ── */
     main { flex:1; padding:40px; box-sizing:border-box; overflow-y:auto; }
-    .pagina { display:none; }
+    .pagina { display:none; background:rgba(255,255,255,0.96); padding:35px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.25); animation:fadeIn 0.3s ease-in-out; }
     .pagina.ativa { display:block; }
-    h1 { color:#1e293b; margin-top:0; }
-    h3.st { color:#0d9488; border-bottom:2px solid #e5e7eb; padding-bottom:8px; margin-top:30px; }
-    form { display:flex; flex-direction:column; gap:14px; max-width:650px; background:white; padding:25px; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    h1 { color:#1e3a8a; font-size:24px; font-weight:700; margin-top:0; }
+    p.subtitulo { color:#4b5563; font-size:14px; margin-top:-8px; margin-bottom:25px; }
+    h3.st { color:#0d9488; border-bottom:2px solid #e5e7eb; padding-bottom:8px; margin-top:30px; font-size:18px; }
+
+    /* ── FORMULÁRIOS ── */
+    form { display:flex; flex-direction:column; gap:14px; max-width:650px; }
     .campo-pergunta { display:flex; flex-direction:column; gap:6px; }
-    .campo-pergunta label { font-size:14px; font-weight:600; color:#334155; }
-    select, input { padding:10px; font-size:14px; border-radius:6px; border:1px solid #cbd5e1; }
-    button.form-btn { padding:11px; font-size:14px; background:#0d9488; color:white; font-weight:bold; cursor:pointer; border:none; border-radius:6px; transition:background 0.2s; }
-    button.form-btn:hover { background:#0f766e; }
-    table { width:100%; border-collapse:collapse; margin-top:16px; background:white; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
-    th,td { text-align:left; padding:11px 14px; border-bottom:1px solid #e2e8f0; font-size:14px; }
-    th { background:#f1f5f9; color:#475569; font-weight:600; }
-    .erro { color:#dc2626; font-weight:bold; }
-    .sucesso { color:#16a34a; font-weight:bold; }
-    .bloco-resultado { background:#f0fdf4; padding:20px; border-radius:8px; border:1px solid #bbf7d0; margin-top:15px; color:#166534; }
-    .limiar-alerta { color:#dc2626; font-weight:bold; }
-    .limiar-controlado { color:#16a34a; font-weight:bold; }
-    .limiar-parcial { color:#d97706; font-weight:bold; }
-    .badge { display:inline-block; padding:3px 8px; border-radius:10px; font-size:12px; font-weight:600; }
+    .campo-pergunta label { font-size:13px; font-weight:600; color:#4b5563; }
+    select, input { padding:11px; font-size:14px; border-radius:8px; border:1px solid #d1d5db; background:#fff; outline:none; transition:all 0.2s; }
+    select:focus, input:focus { border-color:#0d9488; box-shadow:0 0 0 3px rgba(13,148,136,0.15); }
+
+    /* ── BOTÕES ── */
+    button.form-btn { padding:12px 24px; font-size:15px; font-weight:bold; color:white; background:linear-gradient(135deg,#1e40af 0%,#0d9488 100%); border:none; border-radius:8px; cursor:pointer; align-self:flex-start; transition:opacity 0.2s; }
+    button.form-btn:hover { opacity:0.93; }
+    .btn-sm { padding:5px 10px; font-size:12px; font-weight:bold; color:white; border:none; border-radius:5px; cursor:pointer; }
+    .btn-lida { padding:7px 14px; background:#0d9488; color:white; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; white-space:nowrap; }
+    .btn-lida:hover { background:#0f766e; }
+
+    /* ── TABELAS ── */
+    table { width:100%; border-collapse:collapse; font-size:14px; background:white; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden; margin-top:12px; }
+    th,td { text-align:left; padding:11px 14px; border-bottom:1px solid #e5e7eb; }
+    th { background:#f8fafc; color:#475569; font-weight:600; }
+    tr:hover { background:#f1f5f9; }
+
+    /* ── BADGES ── */
+    .badge { display:inline-block; padding:3px 8px; border-radius:12px; font-size:12px; font-weight:600; }
     .badge-novo { background:#dbeafe; color:#1d4ed8; }
     .badge-seguimento { background:#ffedd5; color:#9a3412; }
     .badge-fechado { background:#dcfce7; color:#166534; }
     .badge-alta { background:#fee2e2; color:#b91c1c; }
     .badge-media { background:#fef9c3; color:#854d0e; }
     .badge-baixa { background:#dcfce7; color:#166534; }
-    .card-rec { background:white; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-start; }
+
+    /* ── SCORE CORES ── */
+    .limiar-alerta { color:#dc2626; font-weight:bold; }
+    .limiar-controlado { color:#16a34a; font-weight:bold; }
+    .limiar-parcial { color:#d97706; font-weight:bold; }
+
+    /* ── MENSAGENS ── */
+    .erro { color:#dc2626; font-weight:bold; font-size:14px; margin-top:4px; }
+    .sucesso { color:#059669; font-weight:bold; font-size:14px; margin-top:4px; }
+    .msg { font-size:13px; font-weight:bold; margin-top:8px; }
+
+    /* ── BLOCO RESULTADO CARAT ── */
+    .bloco-resultado { background:#f0fdf4; padding:20px; border-radius:10px; border:1px solid #bbf7d0; margin-top:20px; color:#166534; }
+    .bloco-resultado h3 { margin-top:0; color:#15803d; }
+
+    /* ── CARDS RECOMENDAÇÕES ── */
+    .card-rec { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
     .card-rec .tipo { font-size:12px; font-weight:700; text-transform:uppercase; color:#0d9488; margin-bottom:6px; }
-    .card-rec .desc { font-size:14px; color:#374151; }
+    .card-rec .desc { font-size:14px; color:#374151; line-height:1.5; }
     .card-rec .lida { font-size:12px; color:#9ca3af; margin-top:6px; }
-    .btn-lida { padding:6px 12px; background:#0d9488; color:white; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:bold; }
-    .btn-lida:hover { background:#0f766e; }
+
+    /* ── DASHBOARD ── */
+    .dashboard-legenda { background:#f1f5f9; padding:12px 16px; border-left:4px solid #475569; border-radius:0 6px 6px 0; font-size:13px; margin-bottom:20px; }
+    #chartContainer { background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:24px; display:none; }
   </style>
 </head>
 <body>
 
   <nav>
     <h2>BreathCare Utente</h2>
-    <p style="font-size:12px;color:#9ca3af;margin-bottom:20px;">Olá, <span id="sessaoNome">Utente</span></p>
-    <button id="btn-aba-inicio"     class="ativo" onclick="mudarAba('aba-inicio')">Início</button>
-    <button id="btn-aba-carat"      onclick="mudarAba('aba-carat')">Questionário CARAT</button>
-    <button id="btn-aba-dashboard"  onclick="mudarAba('aba-dashboard')">Meu Dashboard</button>
-    <button id="btn-aba-alertas"    onclick="mudarAba('aba-alertas')">Os Meus Alertas</button>
+    <div class="user-info-box">
+      Utente: <br><span id="sessaoNome">A carregar...</span>
+    </div>
+    <button id="btn-aba-inicio"        class="ativo" onclick="mudarAba('aba-inicio')">Início</button>
+    <button id="btn-aba-carat"         onclick="mudarAba('aba-carat')">Questionário CARAT</button>
+    <button id="btn-aba-dashboard"     onclick="mudarAba('aba-dashboard')">Meu Dashboard</button>
+    <button id="btn-aba-alertas"       onclick="mudarAba('aba-alertas')">Os Meus Alertas</button>
     <button id="btn-aba-recomendacoes" onclick="mudarAba('aba-recomendacoes')">Recomendações</button>
-    <button id="btn-aba-perfil" onclick="mudarAba('aba-perfil')">Os Meus Dados</button>
-    <button onclick="efetuarLogout()" style="background:#dc2626;margin-top:auto;">Terminar Sessão</button>
+    <button id="btn-aba-perfil"        onclick="mudarAba('aba-perfil')">Os Meus Dados</button>
+    <button onclick="efetuarLogout()" class="btn-logout">Terminar Sessão</button>
   </nav>
 
   <main>
@@ -65,15 +102,16 @@
     <!-- INÍCIO -->
     <section id="aba-inicio" class="pagina ativa">
       <h1>Bem-vindo ao BreathCare</h1>
-      <p>Utilize o menu lateral para preencher avaliações CARAT, consultar o seu histórico clínico, ver alertas e recomendações do seu médico.</p>
+      <p class="subtitulo">Plataforma de monitorização clínica da asma e rinite alérgica.</p>
+      <p style="color:#4b5563;font-size:14px;">Utilize o menu lateral para preencher avaliações CARAT, consultar o seu histórico clínico, ver alertas e recomendações do seu médico.</p>
     </section>
 
     <!-- CARAT -->
     <section id="aba-carat" class="pagina">
       <h1>Módulo Clínico CARAT</h1>
-      <p>Avaliação do Controlo da Asma e da Rinite Alérgica (Últimas 4 semanas)</p>
+      <p class="subtitulo">Avaliação do Controlo da Asma e da Rinite Alérgica — últimas 4 semanas.</p>
       <form id="formCARAT">
-        <h3 style="color:#0d9488;margin-top:0;">Vias Aéreas Superiores (Rinite)</h3>
+        <h3 style="color:#0d9488;margin-top:0;font-size:16px;">Vias Aéreas Superiores (Rinite)</h3>
         <div class="campo-pergunta">
           <label>1. Com que frequência teve congestão nasal (nariz entupido)?</label>
           <select id="p1" required>
@@ -104,7 +142,7 @@
             <option value="2">2 — Poucas vezes</option><option value="3">3 — Nunca</option>
           </select>
         </div>
-        <h3 style="color:#2563eb;">Vias Aéreas Inferiores (Asma)</h3>
+        <h3 style="color:#1e40af;margin-top:8px;font-size:16px;">Vias Aéreas Inferiores (Asma)</h3>
         <div class="campo-pergunta">
           <label>5. Com que frequência sentiu falta de ar ou pieira?</label>
           <select id="p5" required>
@@ -153,7 +191,7 @@
       </form>
 
       <div id="resultadoCaratBloco" class="bloco-resultado" style="display:none;">
-        <h3 style="margin-top:0;">Resultado da Avaliação</h3>
+        <h3>Resultado da Avaliação</h3>
         <p><strong>Score Total:</strong> <span id="resScore"></span>/30</p>
         <p><strong>Sub-score Vias Superiores (Rinite):</strong> <span id="resSup"></span>/12</p>
         <p><strong>Sub-score Vias Inferiores (Asma):</strong> <span id="resInf"></span>/18</p>
@@ -167,12 +205,12 @@
     <!-- DASHBOARD -->
     <section id="aba-dashboard" class="pagina">
       <h1>Dashboard de Evolução Clínica</h1>
-      <p style="background:#f1f5f9;padding:10px;border-left:4px solid #475569;font-size:13px;">
-        Scores a <strong style="color:#dc2626;">vermelho</strong> = Não Controlado |
-        <strong style="color:#d97706;">laranja</strong> = Parcialmente Controlado |
+      <div class="dashboard-legenda">
+        Scores a <strong style="color:#dc2626;">vermelho</strong> = Não Controlado &nbsp;|&nbsp;
+        <strong style="color:#d97706;">laranja</strong> = Parcialmente Controlado &nbsp;|&nbsp;
         <strong style="color:#16a34a;">verde</strong> = Controlado — linha a tracejado = limiar mínimo
-      </p>
-      <div id="chartContainer" style="background:white;padding:20px;border-radius:12px;border:1px solid #e2e8f0;margin-bottom:24px;display:none;">
+      </div>
+      <div id="chartContainer">
         <canvas id="chartCarat" height="100"></canvas>
       </div>
       <div id="listaCaratUtente">A carregar...</div>
@@ -181,14 +219,21 @@
     <!-- ALERTAS -->
     <section id="aba-alertas" class="pagina">
       <h1>Os Meus Alertas Clínicos</h1>
-      <p style="color:#4b5563;font-size:14px;">Alertas gerados automaticamente com base nas suas avaliações CARAT.</p>
+      <p class="subtitulo">Alertas gerados automaticamente com base nas suas avaliações CARAT.</p>
       <div id="listaAlertasUtente">A carregar...</div>
+    </section>
+
+    <!-- RECOMENDAÇÕES -->
+    <section id="aba-recomendacoes" class="pagina">
+      <h1>As Minhas Recomendações</h1>
+      <p class="subtitulo">Recomendações geradas pelo sistema com base nas suas avaliações CARAT.</p>
+      <div id="listaRecomendacoes">A carregar...</div>
     </section>
 
     <!-- DADOS PESSOAIS -->
     <section id="aba-perfil" class="pagina">
       <h1>Os Meus Dados Pessoais</h1>
-      <p style="color:#4b5563;font-size:14px;">Actualize o seu nome e contacto telefónico.</p>
+      <p class="subtitulo">Actualize o seu nome e contacto telefónico.</p>
       <form id="formPerfil" style="max-width:500px;">
         <div class="campo-pergunta">
           <label>Nome Completo:</label>
@@ -199,15 +244,8 @@
           <input type="text" id="perfilContacto" placeholder="Ex: 912345678" maxlength="9">
         </div>
         <button class="form-btn" type="submit">Guardar Alterações</button>
-        <p id="msgPerfil" style="margin-top:8px;font-weight:bold;"></p>
+        <p id="msgPerfil" class="msg"></p>
       </form>
-    </section>
-
-    <!-- RECOMENDAÇÕES -->
-    <section id="aba-recomendacoes" class="pagina">
-      <h1>As Minhas Recomendações</h1>
-      <p style="color:#4b5563;font-size:14px;">Recomendações geradas pelo sistema com base nas suas avaliações CARAT. Clique em "Marcar como lida" depois de consultar.</p>
-      <div id="listaRecomendacoes">A carregar...</div>
     </section>
 
   </main>
