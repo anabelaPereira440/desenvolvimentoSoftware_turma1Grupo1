@@ -285,8 +285,7 @@
     </div>
     <button id="btn-aba-usuarios" class="ativo" onclick="mudarAba('aba-usuarios')">Gerir Utentes e Médicos</button>
     <button id="btn-aba-config" onclick="mudarAba('aba-config')">Configurar Parâmetros</button>
-    <button id="btn-aba-simulados" onclick="mudarAba('aba-simulados')">Manutenção / Seeds</button>
-    
+
     <button onclick="efetuarLogout()" class="btn-logout">Terminar Administração</button>
   </nav>
 
@@ -487,18 +486,6 @@
       </form>
     </section>
 
-    <section id="aba-simulados" class="pagina">
-      <h1>Manutenção e Sementeira de Dados</h1>
-      <p class="subtitulo">Gestão rápida de dados simulados do ecossistema clínico para auditorias ou demonstração.</p>
-      
-      <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; max-width: 550px;">
-        <h3 style="margin-top:0; color:#dc2626;">Ações de Destruição Controlada</h3>
-        <p style="font-size:13px; color:#4b5563; margin-bottom:20px;">
-          As operações abaixo modificam o estado imediato do ficheiro SQLite eliminando datasets obsoletos de simulação.
-        </p>
-        <button class="btn-perigo" onclick="limparDadosDeTeste()">Limpar Todos os Registos Simulados</button>
-      </div>
-    </section>
   </main>
 
   <div id="modalApagar" class="modal-overlay">
@@ -994,18 +981,6 @@
         msg.textContent = err.message;
       }
     });
-
-    async function limparDadosDeTeste() {
-      if (!confirm('Tem a certeza? Esta ação elimina todos os dados clínicos (CARAT, alertas, prescrições, exames) mas mantém os utilizadores, utentes e médicos.')) return;
-      try {
-        const res = await fetchAutenticado('/admin/simulados', { method: 'DELETE' });
-        const dados = await res.json();
-        if (!res.ok) throw new Error(dados.erro || 'Erro.');
-        alert(dados.mensagem);
-      } catch (err) {
-        alert('Erro: ' + err.message);
-      }
-    }
 
     function efetuarLogout() {
       localStorage.clear();
