@@ -21,7 +21,7 @@ export class AuthService {
     nome: string,
     username: string,
     password: string,
-    role: string
+    role?: string
   ): Promise<{ token: string; user: any }> {
 
     // Validações de input (Lógica Condicional Obrigatória)

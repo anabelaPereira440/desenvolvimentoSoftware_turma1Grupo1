@@ -5,6 +5,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { LoginDTO, RegisterDTO, AuthResponseDTO } from '../dtos/auth/auth.dto';
 
 export class AuthController {
   private authService = new AuthService();
@@ -13,14 +14,14 @@ export class AuthController {
   // que o 'this.authService' nunca se perde durante a execução das rotas.
   login = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { username, password } = req.body;
-      
+      const { username, password }: LoginDTO = req.body;
+
       // Validação rápida de payload antes de chamar a lógica de negócio
       if (!username || !password) {
         return res.status(400).json({ erro: 'Username e password são obrigatórios.' });
       }
 
-      const resultado = await this.authService.login(username, password);
+      const resultado: AuthResponseDTO = await this.authService.login(username, password);
 
       return res.status(200).json({
         mensagem: 'Login efetuado com sucesso.',
@@ -34,9 +35,9 @@ export class AuthController {
 
   registar = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { nome, username, password, role } = req.body;
-      
-      const resultado = await this.authService.registar(nome, username, password, role);
+      const { nome, username, password, role }: RegisterDTO = req.body;
+
+      const resultado: AuthResponseDTO = await this.authService.registar(nome, username, password, role);
 
       return res.status(201).json({
         mensagem: 'Utilizador registado com sucesso.',
