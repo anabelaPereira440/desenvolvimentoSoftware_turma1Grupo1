@@ -106,7 +106,7 @@
     <p id="msgPrescricao" class="msg"></p>
     <h3 class="st">Histórico de Prescrições</h3>
     <table>
-      <thead><tr><th>ID</th><th>Medicamento</th><th>Dose</th><th>Via</th><th>Médico</th><th>Validade</th></tr></thead>
+      <thead><tr><th>ID</th><th>Medicamento</th><th>Dose</th><th>Via</th><th>Utente (ID)</th><th>Data Criação</th><th>Validade</th></tr></thead>
       <tbody id="lista-prescricoes"></tbody>
     </table>
   </section>
@@ -138,7 +138,7 @@
     <p id="msgExame" class="msg"></p>
     <h3 class="st">Histórico de Exames</h3>
     <table>
-      <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Código</th><th>Médico</th><th>Validade</th></tr></thead>
+      <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Código</th><th>Utente (ID)</th><th>Data Criação</th><th>Validade</th></tr></thead>
       <tbody id="lista-exames"></tbody>
     </table>
   </section>
@@ -326,17 +326,17 @@
   async function carregarPrescricoes() {
     populateUtenteDropdowns();
     const tbody = document.getElementById('lista-prescricoes');
-    tbody.innerHTML = '<tr><td colspan="6">A carregar...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7">A carregar...</td></tr>';
     const res  = await api('/prescricoes');
     const todas = await res.json();
-    // Filtrar apenas prescrições dos utentes deste médico
-    const data = meusUtenteIds.size ? todas.filter(p => meusUtenteIds.has(p.utenteId)) : todas;
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6">Nenhuma prescrição registada.</td></tr>'; return; }
+    const data = todas.filter(p => p.medico_nome === medicoNome);
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Nenhuma prescrição registada.</td></tr>'; return; }
     tbody.innerHTML = data.map(p => `
       <tr>
         <td>#${p.id}</td><td>${p.medicamento}</td><td>${p.dose}</td>
         <td>${p.viaAdministracao||'—'}</td>
-        <td>${p.medico_nome}</td>
+        <td>${p.utenteId}</td>
+        <td>${new Date(p.dataCriacao).toLocaleDateString('pt-PT')}</td>
         <td>${new Date(p.dataValidade).toLocaleDateString('pt-PT')}</td>
       </tr>`).join('');
   }
@@ -365,16 +365,17 @@
   async function carregarExames() {
     populateUtenteDropdowns();
     const tbody = document.getElementById('lista-exames');
-    tbody.innerHTML = '<tr><td colspan="6">A carregar...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7">A carregar...</td></tr>';
     const res   = await api('/exames');
     const todos = await res.json();
-    // Filtrar apenas exames dos utentes deste médico
-    const data = meusUtenteIds.size ? todos.filter(e => meusUtenteIds.has(e.utenteId)) : todos;
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6">Nenhum exame registado.</td></tr>'; return; }
+    const data = todos.filter(e => e.medico_nome === medicoNome);
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="7">Nenhum exame registado.</td></tr>'; return; }
     tbody.innerHTML = data.map(e => `
       <tr>
         <td>#${e.id}</td><td>${e.nome}</td><td>${e.tipo||'—'}</td>
-        <td><code>${e.codigo}</code></td><td>${e.medico_nome}</td>
+        <td><code>${e.codigo}</code></td>
+        <td>${e.utenteId}</td>
+        <td>${new Date(e.dataCriacao).toLocaleDateString('pt-PT')}</td>
         <td>${new Date(e.dataValidade).toLocaleDateString('pt-PT')}</td>
       </tr>`).join('');
   }
