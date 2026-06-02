@@ -122,8 +122,6 @@ export class MedicoService {
   async eliminarMedico(id: number): Promise<void> {
     const medico = await this.buscarPorId(id);
     if (!medico) throw new Error("Médico não encontrado.");
-    const utilizadorId = medico.utilizadorId;
-    await this.repo.remove(medico);
-    await this.repoUtil.delete(utilizadorId);
+    await this.repoUtil.delete(medico.utilizadorId);
   }
 }

@@ -119,8 +119,6 @@ export class UtenteService {
   async eliminarUtente(id: number): Promise<void> {
     const utente = await this.buscarPorId(id);
     if (!utente) throw new Error("Utente não encontrado.");
-    const utilizadorId = utente.utilizadorId;
-    await this.repo.remove(utente);
-    await this.repoUtil.delete(utilizadorId);
+    await this.repoUtil.delete(utente.utilizadorId);
   }
 }
