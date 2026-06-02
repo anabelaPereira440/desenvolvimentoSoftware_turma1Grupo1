@@ -15,7 +15,7 @@ export class CaratService {
   private alertaService = new AlertaService();
 
   async criarAvaliacao(utenteId: number, dados: CreateCaratDto): Promise<AvaliacaoCarat> {
-    // ─── 1. Validação das respostas (inteiros de 0 a 3) ──────────────────────
+    // 1. Validação das respostas (inteiros de 0 a 3) 
     const respostas = [dados.p1, dados.p2, dados.p3, dados.p4, dados.p5, dados.p6, dados.p7, dados.p8, dados.p9, dados.p10];
     for (let i = 0; i < respostas.length; i++) {
       const v = respostas[i];
@@ -24,14 +24,14 @@ export class CaratService {
       }
     }
 
-    // ─── 2. Verificar existência do utente ────────────────────────────────────
+    // 2. Verificar existência do utente
     const utente = await this.utenteRepo.findOneBy({ id: utenteId });
     if (!utente) throw new Error('Utente não encontrado no sistema.');
 
-    // ─── 3. Obter configuração do sistema ─────────────────────────────────────
+    // 3. Obter configuração do sistema 
     const config = await this.configuracaoService.obterConfiguracao();
 
-    // ─── 4. Calcular scores ───────────────────────────────────────────────────
+    // 4. Calcular scores 
     // Vias Superiores (rhinite): p1–p4   | range 0–12
     const subScoreViasSuperiores = dados.p1 + dados.p2 + dados.p3 + dados.p4;
     // Vias Inferiores (asma):    p5–p10  | range 0–18
@@ -39,7 +39,7 @@ export class CaratService {
     // Total: range 0–30
     const scoreTotal = subScoreViasSuperiores + subScoreViasInferiores;
 
-    // ─── 5. Determinar NivelControlo com base nos limiares da Configuracao ────
+    //  5. Determinar NivelControlo com base nos limiares da Configuracao 
     //   score ≤ limiarMinimoScore              → NAO_CONTROLADO
     //   limiarMinimo < score ≤ limiarExame     → PARCIALMENTE_CONTROLADO
     //   score > limiarExame                    → CONTROLADO
@@ -61,7 +61,7 @@ export class CaratService {
       resumoRecomendacoes = `Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em ${config.proximaAvaliacaoSemanas} semanas.`;
     }
 
-    // ─── 6. Calcular data da próxima avaliação consoante nível de controlo ───
+    // 6. Calcular data da próxima avaliação consoante nível de controlo 
     const semanasPorNivel: Record<NivelControlo, number> = {
       [NivelControlo.NAO_CONTROLADO]:         config.proximaAvaliacaoSemanasNaoControlado,
       [NivelControlo.PARCIALMENTE_CONTROLADO]: config.proximaAvaliacaoSemanasParcialmControlo,
@@ -71,7 +71,7 @@ export class CaratService {
     const proximaAvaliacao = new Date();
     proximaAvaliacao.setDate(proximaAvaliacao.getDate() + semanasProxima * 7);
 
-    // ─── 7. Guardar avaliação CARAT ───────────────────────────────────────────
+    // 7. Guardar avaliação CARAT 
     const novaAvaliacao = new AvaliacaoCarat();
     novaAvaliacao.utenteId = utenteId;
     novaAvaliacao.data = new Date();
@@ -97,7 +97,7 @@ export class CaratService {
 
     const avaliacaoSalva = await this.caratRepo.save(novaAvaliacao);
 
-    // ─── 8. Gerar Alerta se score NAO_CONTROLADO ──────────────────────────────
+    // 8. Gerar Alerta se score NAO_CONTROLADO 
     const medicoId = utente.medicoId;
     if (nivelControlo === NivelControlo.NAO_CONTROLADO) {
       try {
@@ -113,7 +113,7 @@ export class CaratService {
       }
     }
 
-    // ─── 10. Verificar deterioração face à avaliação anterior ─────────────────
+    // 9. Verificar deterioração face à avaliação anterior 
     try {
       const anteriores = await this.caratRepo.find({
         where: { utenteId },

@@ -17,7 +17,7 @@ export class Configuracao {
   deterioracaoScore!: number;
 
   // Score total abaixo ou igual ao qual (e acima de limiarMinimoScore) a doença é considerada
-  // Parcialmente Controlada e é gerada recomendação de Indicação de Exame (default: 24)
+  // Parcialmente Controlada — sem alerta gerado, apenas recomendação textual (default: 24)
   @Column({ type: 'float', default: 24 })
   limiarScoreParaRecomendarExame!: number;
 

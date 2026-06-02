@@ -20,9 +20,11 @@ import { Utente } from './utente.entity';
  * Score total: 0–30
  *
  * Limiares (configuráveis por administrador via Configuracao):
- *   score ≤ limiarMinimoScore              → NAO_CONTROLADO      → alerta Revisão Terapêutica
- *   limiarMinimo < score ≤ limiarExame     → PARCIALMENTE_CONTROLADO → alerta Indicação de Exame
- *   score > limiarExame                    → CONTROLADO           → sem alerta
+ *   score ≤ limiarMinimoScore              → NAO_CONTROLADO           → alerta REVISAO_TERAPEUTICA
+ *   limiarMinimo < score ≤ limiarExame     → PARCIALMENTE_CONTROLADO  → sem alerta
+ *   score > limiarExame                    → CONTROLADO               → sem alerta
+ *
+ * Alerta DETERIORACAO_SCORE gerado se queda ≥ config.deterioracaoScore face à avaliação anterior.
  */
 @Entity()
 @Index(['utenteId', 'data'])
@@ -99,7 +101,7 @@ export class AvaliacaoCarat {
   @Column({ type: 'date', nullable: true })
   proximaAvaliacao?: Date;
 
-  // Limiares da Configuração vigentes no momento desta avaliação (para rastreabilidade histórica)
+  // Limiares da Configuração vigentes no momento desta avaliação (rastreabilidade histórica)
   @Column({ type: 'float' })
   limiarMinimoScoreUsado!: number;
 
@@ -107,7 +109,6 @@ export class AvaliacaoCarat {
   limiarScoreParaRecomendarExameUsado!: number;
 
   // --- Relação com o utente ---
-
   @Column()
   utenteId!: number;
 

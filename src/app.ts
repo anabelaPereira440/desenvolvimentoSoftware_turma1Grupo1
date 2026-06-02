@@ -32,8 +32,6 @@ import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
 import alertaRoutes from './routes/alerta.routes';
 import configuracaoRoutes from './routes/configuracao.routes';
-import adminRoutes from './routes/admin.routes';
-
 const app = express();
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -50,7 +48,6 @@ app.use('/utente', caratRoutes);  // POST /utente/:id/carat  |  GET /utente/:id/
 app.use('/carat', caratRoutes);   // GET /carat/:evalId
 app.use('/alertas', alertaRoutes);
 app.use('/configuracao', configuracaoRoutes);
-app.use('/admin', adminRoutes);
 
 
 // Inicialização da base de dados e servidor
@@ -255,10 +252,10 @@ if (require.main === module) {
                     {
                         utenteId: maria.id,
                         medicoResponsavelId: 1,
-                        tipoAlerta: TipoAlerta.INDICACAOEXAMES,
+                        tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
                         estado: AlertaEstado.FECHADO,
                         prioridade: AlertaPrioridade.BAIXA,
-                        motivo: "Sintoma persistente de tosse noturna reportado no diário clínico."
+                        motivo: "Deterioração do score CARAT registada na avaliação anterior. Alerta resolvido após reavaliação."
                     }
                 ]);
                 console.log("Alertas clínicos simulados criados com sucesso!");
