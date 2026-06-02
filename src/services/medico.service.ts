@@ -1,5 +1,6 @@
 import { AppDataSource } from '../database/database';
 import { Medico } from '../models/medico.entity';
+import { Utilizador } from '../models/utilizador.entity';
 import { SexoBiologico } from '../enums/SexoBiologico.enum';
 import { EspecialidadeMedica } from '../enums/EspecialidadeMedica.enum';
 import { CreateMedicoDTO, UpdateMedicoDTO } from '../dtos/medico/create-medico.dto';
@@ -7,6 +8,7 @@ import { CreateMedicoDTO, UpdateMedicoDTO } from '../dtos/medico/create-medico.d
 export class MedicoService {
 
   private repo = AppDataSource.getRepository(Medico);
+  private repoUtil = AppDataSource.getRepository(Utilizador);
 
   async listarMedicos(utilizadorId?: number): Promise<Medico[]> {
     if (utilizadorId) return this.repo.find({ where: { utilizadorId } });
@@ -120,6 +122,8 @@ export class MedicoService {
   async eliminarMedico(id: number): Promise<void> {
     const medico = await this.buscarPorId(id);
     if (!medico) throw new Error("Médico não encontrado.");
+    const utilizadorId = medico.utilizadorId;
     await this.repo.remove(medico);
+    await this.repoUtil.delete(utilizadorId);
   }
 }

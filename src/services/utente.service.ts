@@ -1,11 +1,13 @@
 import { AppDataSource } from '../database/database';
 import { Utente } from '../models/utente.entity';
+import { Utilizador } from '../models/utilizador.entity';
 import { SexoBiologico } from '../enums/SexoBiologico.enum';
 import { CreateUtenteDTO, UpdateUtenteDTO } from '../dtos/utente/create-utente.dto';
 
 export class UtenteService {
 
   private repo = AppDataSource.getRepository(Utente);
+  private repoUtil = AppDataSource.getRepository(Utilizador);
 
   async listarUtentes(medicoId?: number, utilizadorId?: number): Promise<Utente[]> {
     if (medicoId) {
@@ -117,6 +119,8 @@ export class UtenteService {
   async eliminarUtente(id: number): Promise<void> {
     const utente = await this.buscarPorId(id);
     if (!utente) throw new Error("Utente não encontrado.");
+    const utilizadorId = utente.utilizadorId;
     await this.repo.remove(utente);
+    await this.repoUtil.delete(utilizadorId);
   }
 }
