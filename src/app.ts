@@ -32,6 +32,7 @@ import prescricaoRoutes from './routes/prescricao.routes';
 import caratRoutes from './routes/carat.routes';
 import alertaRoutes from './routes/alerta.routes';
 import configuracaoRoutes from './routes/configuracao.routes';
+import router from './routes/fhir.routes';
 const app = express();
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -48,6 +49,7 @@ app.use('/utente', caratRoutes);  // POST /utente/:id/carat  |  GET /utente/:id/
 app.use('/carat', caratRoutes);   // GET /carat/:evalId
 app.use('/alertas', alertaRoutes);
 app.use('/configuracao', configuracaoRoutes);
+app.use('/fhir', router);
 
 
 // Inicialização da base de dados e servidor
