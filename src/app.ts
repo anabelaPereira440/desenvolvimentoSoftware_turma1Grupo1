@@ -182,55 +182,78 @@ if (require.main === module) {
             const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
 
             if (maria && antonio) {
-                const proxAvaliacao = new Date("2026-06-17"); // ~4 semanas após a última avaliação
+                // Maria: Avaliação 1 — 15/03/2026 (linha de base, PARCIALMENTE CONTROLADO)
+                // sup=8 (p1-p4: 2+2+2+2), inf=14 (p5-p10: 2+2+3+2+2+3), total=22
+                await caratRepo.save({
+                    data: new Date("2026-03-15"),
+                    p1: 2, p2: 2, p3: 2, p4: 2,
+                    p5: 2, p6: 2, p7: 3, p8: 2, p9: 2, p10: 3,
+                    scoreTotal: 22,
+                    subScoreViasSuperiores: 8,
+                    subScoreViasInferiores: 14,
+                    nivelControlo: NivelControlo.PARCIALMENTE_CONTROLADO,
+                    interpretacao: "Doença Respiratória Parcialmente Controlada.",
+                    recomendacoes: "Indicação para a realização de exames complementares de diagnóstico. Manter o plano terapêutico habitual e agendar consulta de rotina.",
+                    proximaAvaliacao: new Date("2026-04-05"), // 3 semanas (PARCIALMENTE)
+                    limiarMinimoScoreUsado: 19,
+                    limiarScoreParaRecomendarExameUsado: 24,
+                    utenteId: maria.id
+                });
 
-                await caratRepo.save([
-                    {
-                        data: new Date("2026-04-10"),
-                        p1: 1, p2: 1, p3: 1, p4: 1,
-                        p5: 1, p6: 2, p7: 1, p8: 1, p9: 1, p10: 1,
-                        scoreTotal: 11,
-                        subScoreViasSuperiores: 4,
-                        subScoreViasInferiores: 7,
-                        nivelControlo: NivelControlo.NAO_CONTROLADO,
-                        interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
-                        recomendacoes: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente recomendada.",
-                        proximaAvaliacao: new Date("2026-05-08"),
-                        limiarMinimoScoreUsado: 19,
-                        limiarScoreParaRecomendarExameUsado: 24,
-                        utenteId: maria.id
-                    },
-                    {
-                        data: new Date("2026-05-20"),
-                        p1: 3, p2: 3, p3: 2, p4: 3,
-                        p5: 3, p6: 2, p7: 2, p8: 3, p9: 2, p10: 2,
-                        scoreTotal: 25,
-                        subScoreViasSuperiores: 11,
-                        subScoreViasInferiores: 14,
-                        nivelControlo: NivelControlo.CONTROLADO,
-                        interpretacao: "Doença Respiratória Controlada.",
-                        recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 4 semanas.",
-                        proximaAvaliacao: proxAvaliacao,
-                        limiarMinimoScoreUsado: 19,
-                        limiarScoreParaRecomendarExameUsado: 24,
-                        utenteId: maria.id
-                    },
-                    {
-                        data: new Date("2026-05-22"),
-                        p1: 2, p2: 2, p3: 2, p4: 2,
-                        p5: 2, p6: 2, p7: 3, p8: 2, p9: 2, p10: 2,
-                        scoreTotal: 21,
-                        subScoreViasSuperiores: 8,
-                        subScoreViasInferiores: 13,
-                        nivelControlo: NivelControlo.PARCIALMENTE_CONTROLADO,
-                        interpretacao: "Doença Respiratória Parcialmente Controlada.",
-                        recomendacoes: "Indicação para realização de exames complementares. Manter o plano terapêutico e agendar consulta de rotina.",
-                        proximaAvaliacao: proxAvaliacao,
-                        limiarMinimoScoreUsado: 19,
-                        limiarScoreParaRecomendarExameUsado: 24,
-                        utenteId: antonio.id
-                    }
-                ]);
+                // Maria: Avaliação 2 — 10/04/2026 (deterioração 22→11, NAO CONTROLADO)
+                // sup=4 (1+1+1+1), inf=7 (1+2+1+1+1+1), total=11
+                await caratRepo.save({
+                    data: new Date("2026-04-10"),
+                    p1: 1, p2: 1, p3: 1, p4: 1,
+                    p5: 1, p6: 2, p7: 1, p8: 1, p9: 1, p10: 1,
+                    scoreTotal: 11,
+                    subScoreViasSuperiores: 4,
+                    subScoreViasInferiores: 7,
+                    nivelControlo: NivelControlo.NAO_CONTROLADO,
+                    interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
+                    recomendacoes: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente recomendada. Reforce medidas de autocuidado e monitorize os sintomas.",
+                    proximaAvaliacao: new Date("2026-04-24"), // 2 semanas (NAO_CONTROLADO)
+                    limiarMinimoScoreUsado: 19,
+                    limiarScoreParaRecomendarExameUsado: 24,
+                    utenteId: maria.id
+                });
+
+                // Maria: Avaliação 3 — 20/05/2026 (recuperação plena, CONTROLADO)
+                // sup=11 (3+3+2+3), inf=14 (3+2+2+3+2+2), total=25
+                await caratRepo.save({
+                    data: new Date("2026-05-20"),
+                    p1: 3, p2: 3, p3: 2, p4: 3,
+                    p5: 3, p6: 2, p7: 2, p8: 3, p9: 2, p10: 2,
+                    scoreTotal: 25,
+                    subScoreViasSuperiores: 11,
+                    subScoreViasInferiores: 14,
+                    nivelControlo: NivelControlo.CONTROLADO,
+                    interpretacao: "Doença Respiratória Controlada.",
+                    recomendacoes: "Excelente estado clínico! Continue com o plano prescrito. Próxima avaliação sugerida em 4 semanas.",
+                    proximaAvaliacao: new Date("2026-06-17"), // 4 semanas (CONTROLADO)
+                    limiarMinimoScoreUsado: 19,
+                    limiarScoreParaRecomendarExameUsado: 24,
+                    utenteId: maria.id
+                });
+
+                // António: Avaliação única — 22/05/2026 (NAO CONTROLADO, score=16)
+                // sup=6 (2+1+1+2), inf=10 (1+2+2+1+2+2), total=16
+                await caratRepo.save({
+                    data: new Date("2026-05-22"),
+                    p1: 2, p2: 1, p3: 1, p4: 2,
+                    p5: 1, p6: 2, p7: 2, p8: 1, p9: 2, p10: 2,
+                    scoreTotal: 16,
+                    subScoreViasSuperiores: 6,
+                    subScoreViasInferiores: 10,
+                    nivelControlo: NivelControlo.NAO_CONTROLADO,
+                    interpretacao: "Doença Respiratória Não Controlada (Controlo Insuficiente).",
+                    recomendacoes: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente recomendada. Reforce medidas de autocuidado e monitorize os sintomas.",
+                    proximaAvaliacao: new Date("2026-06-05"), // 2 semanas (NAO_CONTROLADO)
+                    limiarMinimoScoreUsado: 19,
+                    limiarScoreParaRecomendarExameUsado: 24,
+                    utenteId: antonio.id
+                });
+
                 console.log("Dados históricos do CARAT semeados com sucesso!");
             }
         }
@@ -241,25 +264,56 @@ if (require.main === module) {
             const maria = await utenteRepo.findOneBy({ numeroUtente: 123456789 });
             const antonio = await utenteRepo.findOneBy({ numeroUtente: 987654321 });
 
-            if (maria && antonio) {            
-                await alertaRepo.save([
-                    {
-                        utenteId: maria.id,
-                        medicoResponsavelId: 1,
-                        tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
-                        estado: AlertaEstado.NOVO,
-                        prioridade: AlertaPrioridade.ALTA,
-                        motivo: "Score CARAT abaixo do limiar. Utente Maria Laurentina apresenta queixas de dispneia ligeira."
-                    },
-                    {
-                        utenteId: maria.id,
-                        medicoResponsavelId: 1,
-                        tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
-                        estado: AlertaEstado.FECHADO,
-                        prioridade: AlertaPrioridade.BAIXA,
-                        motivo: "Deterioração do score CARAT registada na avaliação anterior. Alerta resolvido após reavaliação."
-                    }
-                ]);
+            if (maria && antonio) {
+                // Obter avaliações CARAT relevantes para associar aos alertas
+                const mariaEval10Abr = await caratRepo.findOneBy({ utenteId: maria.id, data: new Date("2026-04-10") });
+                const antonioEval22Mai = await caratRepo.findOneBy({ utenteId: antonio.id, data: new Date("2026-05-22") });
+
+                // Alertas da Maria: gerados a 10/04 (score=11, queda de 22→11), fechados após recuperação em 20/05 (score=25)
+                const alertaMariaDeterioracao = await alertaRepo.save({
+                    utenteId: maria.id,
+                    medicoResponsavelId: 1,
+                    tipoAlerta: TipoAlerta.DETERIORACAOSCORE,
+                    estado: AlertaEstado.FECHADO,
+                    prioridade: AlertaPrioridade.ALTA,
+                    motivo: "Deterioração de 11 pontos no score CARAT (de 22 para 11).",
+                    avaliacaoCaratId: mariaEval10Abr?.id ?? null
+                });
+                const alertaMariaRevisao = await alertaRepo.save({
+                    utenteId: maria.id,
+                    medicoResponsavelId: 1,
+                    tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
+                    estado: AlertaEstado.FECHADO,
+                    prioridade: AlertaPrioridade.ALTA,
+                    motivo: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente.",
+                    avaliacaoCaratId: mariaEval10Abr?.id ?? null
+                });
+
+                // Alerta do António: gerado a 22/05 (score=16 ≤ 19), ainda por resolver
+                const alertaAntonioRevisao = await alertaRepo.save({
+                    utenteId: antonio.id,
+                    medicoResponsavelId: 1,
+                    tipoAlerta: TipoAlerta.REVISAOTERAPEUTICA,
+                    estado: AlertaEstado.NOVO,
+                    prioridade: AlertaPrioridade.ALTA,
+                    motivo: "Score CARAT abaixo do limiar mínimo. Revisão terapêutica urgente.",
+                    avaliacaoCaratId: antonioEval22Mai?.id ?? null
+                });
+
+                // Ajustar datas (createdAt é gerido pelo TypeORM, corrigir via SQL direto)
+                await AppDataSource.query(
+                    `UPDATE alerta SET "createdAt" = ?, "updatedAt" = ? WHERE id = ?`,
+                    ['2026-04-10T10:00:00.000Z', '2026-05-20T10:00:00.000Z', alertaMariaDeterioracao.id]
+                );
+                await AppDataSource.query(
+                    `UPDATE alerta SET "createdAt" = ?, "updatedAt" = ? WHERE id = ?`,
+                    ['2026-04-10T10:00:00.000Z', '2026-05-20T10:00:00.000Z', alertaMariaRevisao.id]
+                );
+                await AppDataSource.query(
+                    `UPDATE alerta SET "createdAt" = ?, "updatedAt" = ? WHERE id = ?`,
+                    ['2026-05-22T10:00:00.000Z', '2026-05-22T10:00:00.000Z', alertaAntonioRevisao.id]
+                );
+
                 console.log("Alertas clínicos simulados criados com sucesso!");
             }
         }
