@@ -1,0 +1,3410 @@
+{
+  "info": {
+    "_postman_id": "8ca89d64-7e0c-42ca-ab1f-609cbf12f80d",
+    "name": "Projeto DS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55246311",
+    "_collection_link": "https://go.postman.co/collection/55246311-8ca89d64-7e0c-42ca-ab1f-609cbf12f80d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Login efetuado com sucesso.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter token e dados do utilizador\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"token\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"user\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"nome\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"username\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"role\");\r",
+                  "    pm.environment.set(\"adminToken\", jsonData.token);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O role deve ser ADMIN\", function () {\r",
+                  "    pm.expect(pm.response.json().user.role).to.eql(\"ADMIN\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login admin com credenciais erradas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 401\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter campo de erro\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta não deve conter token\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.not.have.property(\"token\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"passwordErrada\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Token do utente guardado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"token\");\r",
+                  "    pm.environment.set(\"utenteToken\", jsonData.token);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O role deve ser UTENTE\", function () {\r",
+                  "    pm.expect(pm.response.json().user.role).to.eql(\"UTENTE\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"maria.laurentina\",\r\n  \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Token do médico guardado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"token\");\r",
+                  "    pm.environment.set(\"medicoToken\", jsonData.token);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O role deve ser MEDICO\", function () {\r",
+                  "    pm.expect(pm.response.json().user.role).to.eql(\"MEDICO\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"jorge.almeida\",\r\n  \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login admin com dados em falta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve indicar campos obrigatórios\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Username e password são obrigatórios.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "registo utilizador para médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Utilizador registado com sucesso.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter token e dados do utilizador\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"token\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"user\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"username\");\r",
+                  "    pm.expect(jsonData.user.username).to.eql(\"ana.costa\");\r",
+                  "    pm.environment.set(\"utilizadorMedicoId\", jsonData.user.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Ana Costa\",\r\n    \"username\": \"ana.cost\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"MEDICO\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "registo utilizador para utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"ID do novo utilizador utente guardado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.user).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"utilizadorUtenteId\", jsonData.user.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"João Teste\",\r\n    \"username\": \"joao.teste\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"UTENTE\"\r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "registo sem autenticação",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 401\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter erro de token\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Token não fornecido.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"nome\": \"Sem Auth\", \r\n    \"username\": \"sem.auth\", \r\n    \"password\": \"123456\" \r\n    \r\n}\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logs de auditoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada log deve ter os campos esperados\", function () {\r",
+                  "    const logs = pm.response.json();\r",
+                  "    logs.forEach(function (log) {\r",
+                  "        pm.expect(log).to.have.property(\"id\");\r",
+                  "        pm.expect(log).to.have.property(\"acao\");\r",
+                  "        pm.expect(log).to.have.property(\"dataHora\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sessão terminada\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Sessão terminada com sucesso.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CARAT",
+      "item": [
+        {
+          "name": "submeter CARAT (doença controlada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Questionário CARAT submetido com sucesso!\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto resultado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"resultado\");\r",
+                  "    pm.expect(jsonData.resultado).to.be.an(\"object\");\r",
+                  "    pm.environment.set(\"avaliacaoCaratId\", jsonData.resultado.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O resultado deve ter todos os campos esperados\", function () {\r",
+                  "    const resultado = pm.response.json().resultado;\r",
+                  "    pm.expect(resultado).to.have.property(\"id\");\r",
+                  "    pm.expect(resultado).to.have.property(\"scoreTotal\");\r",
+                  "    pm.expect(resultado).to.have.property(\"subScoreViasSuperiores\");\r",
+                  "    pm.expect(resultado).to.have.property(\"subScoreViasInferiores\");\r",
+                  "    pm.expect(resultado).to.have.property(\"nivelControlo\");\r",
+                  "    pm.expect(resultado).to.have.property(\"interpretacao\");\r",
+                  "    pm.expect(resultado).to.have.property(\"recomendacoes\");\r",
+                  "    pm.expect(resultado).to.have.property(\"proximaAvaliacao\");\r",
+                  "    pm.expect(resultado).to.have.property(\"data\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O score total deve ser 30\", function () {\r",
+                  "    pm.expect(pm.response.json().resultado.scoreTotal).to.eql(30);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Os sub-scores devem estar corretos\", function () {\r",
+                  "    const resultado = pm.response.json().resultado;\r",
+                  "    pm.expect(resultado.subScoreViasSuperiores).to.eql(12);\r",
+                  "    pm.expect(resultado.subScoreViasInferiores).to.eql(18);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O nível de controlo deve ser CONTROLADO\", function () {\r",
+                  "    pm.expect(pm.response.json().resultado.nivelControlo).to.eql(\"CONTROLADO\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"p1\": 3, \"p2\": 3, \"p3\": 3, \"p4\": 3,\r\n    \"p5\": 3, \"p6\": 3, \"p7\": 3, \"p8\": 3, \"p9\": 3, \"p10\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/1/carat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "1",
+                "carat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "submeter CARAT (doença não controlada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Questionário CARAT submetido com sucesso!\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O score total deve ser 5\", function () {\r",
+                  "    pm.expect(pm.response.json().resultado.scoreTotal).to.eql(5);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O nível de controlo deve ser NAO_CONTROLADO\", function () {\r",
+                  "    pm.expect(pm.response.json().resultado.nivelControlo).to.eql(\"NAO_CONTROLADO\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"p1\": 0, \"p2\": 1, \"p3\": 0, \"p4\": 1,\r\n    \"p5\": 1, \"p6\": 0, \"p7\": 1, \"p8\": 0, \"p9\": 1, \"p10\": 0\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/1/carat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "1",
+                "carat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "histórico CARAT do utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array não vazio\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada avaliação deve ter os campos esperados\", function () {\r",
+                  "    pm.response.json().forEach(function (avaliacao) {\r",
+                  "        pm.expect(avaliacao).to.have.property(\"id\");\r",
+                  "        pm.expect(avaliacao).to.have.property(\"scoreTotal\");\r",
+                  "        pm.expect(avaliacao).to.have.property(\"nivelControlo\");\r",
+                  "        pm.expect(avaliacao).to.have.property(\"data\");\r",
+                  "        pm.expect(avaliacao).to.have.property(\"utenteId\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todas as avaliações pertencem ao utente 1\", function () {\r",
+                  "    pm.response.json().forEach(function (avaliacao) {\r",
+                  "        pm.expect(avaliacao.utenteId).to.eql(1);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/1/carat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "1",
+                "carat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "avaliação CARAT por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A avaliação deve ter todos os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"p1\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"p10\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"scoreTotal\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"subScoreViasSuperiores\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"subScoreViasInferiores\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"nivelControlo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"interpretacao\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"recomendacoes\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"proximaAvaliacao\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"utenteId\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O ID deve corresponder ao solicitado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"avaliacaoCaratId\")));\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carat/{{avaliacaoCaratId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carat",
+                "{{avaliacaoCaratId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "submeter CARAT com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"p1\": 2, \"p2\": 2, \"p3\": 2, \"p4\": 2,\r\n    \"p5\": 2, \"p6\": 2, \"p7\": 2, \"p8\": 2, \"p9\": 2, \"p10\": 2\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/1/carat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "1",
+                "carat"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Alertas",
+      "item": [
+        {
+          "name": "criar alerta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Alerta clínico gerado com sucesso.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto alerta\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"alerta\");\r",
+                  "    pm.expect(jsonData.alerta).to.be.an(\"object\");\r",
+                  "    pm.expect(jsonData.alerta).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"alertaId\", jsonData.alerta.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O alerta criado deve ter os dados enviados\", function () {\r",
+                  "    const alerta = pm.response.json().alerta;\r",
+                  "    pm.expect(alerta.tipoAlerta).to.eql(\"REVISAO_TERAPEUTICA\");\r",
+                  "    pm.expect(alerta.prioridade).to.eql(\"ALTA\");\r",
+                  "    pm.expect(alerta.estado).to.eql(\"NOVO\");\r",
+                  "    pm.expect(alerta.utenteId).to.eql(1);\r",
+                  "    pm.expect(alerta.medicoResponsavelId).to.eql(1);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"utenteId\": 1,\r\n    \"medicoResponsavelId\": 1,\r\n    \"tipoAlerta\": \"REVISAO_TERAPEUTICA\",\r\n    \"prioridade\": \"ALTA\",\r\n    \"motivo\": \"Revisão clínica necessária após avaliação CARAT\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar alertas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada alerta deve ter os campos esperados\", function () {\r",
+                  "    pm.response.json().forEach(function (alerta) {\r",
+                  "        pm.expect(alerta).to.have.property(\"id\");\r",
+                  "        pm.expect(alerta).to.have.property(\"tipoAlerta\");\r",
+                  "        pm.expect(alerta).to.have.property(\"estado\");\r",
+                  "        pm.expect(alerta).to.have.property(\"prioridade\");\r",
+                  "        pm.expect(alerta).to.have.property(\"utenteId\");\r",
+                  "        pm.expect(alerta).to.have.property(\"medicoResponsavelId\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "alertas filtrados por estado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos os alertas devem ter estado NOVO\", function () {\r",
+                  "    pm.response.json().forEach(function (alerta) {\r",
+                  "        pm.expect(alerta.estado).to.eql(\"NOVO\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/?estado=NOVO",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "NOVO"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "alertas de um utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos os alertas devem pertencer ao utente 1\", function () {\r",
+                  "    pm.response.json().forEach(function (alerta) {\r",
+                  "        pm.expect(alerta.utenteId).to.eql(1);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/utente/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "utente",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "alerta por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O alerta deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"tipoAlerta\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"estado\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"prioridade\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"motivo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"utenteId\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"medicoResponsavelId\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O ID deve corresponder ao solicitado\", function () {\r",
+                  "    pm.expect(pm.response.json().id).to.eql(parseInt(pm.environment.get(\"alertaId\")));\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/{{alertaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "{{alertaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "atualizar estado do alerta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Alerta clínico atualizado com sucesso.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o alerta atualizado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"alerta\");\r",
+                  "    pm.expect(jsonData.alerta).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O estado deve estar atualizado para EM_SEGUIMENTO\", function () {\r",
+                  "    pm.expect(pm.response.json().alerta.estado).to.eql(\"EM_SEGUIMENTO\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A prioridade deve estar atualizada para CRITICA\", function () {\r",
+                  "    pm.expect(pm.response.json().alerta.prioridade).to.eql(\"CRITICA\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"estado\": \"EM_SEGUIMENTO\",\r\n    \"prioridade\": \"CRITICA\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/{{alertaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                "{{alertaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar alerta com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"utenteId\": 1,\r\n    \"medicoResponsavelId\": 1,\r\n    \"tipoAlerta\": \"REVISAO_TERAPEUTICA\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/alertas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "alertas",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "FHIR",
+      "item": [
+        {
+          "name": "observações FHIR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada observação deve ter os campos esperados\", function () {\r",
+                  "    const observacoes = pm.response.json();\r",
+                  "    observacoes.forEach(function (obs) {\r",
+                  "        pm.expect(obs).to.have.property(\"id\");\r",
+                  "        pm.expect(obs).to.have.property(\"status\");\r",
+                  "        pm.expect(obs).to.have.property(\"value\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/fhir/observations?code=9279-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "fhir",
+                "observations"
+              ],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "9279-1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exames",
+      "item": [
+        {
+          "name": "listar exames",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada exame deve ter os campos esperados\", function () {\r",
+                  "    const exames = pm.response.json();\r",
+                  "    exames.forEach(function (exame) {\r",
+                  "        pm.expect(exame).to.have.property(\"id\");\r",
+                  "        pm.expect(exame).to.have.property(\"nome\");\r",
+                  "        pm.expect(exame).to.have.property(\"tipo\");\r",
+                  "        pm.expect(exame).to.have.property(\"codigo\");\r",
+                  "        pm.expect(exame).to.have.property(\"medico_nome\");\r",
+                  "        pm.expect(exame).to.have.property(\"utenteId\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exames/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exames",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar exame",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto exame criado diretamente\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"object\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"exameId\", jsonData.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O exame criado deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"nome\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"tipo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"codigo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"medico_nome\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"utenteId\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"dataCriacao\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O exame criado deve ter os dados enviados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.nome).to.eql(\"Espirometria de Rotina\");\r",
+                  "    pm.expect(jsonData.tipo).to.eql(\"ESPIROMETRIA\");\r",
+                  "    pm.expect(jsonData.codigo).to.eql(\"ESP001\");\r",
+                  "    pm.expect(jsonData.medico_nome).to.eql(\"Jorge Almeida\");\r",
+                  "    pm.expect(jsonData.utenteId).to.eql(1);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Espirometria de Rotina\",\r\n    \"tipo\": \"ESPIROMETRIA\",\r\n    \"codigo\": \"ESP001\",\r\n    \"medico_nome\": \"Jorge Almeida\",\r\n    \"utenteId\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exames/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exames",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar exames filtrado por utenteId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array não vazio\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todos os exames devem pertencer ao utenteId 1\", function () {\r",
+                  "    pm.response.json().forEach(function (exame) {\r",
+                  "        pm.expect(exame.utenteId).to.eql(1);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exames/?utenteId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exames",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "utenteId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar exames com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Tentativa Indevida\",\r\n    \"tipo\": \"OXIMETRIA\",\r\n    \"codigo\": \"OX001\",\r\n    \"medico_nome\": \"Ninguém\",\r\n    \"utenteId\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/exames/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exames",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Utente",
+      "item": [
+        {
+          "name": "criar utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.include(\"registado no sistema\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto utente\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"utente\");\r",
+                  "    pm.expect(jsonData.utente).to.be.an(\"object\");\r",
+                  "    pm.expect(jsonData.utente).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"utenteId\", jsonData.utente.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O utente criado deve ter os dados enviados\", function () {\r",
+                  "    const utente = pm.response.json().utente;\r",
+                  "    pm.expect(utente.nome).to.eql(\"João Teste\");\r",
+                  "    pm.expect(utente.numeroUtente).to.eql(111222333);\r",
+                  "    pm.expect(utente.sexo).to.eql(\"MASCULINO\");\r",
+                  "    pm.expect(utente.medicoId).to.eql(1);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"João Teste\",\r\n    \"numeroUtente\": 111222333,\r\n    \"dataNascimento\": \"1992-07-15\",\r\n    \"sexo\": \"MASCULINO\",\r\n    \"contacto\": \"961111111\",\r\n    \"medicoId\": 1,\r\n    \"utilizadorId\": {{utilizadorUtenteId}}\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar utentes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada utente deve ter os campos esperados\", function () {\r",
+                  "    const utentes = pm.response.json();\r",
+                  "    utentes.forEach(function (utente) {\r",
+                  "        pm.expect(utente).to.have.property(\"id\");\r",
+                  "        pm.expect(utente).to.have.property(\"nome\");\r",
+                  "        pm.expect(utente).to.have.property(\"numeroUtente\");\r",
+                  "        pm.expect(utente).to.have.property(\"medicoId\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "utente por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O utente deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"nome\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"numeroUtente\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"dataNascimento\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"sexo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"contacto\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"medicoId\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O ID deve corresponder ao solicitado\", function () {\r",
+                  "    pm.expect(pm.response.json().id).to.eql(parseInt(pm.environment.get(\"utenteId\")));\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/{{utenteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "{{utenteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar utentes sem token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 401\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter erro de token\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Token não fornecido.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "atualizar utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Utente atualizado com sucesso\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o utente atualizado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"utente\");\r",
+                  "    pm.expect(jsonData.utente.contacto).to.eql(\"969999999\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"contacto\": \"969999999\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/{{utenteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "{{utenteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar utente com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Utente Não Autorizado\",\r\n    \"numeroUtente\": 999999999,\r\n    \"dataNascimento\": \"1990-01-01\",\r\n    \"sexo\": \"MASCULINO\",\r\n    \"contacto\": \"910000000\",\r\n    \"medicoId\": 1,\r\n    \"utilizadorId\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar utente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de confirmação\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Utente removido do sistema com sucesso.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/utente/{{utenteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "utente",
+                "{{utenteId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Médico",
+      "item": [
+        {
+          "name": "criar médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.include(\"registado no sistema\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto médico\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"medico\");\r",
+                  "    pm.expect(jsonData.medico).to.be.an(\"object\");\r",
+                  "    pm.expect(jsonData.medico).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"medicoId\", jsonData.medico.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O médico criado deve ter os dados enviados\", function () {\r",
+                  "    const medico = pm.response.json().medico;\r",
+                  "    pm.expect(medico.nome).to.eql(\"Dr. Ana Costa\");\r",
+                  "    pm.expect(medico.especialidade).to.eql(\"PNEUMOLOGIA\");\r",
+                  "    pm.expect(medico.cedulaProfissional).to.eql(77777);\r",
+                  "    pm.expect(medico.sexo).to.eql(\"FEMININO\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Ana Costa\",\r\n    \"especialidade\": \"PNEUMOLOGIA\",\r\n    \"cedulaProfissional\": 77777,\r\n    \"dataNascimento\": \"1985-04-10\",\r\n    \"sexo\": \"FEMININO\",\r\n    \"contacto\": \"912345678\",\r\n    \"utilizadorId\": {{utilizadorMedicoId}}\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar médicos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada médico deve ter os campos esperados\", function () {\r",
+                  "    const medicos = pm.response.json();\r",
+                  "    medicos.forEach(function (medico) {\r",
+                  "        pm.expect(medico).to.have.property(\"id\");\r",
+                  "        pm.expect(medico).to.have.property(\"nome\");\r",
+                  "        pm.expect(medico).to.have.property(\"especialidade\");\r",
+                  "        pm.expect(medico).to.have.property(\"cedulaProfissional\");\r",
+                  "        pm.expect(medico).to.have.property(\"contacto\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "médico por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O médico deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"nome\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"especialidade\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"cedulaProfissional\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"contacto\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"O ID deve corresponder ao solicitado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get(\"medicoId\")));\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/{{medicoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                "{{medicoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "atualizar médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Médico atualizado com sucesso\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o médico atualizado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"medico\");\r",
+                  "    pm.expect(jsonData.medico.contacto).to.eql(\"919999999\");\r",
+                  "    pm.expect(jsonData.medico.especialidade).to.eql(\"MEDICINA_INTERNA\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"contacto\": \"919999999\", \r\n    \"especialidade\": \"MEDICINA_INTERNA\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/{{medicoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                "{{medicoId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar médico com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Médico Não Autorizado\",\r\n    \"especialidade\": \"PNEUMOLOGIA\",\r\n    \"cedulaProfissional\": 11111,\r\n    \"dataNascimento\": \"1990-01-01\",\r\n    \"sexo\": \"MASCULINO\",\r\n    \"contacto\": \"910000000\",\r\n    \"utilizadorId\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "eliminar médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de confirmação\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Médico removido do sistema com sucesso.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/medico/{{medicoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "medico",
+                "{{medicoId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prescrição",
+      "item": [
+        {
+          "name": "listar prescrições",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cada prescrição deve ter os campos esperados\", function () {\r",
+                  "    const prescricoes = pm.response.json();\r",
+                  "    prescricoes.forEach(function (prescricao) {\r",
+                  "        pm.expect(prescricao).to.have.property(\"id\");\r",
+                  "        pm.expect(prescricao).to.have.property(\"medicamento\");\r",
+                  "        pm.expect(prescricao).to.have.property(\"dose\");\r",
+                  "        pm.expect(prescricao).to.have.property(\"viaAdministracao\");\r",
+                  "        pm.expect(prescricao).to.have.property(\"medico_nome\");\r",
+                  "        pm.expect(prescricao).to.have.property(\"utenteId\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescricoes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prescricoes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar prescrição",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto prescrição criado diretamente\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"object\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"id\");\r",
+                  "    pm.environment.set(\"prescricaoId\", jsonData.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A prescrição criada deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"medicamento\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"dose\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"viaAdministracao\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"medico_nome\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"utenteId\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"dataCriacao\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A prescrição criada deve ter os dados enviados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.medicamento).to.eql(\"Budesonida\");\r",
+                  "    pm.expect(jsonData.dose).to.eql(\"200mcg 2x dia\");\r",
+                  "    pm.expect(jsonData.viaAdministracao).to.eql(\"INALADA\");\r",
+                  "    pm.expect(jsonData.medico_nome).to.eql(\"Jorge Almeida\");\r",
+                  "    pm.expect(jsonData.utenteId).to.eql(1);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"medicamento\": \"Budesonida\",\r\n    \"dose\": \"200mcg 2x dia\",\r\n    \"viaAdministracao\": \"INALADA\",\r\n    \"medico_nome\": \"Jorge Almeida\",\r\n    \"utenteId\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescricoes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prescricoes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "listar prescrições filtrado por utenteId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser um array não vazio\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "    pm.expect(jsonData.length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Todas as prescrições devem pertencer ao utenteId 1\", function () {\r",
+                  "    pm.response.json().forEach(function (prescricao) {\r",
+                  "        pm.expect(prescricao.utenteId).to.eql(1);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescricoes/?utenteId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prescricoes",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "utenteId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "criar prescrição com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{utenteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"medicamento\": \"Tentativa Indevida\",\r\n    \"dose\": \"100mg\",\r\n    \"viaAdministracao\": \"ORAL\",\r\n    \"medico_nome\": \"Ninguém\",\r\n    \"utenteId\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescricoes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "prescricoes",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Configuração",
+      "item": [
+        {
+          "name": "ver configuração",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ter os campos esperados\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"limiarMinimoScore\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"deterioracaoScore\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"limiarScoreParaRecomendarExame\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"proximaAvaliacaoSemanas\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"proximaAvaliacaoSemanasParcialmControlo\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"proximaAvaliacaoSemanasNaoControlado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Os valores por defeito do sistema devem estar corretos\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.limiarMinimoScore).to.eql(19);\r",
+                  "    pm.expect(jsonData.deterioracaoScore).to.eql(4);\r",
+                  "    pm.expect(jsonData.limiarScoreParaRecomendarExame).to.eql(24);\r",
+                  "    pm.expect(jsonData.proximaAvaliacaoSemanas).to.eql(4);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/configuracao/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "configuracao",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "atualizar configuração",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de sucesso\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"mensagem\");\r",
+                  "    pm.expect(jsonData.mensagem).to.eql(\"Configuração atualizada com sucesso.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter o objeto configuração\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"configuracao\");\r",
+                  "    pm.expect(jsonData.configuracao).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Os valores devem estar atualizados\", function () {\r",
+                  "    const config = pm.response.json().configuracao;\r",
+                  "    pm.expect(config.limiarMinimoScore).to.eql(18);\r",
+                  "    pm.expect(config.deterioracaoScore).to.eql(5);\r",
+                  "    pm.expect(config.proximaAvaliacaoSemanas).to.eql(3);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"limiarMinimoScore\": 18,\r\n    \"deterioracaoScore\": 5,\r\n    \"proximaAvaliacaoSemanas\": 3\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/configuracao/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "configuracao",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "atualizar configuração com role errado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 403\", function () {\r",
+                  "    pm.response.to.have.status(403);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve conter mensagem de acesso negado\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property(\"erro\");\r",
+                  "    pm.expect(jsonData.erro).to.eql(\"Acesso negado: permissões insuficientes.\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \r\n    \"limiarMinimoScore\": 10 \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/configuracao/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "configuracao",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "restaurar configuração original",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Deve devolver status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A resposta deve ser JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"A configuração deve estar restaurada aos valores originais\", function () {\r",
+                  "    const config = pm.response.json().configuracao;\r",
+                  "    pm.expect(config.limiarMinimoScore).to.eql(19);\r",
+                  "    pm.expect(config.deterioracaoScore).to.eql(4);\r",
+                  "    pm.expect(config.limiarScoreParaRecomendarExame).to.eql(24);\r",
+                  "    pm.expect(config.proximaAvaliacaoSemanas).to.eql(4);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"limiarMinimoScore\": 19,\r\n    \"deterioracaoScore\": 4,\r\n    \"limiarScoreParaRecomendarExame\": 24,\r\n    \"proximaAvaliacaoSemanas\": 4,\r\n    \"proximaAvaliacaoSemanasParcialmControlo\": 3,\r\n    \"proximaAvaliacaoSemanasNaoControlado\": 2\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/configuracao/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "configuracao",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "userToken",
+      "value": ""
+    }
+  ]
+}
