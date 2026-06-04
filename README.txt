@@ -1,86 +1,74 @@
-O BreathCare Health System consiste numa aplicação web destinada à prevenção e acompanhamento de doenças respiratórias crónicas, permitindo avaliar o controlo da doença através do questionário CARAT, monitorizar a evolução clínica do utente e gerar alertas para os profissionais de saúde, de forma automatizada, baseada em dados clínicos e acessível através de dashboards interativos.
-O objetivo principal do sistema é apoiar a gestão contínua de doenças respiratórias crónicas, contribuindo para a prevenção de complicações, deteção precoce de agravamentos e melhoria do acompanhamento médico.
-A implementação do sistema BreathCare assenta numa proposta de valor multidimensional que visa transformar o acompanhamento das doenças respiratórias através da tecnologia.
+======================================================================
+BREATHCARE HEALTH SYSTEM
+Sistema de Prevencao e Acompanhamento de Doencas Respiratorias
+======================================================================
 
-Requisitos funcionais
-Os requisitos funcionais descrevem as funções, comportamentos e serviços que o sistema deve fornecer para satisfazer as necessidades dos seus utilizadores. Estes requisitos definem "o que" o sistema faz em resposta a determinadas entradas, detalhando as interações entre os perfis de utilizador (Utente, Médico e Administrador) e a plataforma.
-A definição clara desses requisitos serve dois propósitos fundamentais neste projeto. Em primeiro lugar, servem como base para o desenho da arquitetura, do modelo de domínio e do diagrama de classes. Além disso, também permitem verificar e validar se o sistema cumpre os objetivos de prevenção e acompanhamento de doenças respiratórias, como a correta execução do módulo CARAT e a criação de alertas clínicos.
-Ao documentar estes requisitos através de use cases, garantimos que todas as funcionalidades críticas — desde o cálculo do score de controlo da asma e rinite alérgica até à gestão de alertas médicos — estão devidamente alinhadas com as expectativas da clínica contratante.
+Este ficheiro contem as instrucoes necessarias para a instalacao, configuracao e execucao local da Web API e do Cliente Web do sistema BreathCare Health System, desenvolvido pelo Grupo 1 da Turma 1 em Junho de 2026.
 
-Autenticação e Gestão de Perfis:
-[FEITO] O sistema deve permitir que os utilizadores efetuem login através de credenciais de acesso;
-[FEITO] O sistema deve identificar o perfil do utilizador autenticado (Utente, Médico ou Administrador);
-[FEITO] O sistema deve restringir o acesso às funcionalidades de acordo com o perfil do utilizador;
-[FEITO] O sistema deve permitir que os utilizadores terminem a sessão (logout).
+----------------------------------------------------------------------
+1. TECNOLOGIAS UTILIZADAS
+----------------------------------------------------------------------
+* Backend: Node.js com TypeScript
+* Framework Web: Express
+* Base de Dados: SQLite (Ficheiro local "data.db")
+* Frontend: HTML5 e JavaScript (API nativa "fetch")
 
-Módulo CARAT:
-[FEITO] O sistema deve permitir que o utente preencha e submeta o questionário CARAT;
-[FEITO] O sistema deve validar as respostas submetidas pelo utente;
-[FEITO] O sistema deve calcular automaticamente o score CARAT (e sub-scores, se aplicável) com base nas respostas fornecidas;
-[FEITO] O sistema deve interpretar o resultado do score e determinar o nível de controlo da doença (ex: controlado/parcialmente/não controlado);
-[FEITO] O sistema deve armazenar cada avaliação CARAT associada ao utente e à data de realização;
-[FEITO] O sistema deve gerar recomendações automáticas com base no resultado da avaliação (ex. educação para autocuidado, sinais de alarme, revisão terapêutica);
-[FEITO] O sistema deve sugerir a data para a próxima avaliação;
-[FEITO] O sistema deve apresentar ao utente o resultado da avaliação, incluindo score, interpretação e recomendações.
+----------------------------------------------------------------------
+2. PRE-REQUISITOS
+----------------------------------------------------------------------
+Certifique-se de que tem o Node.js instalado no seu computador. 
+Pode verificar abrindo um terminal e digitando os comandos:
 
+node -v
+npm -v
 
-Sistema de Alertas
-[FEITO] O sistema deve gerar automaticamente alertas clínicos quando são detetadas situações de risco, nomeadamente:
-[FEITO] o score CARAT está abaixo do limiar definido;
-[FEITO] existe deterioração do score em relação à avaliação anterior;
-[FEITO] existem sintomas persistentes;
-[FEITO] existe indicação de necessidade de exames.
-[FEITO] O sistema deve associar cada alerta a um utente e ao respetivo médico;
-[FEITO] O sistema deve permitir que o médico consulte os alertas associados aos seus utentes;
-[FEITO] O sistema deve permitir que o médico altere o estado de um alerta (Novo → Visto → Em Seguimento → Fechado);
-[FEITO] O sistema deve permitir que o médico defina ou atualize a prioridade do alerta.
+----------------------------------------------------------------------
+3. INSTRUCOES DE EXECUCAO (PASSO A PASSO)
+----------------------------------------------------------------------
 
-Dashboard do Utente
-[FEITO] O sistema deve disponibilizar ao utente um dashboard de acompanhamento da doença;
-[FEITO] O sistema deve apresentar um gráfico com a evolução temporal dos scores CARAT;
-[FEITO] O sistema deve apresentar o histórico de avaliações realizadas;
-[FEITO] O sistema deve mostrar uma linha de limiar (controlo insuficiente) para comparação;
-[FEITO] O sistema deve mostrar, para cada avaliação:
-[FEITO] data;
-[FEITO] score obtido;
-[FEITO] interpretação do resultado;
-[FEITO] O sistema deve apresentar alertas associados ao estado clínico do utente;
-[FEITO] O sistema deve apresentar recomendações associadas às avaliações realizadas.
+PASSO 3.1: Abrir o Projeto no IDE
+1. Abra o Visual Studio Code (VS Code).
+2. No menu superior, selecione: File -> Open Folder...
+3. Escolha a pasta raiz do projeto (onde se encontra o ficheiro 
+   "package.json" e a pasta "src").
 
-Consulta Clínica pelo Médico
-[FEITO] O sistema deve permitir que o médico consulte a lista de utentes sob sua responsabilidade;
-[FEITO] O sistema deve permitir que o médico aceda ao perfil clínico de um utente;
-[FEITO] O sistema deve permitir que o médico consulte o histórico de avaliações CARAT de um utente;
-[FEITO] O sistema deve permitir que o médico consulte os alertas associados aos seus utentes;
-[FEITO] O sistema deve permitir que o médico consulte dados clínicos (sintomas, medicação e exames clínicos) associados ao utente.
+PASSO 3.2: Instalar as Dependencias
+1. Abra o terminal integrado do VS Code (menu Terminal -> New Terminal).
+2. Execute o seguinte comando para instalar o Express, o TypeScript 
+   e todas as bibliotecas necessarias:
 
-Gestão de Dados Clínicos
-[FEITO] O sistema deve permitir que o médico registe dados clínicos (sintomas, medicação e exames clínicos) associados a um utente;
-[FEITO] O sistema deve permitir que o médico atualize dados clínicos associados a um utente;
-[FEITO] O sistema deve permitir ao utente atualizar os seus próprios dados pessoais.
+npm install
 
-Gestão de Utilizadores
-[FEITO] O sistema deve permitir ao administrador atribuir ou alterar o perfil de um utilizador (Utente, Médico ou Administrador);
-[FEITO] O sistema deve permitir ao administrador criar registos de utentes e médicos;
-[FEITO] O sistema deve permitir ao administrador consultar registos de utentes e médicos;
-[FEITO] O sistema deve permitir ao administrador atualizar informação de utentes e médicos;
-[FEITO] O sistema deve permitir ao administrador eliminar registos de utentes e médicos;
-[FEITO] O sistema deve permitir associar utentes a médicos responsáveis.
+PASSO 3.3: Inicializar e Correr o Servidor
+1. No mesmo terminal do VS Code, execute o comando para iniciar o 
+   servidor Express atraves do executor de TypeScript:
 
-Gestão de dados simulados
-[ ] O sistema deve permitir ao administrador inserir dados clínicos simulados no sistema para fins de teste e demonstração;
-[ ] O sistema deve permitir ao administrador consultar e remover dados simulados.
+npx ts-node src/app.ts
 
-Configuração do Sistema
-[FEITO] O sistema deve permitir ao administrador definir o limiar mínimo do score CARAT utilizado para geração de alertas;
-[FEITO] O sistema deve permitir ao administrador configurar parâmetros utilizados nas regras de alerta.
+2. O terminal devera exibir uma mensagem confirmando que o servidor 
+   foi ativado com sucesso na porta 3000 e que esta conectado ao 
+   ficheiro de base de dados SQLite "data.db".
 
-Endpoints REST mínimos:
-[FEITO] - utentes (GET/patients, POST/patients, GET/patients/:id, PUT/PATCH/patients/:id, DELETE/patients/ :id)
-[FEITO] - medicos (GET/medicos, POST/medicos, GET/medicos/:id, PUT/PATCH/medicos/:id, DELETE/medicos/ :id)
-[FEITO] - Carat (POST/patients/id:/carat, GET/patients/:id/carat, GET/carat/:evalid)
-[FEITO] - PATCH/alerts/:id (estado/prioridade)
-[FEITO] Autenticação
-[ ] FHIR???
-[ ] Fazer testes de integração
-[FEITO] Logs mínimos: registo de ações realizadas no sistema, por exemplo, na tabela do ficheiro database
+PASSO 3.4: Aceder ao Sistema Completo
+1. Abra o seu navegador web (Google Chrome, Edge, Firefox ou Safari).
+2. Aceda ao seguinte endereco:
+
+http://localhost:3000/
+
+A partir deste endereco (que carrega o ficheiro "index.html" da pasta publica), devera efetuar o login com os dados dos utilizadores simulados para ter acesso completo aos portais do Utente, Medico e Administrador.
+
+----------------------------------------------------------------------
+4. DADOS SIMULADOS
+----------------------------------------------------------------------
+O sistema ja se encontra configurado com um mecanismo de seed automatico.
+Aquando da primeira inicializacao do servidor (Passo 3.3), a base de dados SQLite e automaticamente populada com dados inventados/simulados. 
+Isto inclui perfis de teste para o Administrador, Medicos e Utentes (com os respetivos historicos de sintomas, medicacoes e questionarios CARAT), permitindo a avaliacao imediata do sistema sem necessidade de insercao manual de dados.
+
+----------------------------------------------------------------------
+AUTORAS - (TURMA 1 - GRUPO 1)
+----------------------------------------------------------------------
+* Anabela Morais Pereira (202406638)
+* Carlota de Castro Ribeiro e Pereira Sobral (202403584)
+* Diana Judite Xavier Galhardo (202403936)
+* Iva Moura Alves (202404407)
+======================================================================
