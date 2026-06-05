@@ -58,11 +58,26 @@ http://localhost:3000/
 A partir deste endereco (que carrega o ficheiro "index.html" da pasta publica), devera efetuar o login com os dados dos utilizadores simulados para ter acesso completo aos portais do Utente, Medico e Administrador.
 
 ----------------------------------------------------------------------
-4. DADOS SIMULADOS
+4. DADOS SIMULADOS E CREDENCIAIS DE ACESSO (SEED)
 ----------------------------------------------------------------------
 O sistema ja se encontra configurado com um mecanismo de seed automatico.
-Aquando da primeira inicializacao do servidor (Passo 3.3), a base de dados SQLite e automaticamente populada com dados inventados/simulados. 
+Aquando da primeira inicializacao do servidor (Passo 3.3), a base de dados SQLite e automaticamente populada com dados inventados/simulados.
 Isto inclui perfis de teste para o Administrador, Medicos e Utentes (com os respetivos historicos de sintomas, medicacoes e questionarios CARAT), permitindo a avaliacao imediata do sistema sem necessidade de insercao manual de dados.
+
+Apos a inicializacao, os seguintes utilizadores estao disponiveis para login:
+
++------------------+-------------------+----------+-------------------+
+| Perfil           | Username          | Password | Nome              |
++------------------+-------------------+----------+-------------------+
+| Administrador    | admin             | 123456   | Administrador     |
+| Medico           | jorge.almeida     | 123456   | Jorge Almeida     |
+| Utente           | maria.laurentina  | 123456   | Maria Laurentina  |
+| Utente           | antonio.silva     | 123456   | Antonio Silva     |
++------------------+-------------------+----------+-------------------+
+
+NOTA: O login e feito por USERNAME (nao por email).
+      O login devolve um JWT. Todos os endpoints protegidos requerem o header:
+      Authorization: Bearer <token>
 
 ----------------------------------------------------------------------
 AUTORAS - (TURMA 1 - GRUPO 1)
